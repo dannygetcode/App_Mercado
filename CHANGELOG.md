@@ -11,3 +11,10 @@ Formato: una entrada por versión (`versionName` semántico). Las fechas están 
   solo retrato y sin componentes exportados salvo el lanzador.
 - App mínima: tema propio claro/oscuro, pantalla "Mercado", `AppContainer` y `AppLog`.
 - `scripts/verificar.sh` con los chequeos de seguridad y pruebas de humo en ambos módulos.
+
+### L1 · Dominio (2026-11-16)
+- Modelo con dinero exacto (`Pesos`), compra, catálogo y presupuesto.
+- Reglas puras: formato de pesos, validación de códigos EAN/UPC/Code 128, antirrebote,
+  semáforo, normalización de nombres y meses en hora de Colombia.
+- Casos de uso de compra (escanear, desconocido, suelto, por peso, editar, deshacer, cerrar,
+  descartar) y de presupuesto y catálogo, con 71 pruebas en la JVM.

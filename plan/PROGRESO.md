@@ -2,7 +2,7 @@
 
 Lo mantiene el agente. Una sesión nueva empieza leyendo este archivo.
 
-**Loop actual:** L1
+**Loop actual:** L2 (siguiente sesión)
 **Última actualización:** 2026-11-16
 **Pasos `[HUMANO]` pendientes:** L0 instalar APK debug y confirmar que abre (no bloqueante)
 
@@ -11,7 +11,7 @@ Lo mantiene el agente. Una sesión nueva empieza leyendo este archivo.
 | Loop | Estado | Puerta de salida |
 | --- | --- | --- |
 | L0 Base del proyecto | cerrado | verde 2026-11-16 (humano no bloqueante pendiente) |
-| L1 Dominio | en curso | — |
+| L1 Dominio | cerrado | verde 2026-11-16 |
 | L2 Datos cifrados | pendiente | — |
 | L3 Escáner | pendiente | — |
 | L4 Compra en curso | pendiente | — |
@@ -62,3 +62,9 @@ Formato por loop (copiar el bloque al empezar cada uno):
 - [x] T4 — Falsos en `domain/src/test/.../fakes`: `InMemoryProductRepository`, `InMemoryTripRepository` (con `Flow` reactivo vía `MutableStateFlow`), `InMemoryBudgetRepository`, `ImmediateTransactionRunner`, `FakeClock` (con helper de hora de Bogotá).
 - [x] T5 — Casos de uso de compra: `StartTrip` (con `TripLimit` Default/None/Custom y `defaultLimit()`), `ObserveActiveTrip`, `HandleScan`, `AddProductToTrip`, `AddUnknownScanned`, `AddLoosePrice`, `AddWeighedItem`, `ChangeQuantity`, `ChangeLinePrice`, `RemoveLine`, `RenameLooseLine`, `UndoLastAction`, `CloseTrip`, `DiscardTrip`, `SetPaidTotal`. `TripSession` serializa con `Mutex` + transacción; `UndoBuffer` de tamaño 1 con pasos de reversión. `GetMonthStatus`/`SetMonthlyBudget` adelantados (los necesita `StartTrip`). 36 pruebas nuevas.
 - [x] T6 — Presupuesto y catálogo: `GetMonthStatus` (herencia del mes anterior más reciente), `SetMonthlyBudget`, `SearchProducts`, `SaveProduct` (validación, duplicados por nombre normalizado, favoritos al final, historial `MANUAL`), `DeactivateProduct`, `LinkBarcode` (normaliza; reasigna si era de otro), `ObserveFavorites`. 11 pruebas nuevas.
+**Informe de cierre**
+- Verificación: `verificar.sh completo` → VERDE (9/9 chequeos; incluye dominio sin android y sin Float/Double). Lint sin hallazgos.
+- Medido: 71 pruebas de dominio en verde (reglas 24, compra 36, presupuesto 5, catálogo 6); `:domain:test` completo en ≈ 11 s. Todos los casos obligatorios de dominio de `06-pruebas.md` existen y pasan, salvo `SuggestionRules` (L7, excluido por la puerta).
+- Desviaciones de la especificación: ninguna de fondo. Detalles decididos con "la vara única" en DECISIONES (Code 128 solo alfanumérico, `TransactionRunner`, deshacer de varios pasos, reglas de historial al cerrar, reasignación de códigos). `Clock`, `LineMath`, `GetMonthStatus` y `SetMonthlyBudget` se adelantaron a la tarea que los necesitó.
+- Pendiente para Daniel: nada de L1. Sigue pendiente el paso no bloqueante de L0 (instalar el APK debug).
+
