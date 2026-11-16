@@ -4,7 +4,7 @@ Lo mantiene el agente. Una sesión nueva empieza leyendo este archivo.
 
 **Loop actual:** L3
 **Última actualización:** 2026-11-16
-**Pasos `[HUMANO]` pendientes:** **L3 prueba del escáner en modo avión (BLOQUEANTE)**; L0 instalar APK debug y confirmar que abre; L2 correr instrumentadas y revisar la semilla (no bloqueantes)
+**Pasos `[HUMANO]` pendientes:** **L3 prueba del escáner en modo avión (BLOQUEANTE)**; L2 revisar la semilla (no bloqueante)
 
 ## Tablero
 
@@ -118,4 +118,5 @@ Formato por loop (copiar el bloque al empezar cada uno):
   4. Leer 10 productos de la casa, uno tras otro, apuntando a unos 15–25 cm.
   5. Reportar: ¿se cerró la app en algún momento?, ¿cuántos de los 10 leyó al primer intento?, ¿se sintió instantáneo?, y el valor de "Cámara → primera lectura" y los tiempos "+x,xx s" de la lista.
   - Revisión de código posterior (skill engineering:code-review): el hilo de análisis se apagaba antes de soltar la cámara (posible `RejectedExecutionException` al salir) y un fallo de `ProcessCameraProvider` no se capturaba (cierre de la app). Corregido: un ejecutor por enlace apagado tras `unbind`, y cualquier fallo al abrir la cámara muestra "No se pudo abrir la cámara". `verificar.sh completo` VERDE de nuevo.
+  - 2026-11-16, en el Poco X8 Pro (HyperOS, Android 16): APK debug instalado y abre (cierra el humano de L0). `EncryptedDbTest` 1/1 y `DbKeyManagerTest` 3/3 pasan en el teléfono (cierra el humano de L2). `ScannerSmokeTest` falló al conceder el permiso por shell (HyperOS lo niega: `GRANT_RUNTIME_PERMISSIONS`); ahora usa el permiso si ya fue concedido desde la app. Instalación: `adb install` y `connectedDebugAndroidTest` fallan en HyperOS (`INSTALL_FAILED_USER_RESTRICTED` / flag `-g`); funciona `adb push` a `/data/local/tmp` + `adb shell pm install -r -t` y `am instrument -w`. En Git Bash hace falta `MSYS_NO_PATHCONV=1` para rutas del teléfono.
   - Si se cae o no lee sin red → `ZxingCppBarcodeDecoder` y repetir. Si lee < 8 de 10 → ajustar resolución/enfoque y repetir.
