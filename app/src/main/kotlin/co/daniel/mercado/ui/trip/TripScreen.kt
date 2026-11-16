@@ -74,7 +74,10 @@ fun TripScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    LaunchedEffect(state.noActiveTrip) { if (state.noActiveTrip) onNoActiveTrip() }
+    // Solo si la compra desaparece estando aquí (no por un estado viejo al entrar).
+    var sawTrip by remember { mutableStateOf(false) }
+    if (state.trip != null) sawTrip = true
+    LaunchedEffect(sawTrip, state.noActiveTrip) { if (sawTrip && state.noActiveTrip) onNoActiveTrip() }
     BackHandler(onBack = onBack)
     val view = LocalView.current
     DisposableEffect(view) {

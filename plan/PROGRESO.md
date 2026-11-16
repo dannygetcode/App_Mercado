@@ -132,8 +132,8 @@ Formato por loop (copiar el bloque al empezar cada uno):
 - [x] T5 — Hoja Producto nuevo: título, código pequeño, nombre opcional sin foco al abrir con autocompletado (4 sugerencias), teclado activo; elegir sugerencia prellena su precio y cambia el botón a "Asociar y sumar"; cerrar sin sumar descarta la lectura. La cámara queda en pausa mientras está abierta.
 - [x] T6 — Hoja Favoritos/Buscar (~70 % del alto): pestañas, total visible arriba, rejilla de 3 columnas (nombre en 2 líneas y precio; KG dice "por peso"); tocar agrega sin cerrar la hoja y vibra; buscar con foco, resultados al teclear, "Crear «texto»" sin resultados; Enter agrega el primero.
 - [x] T7 — Hoja Editar línea (renombrar si es suelta, precio → teclado, cantidad −/+ de 56 dp, eliminar) y deslizar a la izquierda para eliminar (`SwipeToDismissBox`), ambos con deshacer.
-- [ ] T8 — 
-- [ ] T9 — 
-- [ ] T10 — 
+- [x] T8 — Cierre de compra (`CloseTripScreen` + `CloseTripViewModel`): resumen (artículos, total estimado, límite, diferencia con color del semáforo), "¿Cuánto pagaste?" con `PriceKeypad` en hoja (0 = sin pagado), tienda con chips de las usadas antes, "Ponles nombre" para los provisionales de la compra (nombre + categoría en chips, omitible; nombre repetido avisa y no cierra), "Guardar compra" (nombra con `SaveProduct` y luego `CloseTrip`) y "Descartar compra" con la única confirmación. 4 pruebas.
+- [x] T9 — Inicio provisional (`HomeViewModel`): "Este mes · Gastado $X de $Y", botón de 72 dp abajo "Ir a mercar" / "Continuar compra · $X"; hoja de límite con `PriceKeypad` prellenado con lo que queda del mes (0 = sin límite) y "Empezar". Navegación provisional en `MainActivity` (Inicio, Compra, Cierre, Diagnóstico); con compra abierta al arrancar abre directo la compra. 2 pruebas de ViewModel + 3 de UI.
+- [x] T10 — RNF-09: `TripRobustnessTest` arma una compra (escaneo, `+`, precio suelto, precio corregido, límite), "mata" el proceso (cancela el ViewModel y cierra la base de archivo) y abre otra base sobre el mismo archivo con un ViewModel nuevo: misma compra, líneas, cantidades, precios, total y límite. El estado vive en la base; lo único que se pierde es la hoja abierta y el búfer de deshacer.
 - [ ] T11 — 
 **Informe de cierre**
