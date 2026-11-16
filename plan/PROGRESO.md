@@ -103,7 +103,7 @@ Formato por loop (copiar el bloque al empezar cada uno):
 ### L3 · Escáner
 - [ ] T1 — 
 - [ ] T2 — 
-- [ ] T3 — 
+- [x] T3 — `ScanFeedback` / `DefaultScanFeedback`: aceptada = vibración 30 ms + pitido corto (`ToneGenerator`, canal de notificaciones: respeta el modo silencio); desconocida = vibración doble sin pitido. Lee los ajustes `scanSound`/`scanVibration` en cada lectura desde un `StateFlow` del `AppContainer`. Permiso `VIBRATE`. `AppContainer.newBarcodeDecoder()` entrega ML Kit. 5 pruebas JVM.
 - [ ] T4 — 
 - [ ] T5 — 
 - [ ] T6 — 

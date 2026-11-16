@@ -17,6 +17,15 @@ import co.daniel.mercado.data.seed.SeedImporter
 import co.daniel.mercado.data.seed.SeedResult
 import co.daniel.mercado.data.settings.SettingsStore
 import co.daniel.mercado.data.settings.settingsDataStore
+import co.daniel.mercado.scanner.BarcodeDecoder
+import co.daniel.mercado.scanner.DefaultScanFeedback
+import co.daniel.mercado.scanner.MlKitBarcodeDecoder
+import co.daniel.mercado.scanner.ScanFeedback
+import co.daniel.mercado.scanner.ScanFeedbackPrefs
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import co.daniel.mercado.domain.port.Clock
 import co.daniel.mercado.domain.rules.ScanDebouncer
 import co.daniel.mercado.domain.usecase.AddLoosePrice
@@ -66,6 +75,17 @@ class AppContainer(
     ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) {
     val settings = SettingsStore(dataStore, secureScreenDefault = !BuildConfig.DEBUG)
+
+    /** Ajustes del escáner siempre a mano (sin suspender) para la retroalimentación de cada lectura. */
+    private val scanFeedbackPrefs: StateFlow<ScanFeedbackPrefs> = settings.settings
+        .map { ScanFeedbackPrefs(sound = it.scanSound, vibration = it.scanVibration) }
+        .stateIn(scope, SharingStarted.Eagerly, ScanFeedbackPrefs())
+
+    val scanFeedback: ScanFeedback by lazy {
+        DefaultScanFeedback.create(appContext) { scanFeedbackPrefs.value }
+    }
+
+    fun newBarcodeDecoder(): BarcodeDecoder = MlKitBarcodeDecoder()
 
     private val dataGraph: Deferred<DataGraph> = scope.async(ioDispatcher) {
         val db = databaseFactory.create(appContext)

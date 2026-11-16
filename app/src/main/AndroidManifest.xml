@@ -9,6 +9,7 @@
 
     <!-- S-14: permisos mínimos. La app sigue usable sin cámara (teclado, favoritos, búsqueda). -->
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.VIBRATE" />
     <uses-feature android:name="android.hardware.camera.any" android:required="false" />
 
     <!-- S-04: sin copias automáticas (nube ni transferencia entre dispositivos). -->
