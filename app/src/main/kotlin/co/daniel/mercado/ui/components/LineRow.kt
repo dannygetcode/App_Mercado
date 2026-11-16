@@ -22,6 +22,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -79,9 +80,11 @@ fun LineRow(
                 overflow = TextOverflow.Ellipsis,
             )
             if (item.unitType == UnitType.UNIT) {
+                val lessLabel = stringResource(R.string.quantity_less, name)
+                val moreLabel = stringResource(R.string.quantity_more, name)
                 FilledTonalIconButton(
                     onClick = onDecrement,
-                    modifier = Modifier.size(48.dp).semantics { contentDescription = "decrement" },
+                    modifier = Modifier.size(48.dp).testTag("decrement").semantics { contentDescription = lessLabel },
                 ) { Text("−", fontSize = 22.sp) }
                 Text(
                     text = item.quantity.toString(),
@@ -91,7 +94,7 @@ fun LineRow(
                 )
                 FilledTonalIconButton(
                     onClick = onIncrement,
-                    modifier = Modifier.size(48.dp).semantics { contentDescription = "increment" },
+                    modifier = Modifier.size(48.dp).testTag("increment").semantics { contentDescription = moreLabel },
                 ) { Text("+", fontSize = 22.sp) }
             } else {
                 Text(

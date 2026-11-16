@@ -1,5 +1,7 @@
 package co.daniel.mercado.ui.trip
 
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -298,7 +300,12 @@ private fun EditLineSheet(line: TripItem, viewModel: TripViewModel) {
         if (line.unitType == UnitType.UNIT) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(stringResource(R.string.edit_line_quantity), modifier = Modifier.weight(1f), style = MaterialTheme.typography.titleMedium)
-                FilledTonalIconButton(onClick = { viewModel.setQuantity(line.id, line.quantity - 1) }, modifier = Modifier.size(56.dp)) {
+                val lessLabel = stringResource(R.string.quantity_less, line.nameSnapshot)
+                val moreLabel = stringResource(R.string.quantity_more, line.nameSnapshot)
+                FilledTonalIconButton(
+                    onClick = { viewModel.setQuantity(line.id, line.quantity - 1) },
+                    modifier = Modifier.size(56.dp).semantics { contentDescription = lessLabel },
+                ) {
                     Text("−", fontSize = 24.sp)
                 }
                 Text(
@@ -307,7 +314,10 @@ private fun EditLineSheet(line: TripItem, viewModel: TripViewModel) {
                     style = MaterialTheme.typography.headlineSmall.merge(MoneyTextStyle),
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                 )
-                FilledTonalIconButton(onClick = { viewModel.setQuantity(line.id, line.quantity + 1) }, modifier = Modifier.size(56.dp)) {
+                FilledTonalIconButton(
+                    onClick = { viewModel.setQuantity(line.id, line.quantity + 1) },
+                    modifier = Modifier.size(56.dp).semantics { contentDescription = moreLabel },
+                ) {
                     Text("+", fontSize = 24.sp)
                 }
             }

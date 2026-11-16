@@ -1,5 +1,6 @@
 package co.daniel.mercado.ui.components
 
+import androidx.compose.ui.platform.testTag
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,8 +20,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -81,7 +80,7 @@ fun PriceKeypad(
         if (title != null) Text(title, style = MaterialTheme.typography.titleMedium)
         BasicText(
             text = MoneyFormat.format(state.value),
-            modifier = Modifier.fillMaxWidth().semantics { contentDescription = "keypad_value" },
+            modifier = Modifier.fillMaxWidth().testTag("keypad_value"),
             style = TotalTextStyle.copy(
                 color = if (state.replaceOnType) {
                     MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)

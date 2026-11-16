@@ -201,7 +201,7 @@
     <string name="settings_about">Acerca de</string>
     <string name="settings_version">Versión %s</string>
     <string name="no_internet_note">Esta app no tiene acceso a internet</string>
-    <string name="import_ok">Catálogo importado: %1$d nuevos, %2$d actualizados.</string>
+    <string name="import_ok">Catálogo importado. Nuevos: %1$d · Actualizados: %2$d.</string>
     <string name="import_unreadable">No se pudo leer el archivo.</string>
     <string name="import_too_large">El archivo pasa de 2 MB.</string>
     <string name="import_malformed">El archivo no es un catálogo JSON válido.</string>
@@ -214,4 +214,8 @@
     <string name="import_invalid_barcode">Producto %d: código de barras no válido.</string>
     <string name="import_duplicate_barcode">Producto %d: su código ya está en otro producto del archivo.</string>
     <string name="import_nothing_written">No se importó nada.</string>
+    <string name="quantity_less">Quitar uno de %s</string>
+    <string name="quantity_more">Agregar uno de %s</string>
+    <string name="data_error_title">No se pudieron abrir tus datos</string>
+    <string name="data_error_text">La base cifrada de este teléfono no abrió. No desinstales la app ni borres sus datos: así se perderían. Cierra Mercado y ábrelo de nuevo. Si sigue igual, no borres nada: los datos siguen guardados en el teléfono.</string>
 </resources>

@@ -2,21 +2,29 @@ package co.daniel.mercado.ui.nav
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -55,6 +63,7 @@ import co.daniel.mercado.ui.settings.SettingsScreen
 import co.daniel.mercado.ui.settings.SettingsViewModel
 import co.daniel.mercado.ui.trip.TripScreen
 import co.daniel.mercado.ui.trip.TripViewModel
+import kotlinx.coroutines.CancellationException
 import kotlin.reflect.KClass
 
 /** Lo que pide el arranque: nada, abrir la compra (acceso directo) o el diagnóstico (solo debug). */
@@ -76,6 +85,31 @@ private fun NavDestination?.isTopLevel(): Boolean =
  */
 @Composable
 fun MercadoNavHost(
+    container: AppContainer,
+    launchAction: LaunchAction,
+    onLaunchActionHandled: () -> Unit,
+) {
+    // La base se abre en segundo plano desde que arranca la app; mientras tanto, solo el fondo.
+    // Si no abre (clave del Keystore perdida), se dice en vez de cerrarse.
+    val opened by produceState<Boolean?>(initialValue = null) {
+        value = try {
+            container.data()
+            true
+        } catch (e: CancellationException) {
+            throw e
+        } catch (_: Exception) {
+            false
+        }
+    }
+    when (opened) {
+        null -> Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {}
+        false -> DataErrorScreen()
+        true -> MercadoNavigation(container, launchAction, onLaunchActionHandled)
+    }
+}
+
+@Composable
+private fun MercadoNavigation(
     container: AppContainer,
     launchAction: LaunchAction,
     onLaunchActionHandled: () -> Unit,
@@ -239,5 +273,18 @@ fun MercadoNavHost(
 fun NavHostController.backToHome() {
     if (!popBackStack(HomeRoute, inclusive = false)) {
         navigate(HomeRoute) { popUpTo(graph.id) { inclusive = true } }
+    }
+}
+
+@Composable
+private fun DataErrorScreen() {
+    Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+        Column(
+            Modifier.safeDrawingPadding().padding(24.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
+        ) {
+            Text(stringResource(R.string.data_error_title), style = MaterialTheme.typography.headlineSmall)
+            Text(stringResource(R.string.data_error_text), style = MaterialTheme.typography.bodyLarge)
+        }
     }
 }

@@ -9,7 +9,6 @@ import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -43,7 +42,7 @@ class ComponentsUiTest {
         compose.onNodeWithText("1").performClick()
         compose.onNodeWithText("2").performClick()
         compose.onNodeWithText("000").performClick()
-        compose.onNodeWithContentDescription("keypad_value").assertTextEquals("$12.000")
+        compose.onNodeWithTag("keypad_value").assertTextEquals("$12.000")
         compose.onNodeWithText("Sumar").assertIsEnabled().performClick()
         assertEquals(Pesos(12_000), submitted)
     }
@@ -57,7 +56,7 @@ class ComponentsUiTest {
             }
         }
         compose.onNodeWithText("⌫").performClick()
-        compose.onNodeWithContentDescription("keypad_value").assertTextEquals("$12")
+        compose.onNodeWithTag("keypad_value").assertTextEquals("$12")
     }
 
     private fun model(total: Long, limit: Long?): TotalCardModel {
@@ -94,7 +93,7 @@ class ComponentsUiTest {
     @Test
     fun `sin limite solo total y articulos`() {
         compose.setContent { MercadoTheme { TotalCard(model(5_900, null)) } }
-        compose.onNodeWithContentDescription("trip_total").assertTextEquals("$5.900")
+        compose.onNodeWithTag("trip_total").assertTextEquals("$5.900")
         compose.onNodeWithText("3 artíc.").assertIsDisplayed()
         compose.onNodeWithTag("traffic_" + TrafficLight.NONE.name).assertDoesNotExist()
     }
@@ -114,8 +113,8 @@ class ComponentsUiTest {
         compose.onNodeWithText("Artículo sin nombre").assertIsDisplayed()
         compose.onNodeWithText("$1.500 c/u").assertIsDisplayed()
         compose.onNodeWithText("$3.000").assertIsDisplayed()
-        compose.onNodeWithContentDescription("increment").performClick()
-        compose.onNodeWithContentDescription("decrement").performClick()
+        compose.onNodeWithTag("increment").performClick()
+        compose.onNodeWithTag("decrement").performClick()
         assertEquals(1, plus)
         assertEquals(1, minus)
     }

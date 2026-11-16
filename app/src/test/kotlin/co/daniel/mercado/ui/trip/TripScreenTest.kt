@@ -4,7 +4,6 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
-import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -80,7 +79,7 @@ class TripScreenTest {
     fun `compra vacia invita a escanear o usar el teclado`() {
         show()
         compose.onNodeWithText("Apunta la cámara a un código de barras o usa el teclado").assertIsDisplayed()
-        compose.onNodeWithContentDescription("trip_total").assertTextEquals("$0")
+        compose.onNodeWithTag("trip_total").assertTextEquals("$0")
     }
 
     @Test
@@ -93,7 +92,7 @@ class TripScreenTest {
         compose.onNodeWithText("Sumar").performClick()
 
         waitForText("Artículo sin nombre")
-        compose.onNodeWithContentDescription("trip_total").assertTextEquals("$12.000")
+        compose.onNodeWithTag("trip_total").assertTextEquals("$12.000")
         compose.onNodeWithTag("sheet").assertDoesNotExist()
     }
 
@@ -104,10 +103,10 @@ class TripScreenTest {
         runBlocking { source.emit(ARROZ) }
         waitForText("Arroz Diana 1 kg")
 
-        compose.onNodeWithContentDescription("decrement").performClick()
+        compose.onNodeWithTag("decrement").performClick()
 
         waitForText("Eliminado: Arroz Diana 1 kg")
-        compose.onNodeWithContentDescription("trip_total").assertTextEquals("$0")
+        compose.onNodeWithTag("trip_total").assertTextEquals("$0")
         compose.onNodeWithText("DESHACER").performClick()
         compose.waitUntil(5_000) { vm.state.value.trip?.total == Pesos(5_900) }
         waitForText("Arroz Diana 1 kg")
@@ -126,7 +125,7 @@ class TripScreenTest {
         compose.onNodeWithText("Sumar").performClick()
 
         waitForText("Producto ····7897")
-        compose.onNodeWithContentDescription("trip_total").assertTextEquals("$7.800")
+        compose.onNodeWithTag("trip_total").assertTextEquals("$7.800")
     }
 
     @Test
@@ -143,7 +142,7 @@ class TripScreenTest {
         compose.onNodeWithText("Sumar").performClick()
 
         waitForText("Cilantro")
-        compose.onNodeWithContentDescription("trip_total").assertTextEquals("$1.500")
+        compose.onNodeWithTag("trip_total").assertTextEquals("$1.500")
     }
 
     @Test
