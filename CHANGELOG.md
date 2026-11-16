@@ -35,3 +35,13 @@ Formato: una entrada por versión (`versionName` semántico). Las fechas están 
 - Pantalla de diagnóstico del escáner (solo debug) con tiempo a primera lectura y lecturas por minuto.
 - `FakeBarcodeSource` y prueba instrumentada de humo de cámara.
 - `verificar.sh` comprueba que ML Kit está incluido sin ningún permiso de red.
+
+### L4 · Compra en curso (2026-11-16)
+- Pantalla "Compra en curso": cámara arriba, total grande con semáforo, lista con la última línea
+  arriba, aviso con "Deshacer" y barra inferior (Teclado, Favoritos, Buscar, Cerrar).
+- Teclado de precio propio (precio suelto, etiqueta de balanza, corregir precio, crear producto).
+- Producto nuevo con precio primero y nombre opcional con autocompletado ("Asociar y sumar").
+- Favoritos y búsqueda en una hoja; editar línea, deslizar para eliminar, `−` hasta 0 elimina.
+- Vibración distinta al cruzar el 80 % y el 100 % del límite; pausa automática de la cámara.
+- Cierre de compra: total pagado, tienda, productos por nombrar, guardar o descartar.
+- Inicio provisional con "Ir a mercar" / "Continuar compra" y límite prellenado.

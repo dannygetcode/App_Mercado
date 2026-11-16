@@ -4,7 +4,7 @@ Lo mantiene el agente. Una sesión nueva empieza leyendo este archivo.
 
 **Loop actual:** L4
 **Última actualización:** 2026-11-16
-**Pasos `[HUMANO]` pendientes:** L2 revisar la semilla (no bloqueante)
+**Pasos `[HUMANO]` pendientes:** **L4 simulacro de compra en casa (BLOQUEANTE)**; L2 revisar la semilla (no bloqueante)
 
 ## Tablero
 
@@ -14,7 +14,7 @@ Lo mantiene el agente. Una sesión nueva empieza leyendo este archivo.
 | L1 Dominio | cerrado | verde 2026-11-16 |
 | L2 Datos cifrados | cerrado | verde 2026-11-16 (2 humanos no bloqueantes pendientes) |
 | L3 Escáner | cerrado | verde 2026-11-16; prueba en modo avión 10/10 |
-| L4 Compra en curso | en curso | — |
+| L4 Compra en curso | esperando humano | verde 2026-11-16; falta simulacro en casa (bloqueante) |
 | L5 Resto de pantallas | pendiente | — |
 | L6 Seguridad y respaldo | pendiente | — |
 | L7 Lista, resúmenes, recordatorios | pendiente | — |
@@ -135,5 +135,21 @@ Formato por loop (copiar el bloque al empezar cada uno):
 - [x] T8 — Cierre de compra (`CloseTripScreen` + `CloseTripViewModel`): resumen (artículos, total estimado, límite, diferencia con color del semáforo), "¿Cuánto pagaste?" con `PriceKeypad` en hoja (0 = sin pagado), tienda con chips de las usadas antes, "Ponles nombre" para los provisionales de la compra (nombre + categoría en chips, omitible; nombre repetido avisa y no cierra), "Guardar compra" (nombra con `SaveProduct` y luego `CloseTrip`) y "Descartar compra" con la única confirmación. 4 pruebas.
 - [x] T9 — Inicio provisional (`HomeViewModel`): "Este mes · Gastado $X de $Y", botón de 72 dp abajo "Ir a mercar" / "Continuar compra · $X"; hoja de límite con `PriceKeypad` prellenado con lo que queda del mes (0 = sin límite) y "Empezar". Navegación provisional en `MainActivity` (Inicio, Compra, Cierre, Diagnóstico); con compra abierta al arrancar abre directo la compra. 2 pruebas de ViewModel + 3 de UI.
 - [x] T10 — RNF-09: `TripRobustnessTest` arma una compra (escaneo, `+`, precio suelto, precio corregido, límite), "mata" el proceso (cancela el ViewModel y cierra la base de archivo) y abre otra base sobre el mismo archivo con un ViewModel nuevo: misma compra, líneas, cantidades, precios, total y límite. El estado vive en la base; lo único que se pierde es la hoja abierta y el búfer de deshacer.
-- [ ] T11 — 
+- [x] T11 — Pasada de velocidad contra "la vara única". Conteo de toques (sin contar dígitos):
+  | Flujo | Toques | Meta |
+  | --- | --- | --- |
+  | Producto conocido escaneado | 0 | 0 ✓ |
+  | Precio suelto | 2 + dígitos ($ Teclado, Sumar) | 2 + dígitos ✓ |
+  | Código desconocido | 1 + dígitos (el teclado ya está activo; Sumar) | 1 + dígitos ✓ |
+  | Favorito | 2 (★ Favoritos, producto); los siguientes favoritos, 1 cada uno | 2 ✓ |
+  | Producto por peso escaneado | 1 + dígitos (Sumar) | — |
+  | Corregir precio | 2 + dígitos (tocar precio, Cambiar; la primera tecla reemplaza el valor) | — |
+  | Deshacer | 1 | — |
+  | Iniciar compra | 2 (Ir a mercar, Empezar con el límite prellenado) | — |
+  | Cerrar compra | 2 (✓ Cerrar, Guardar compra) | — |
+  Ninguna confirmación en el camino feliz (la única es "Descartar compra"). Animaciones: el total cambia con un fundido de 90 ms y el resaltado dura 1 s sin bloquear; las hojas aceptan teclas mientras se abren. Tras "Sumar" la hoja se cierra sola y la cámara sigue. Lecturas con una hoja de datos abierta se ignoran para no sumar por accidente.
 **Informe de cierre**
+- Verificación: `./scripts/verificar.sh completo` → VERDE, 10/10. Lint: 0 errores, 0 advertencias. Pruebas: 74 de dominio + 95 JVM de la app, 0 fallas (incluye `TripViewModel` 16, `PriceKeypad` 5+2, UI de la compra 6, componentes 3, cierre 4, inicio 5, robustez 1).
+- Medido: conteo de toques en T11 (cumple las cuatro metas). APK debug 48,3 MB.
+- Desviaciones de la especificación: la navegación es provisional (enum) hasta L5. El punto "precio viejo" usa la fecha del último punto del historial de precios. Decisiones en DECISIONES.
+- Pendiente para Daniel: `[HUMANO, BLOQUEANTE]` simulacro en casa (instrucciones en el mensaje de cierre).
