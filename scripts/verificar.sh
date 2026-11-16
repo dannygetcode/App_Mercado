@@ -59,6 +59,13 @@ else
     if [ -z "$EXTRA" ]; then pass "permisos en lista blanca (S-01, S-14)"
     else fail "permisos en lista blanca (S-01, S-14)" "fuera de lista: $(echo $EXTRA)"; fi
 
+    # D-07 / L3-T6: ML Kit está dentro del APK y aun así no hay ningún permiso de red.
+    if ! grep -q 'com.google.mlkit' "$MANIFEST"; then
+        fail "ML Kit sin permisos de red (D-07)" "ML Kit no aparece en el manifiesto fusionado"
+    elif grep -qE 'android.permission.(INTERNET|ACCESS_NETWORK_STATE|ACCESS_WIFI_STATE)"' "$MANIFEST"; then
+        fail "ML Kit sin permisos de red (D-07)" "hay un permiso de red"
+    else pass "ML Kit sin permisos de red (D-07)"; fi
+
     if grep -qE 'android:allowBackup="false"' "$MANIFEST"; then pass "allowBackup=false (S-04)"
     else fail "allowBackup=false (S-04)"; fi
 

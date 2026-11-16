@@ -4,7 +4,7 @@ Lo mantiene el agente. Una sesión nueva empieza leyendo este archivo.
 
 **Loop actual:** L3
 **Última actualización:** 2026-11-16
-**Pasos `[HUMANO]` pendientes:** L0 instalar APK debug y confirmar que abre; L2 correr instrumentadas y revisar la semilla (todos no bloqueantes)
+**Pasos `[HUMANO]` pendientes:** **L3 prueba del escáner en modo avión (BLOQUEANTE)**; L0 instalar APK debug y confirmar que abre; L2 correr instrumentadas y revisar la semilla (no bloqueantes)
 
 ## Tablero
 
@@ -13,7 +13,7 @@ Lo mantiene el agente. Una sesión nueva empieza leyendo este archivo.
 | L0 Base del proyecto | cerrado | verde 2026-11-16 (humano no bloqueante pendiente) |
 | L1 Dominio | cerrado | verde 2026-11-16 |
 | L2 Datos cifrados | cerrado | verde 2026-11-16 (2 humanos no bloqueantes pendientes) |
-| L3 Escáner | en curso | — |
+| L3 Escáner | esperando humano | verde 2026-11-16; falta prueba en modo avión (bloqueante) |
 | L4 Compra en curso | pendiente | — |
 | L5 Resto de pantallas | pendiente | — |
 | L6 Seguridad y respaldo | pendiente | — |
@@ -106,5 +106,15 @@ Formato por loop (copiar el bloque al empezar cada uno):
 - [x] T3 — `ScanFeedback` / `DefaultScanFeedback`: aceptada = vibración 30 ms + pitido corto (`ToneGenerator`, canal de notificaciones: respeta el modo silencio); desconocida = vibración doble sin pitido. Lee los ajustes `scanSound`/`scanVibration` en cada lectura desde un `StateFlow` del `AppContainer`. Permiso `VIBRATE`. `AppContainer.newBarcodeDecoder()` entrega ML Kit. 5 pruebas JVM.
 - [x] T4 — Pantalla de diagnóstico (solo debug; botón "Diagnóstico del escáner" en el Inicio provisional, nulo en release): visor al 32 %, linterna, pausa/reanudar, pantalla encendida; muestra cámara → primera lectura (se reinicia al reanudar), lecturas en el último minuto, leídas y rebotes ignorados (mismo `ScanDebouncer` de 1.500 ms), y la lista de códigos con el tiempo desde la lectura anterior. Cada lectura aceptada vibra/pita. Estado inmutable `ScanDiagnostics` con 7 pruebas JVM. `BarcodeSource`/`SharedBarcodeSource`: la cámara solo hace `offer(code)`.
 - [x] T5 — `FakeBarcodeSource` en `src/debug` (compartida por `test` y `androidTest`, fuera de release): `emit` espera a que haya quien escuche. 2 pruebas Robolectric de la pantalla de diagnóstico sin permiso (códigos falsos llegan a la lista, rebote contado). `ScannerSmokeTest` instrumentada: concede `CAMERA`, abre el diagnóstico desde `MainActivity`, espera la cámara, pausa y reanuda sin caerse. Compilada; sin teléfono conectado no se ejecutó (paso humano).
-- [ ] T6 — 
+- [x] T6 — Manifiesto fusionado de release con ML Kit incluido: sin `INTERNET`, `ACCESS_NETWORK_STATE` ni `ACCESS_WIFI_STATE` (el informe del merger muestra `REJECTED` para los que traen `datatransport` de ML Kit y `media3-common` de CameraX). Permisos finales: `CAMERA`, `VIBRATE` y el interno `DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION`. Los componentes de ML Kit, CameraX y `datatransport` quedan `exported="false"`. Nueva comprobación en `verificar.sh`: "ML Kit sin permisos de red (D-07)" (falla si ML Kit no está en el manifiesto o si aparece un permiso de red).
 **Informe de cierre**
+- Verificación: `./scripts/verificar.sh completo` → VERDE, 10/10 (gradle pruebas + lint + assembleDebug + manifiesto release; permisos en lista blanca; ML Kit sin permisos de red; allowBackup=false; release no depurable; solo el lanzador exportado; sin Log/println; dominio puro; sin Float/Double; sin migración destructiva). Lint: "No issues found". Pruebas: 71 de dominio + 52 JVM de la app, 0 fallas. `ScannerSmokeTest` compilada, no ejecutada (sin teléfono).
+- Medido: APK debug 48,2 MB (antes 23,7 MB; ML Kit bundled y CameraX, todas las ABI en debug; release filtra a arm64-v8a/armeabi-v7a y R8 llega en L8). Tiempos de cámara y lectura: pendientes de la prueba humana.
+- Desviaciones de la especificación: ninguna. Decisiones menores en DECISIONES (pitido por canal de notificaciones, permiso pedido al entrar, `FakeBarcodeSource` en `src/debug`, humo sobre el diagnóstico hasta L4).
+- Pendiente para Daniel: `[HUMANO, BLOQUEANTE]` prueba en modo avión con la pantalla de diagnóstico (instrucciones en el mensaje de cierre de la sesión y abajo).
+  1. Conectar el teléfono por USB con depuración USB activa e instalar: `"$LOCALAPPDATA/Android/Sdk/platform-tools/adb.exe" install -r app/build/outputs/apk/debug/app-debug.apk` (o pedirle al agente que lo instale).
+  2. Desconectar el cable y activar **modo avión** (Wi-Fi y datos apagados).
+  3. Abrir Mercado → "Diagnóstico del escáner" → aceptar el permiso de cámara.
+  4. Leer 10 productos de la casa, uno tras otro, apuntando a unos 15–25 cm.
+  5. Reportar: ¿se cerró la app en algún momento?, ¿cuántos de los 10 leyó al primer intento?, ¿se sintió instantáneo?, y el valor de "Cámara → primera lectura" y los tiempos "+x,xx s" de la lista.
+  - Si se cae o no lee sin red → `ZxingCppBarcodeDecoder` y repetir. Si lee < 8 de 10 → ajustar resolución/enfoque y repetir.

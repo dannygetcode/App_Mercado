@@ -26,3 +26,12 @@ Formato: una entrada por versión (`versionName` semántico). Las fechas están 
   productos transcrita del recibo e importada en el primer arranque.
 - Ajustes con DataStore.
 
+### L3 · Escáner (2026-11-16)
+- CameraX 1.6.2 y ML Kit Barcode Scanning 17.3.0 (bundled) detrás de `BarcodeDecoder`; solo
+  EAN-13, EAN-8, UPC-A, UPC-E y Code 128; se acepta la primera lectura con dígito de control válido.
+- `ScannerView` en Compose: lectura continua, pausa, linterna, sin `ImageCapture` ni cuadros a disco;
+  permiso de cámara negado deja la pantalla usable con "Sin acceso a la cámara" y "Permitir".
+- Retroalimentación de lectura (vibración 30 ms y pitido; doble vibración para desconocido) según ajustes.
+- Pantalla de diagnóstico del escáner (solo debug) con tiempo a primera lectura y lecturas por minuto.
+- `FakeBarcodeSource` y prueba instrumentada de humo de cámara.
+- `verificar.sh` comprueba que ML Kit está incluido sin ningún permiso de red.
