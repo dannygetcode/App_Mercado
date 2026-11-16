@@ -94,7 +94,7 @@ Formato por loop (copiar el bloque al empezar cada uno):
 
 **Informe de cierre**
 - Verificación: `verificar.sh completo` → VERDE (9/9). Lint: "No issues found". `compileDebugAndroidTestKotlin` OK.
-- Medido: 71 pruebas de dominio + 31 pruebas de app (JVM) en verde. APK debug 18,6 MB (incluye SQLCipher para todas las ABI en debug). Semilla real: 48 productos, cuadre exacto con el recibo ($497.870).
+- Medido: 71 pruebas de dominio + 31 pruebas de app (JVM) en verde. APK debug 23,7 MB (debug sin R8 y con SQLCipher para todas las ABI; el release filtra ABI y reduce). Semilla real: 48 productos, cuadre exacto con el recibo ($497.870).
 - Desviaciones de la especificación: ninguna de fondo. Decisiones en DECISIONES (clave cruda de SQLCipher, `KeyWrapper`, `shopping_list_item` en v1, DataStore en memoria en pruebas por Windows).
 - Pendiente para Daniel (no bloqueante):
   1. Con el teléfono conectado por USB y depuración USB activa, desde la carpeta del proyecto en Git Bash: `./gradlew :app:connectedDebugAndroidTest`. Deben pasar `EncryptedDbTest` y `DbKeyManagerTest` (3 + 1 pruebas). Si no tienes tiempo, dímelo y la lanzo yo en cuanto `adb devices` muestre el teléfono.
