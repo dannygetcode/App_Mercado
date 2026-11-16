@@ -37,4 +37,7 @@ interface TripRepository {
 
     /** Suma de `COALESCE(totalPaid, totalEstimated)` de las compras cerradas en `[fromMillis, toMillis)`. */
     suspend fun spentBetween(fromMillis: Long, toMillis: Long): Pesos
+
+    /** Tiendas usadas en compras cerradas, la más reciente primero, sin repetir. */
+    suspend fun recentStores(limit: Int): List<String>
 }

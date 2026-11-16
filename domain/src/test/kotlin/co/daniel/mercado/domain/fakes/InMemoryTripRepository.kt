@@ -79,4 +79,12 @@ class InMemoryTripRepository : TripRepository {
             .filter { t -> t.closedAt?.let { it in fromMillis until toMillis } == true }
             .map { it.effectiveTotal }
             .sum()
+
+    override suspend fun recentStores(limit: Int): List<String> =
+        state.value.trips.values
+            .filter { it.closedAt != null && !it.store.isNullOrBlank() }
+            .sortedByDescending { it.closedAt }
+            .mapNotNull { it.store }
+            .distinct()
+            .take(limit)
 }

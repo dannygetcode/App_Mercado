@@ -66,4 +66,10 @@ interface TripDao {
 
     @Query("SELECT COUNT(*) FROM trip_item WHERE trip_id = :tripId")
     suspend fun itemCount(tripId: Long): Int
+
+    @Query(
+        "SELECT store FROM trip WHERE closed_at IS NOT NULL AND store IS NOT NULL AND store != '' " +
+            "GROUP BY store ORDER BY MAX(closed_at) DESC LIMIT :limit",
+    )
+    suspend fun recentStores(limit: Int): List<String>
 }

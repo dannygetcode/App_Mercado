@@ -9,6 +9,7 @@ import co.daniel.mercado.domain.port.Clock
 import co.daniel.mercado.domain.port.ProductRepository
 import co.daniel.mercado.domain.port.TripRepository
 import co.daniel.mercado.domain.rules.Ean
+import co.daniel.mercado.domain.rules.NameNormalizer
 import co.daniel.mercado.domain.rules.ScanDebouncer
 
 /** Código leído → resultado. Valida el código, aplica el antirrebote y agrega o incrementa. */
@@ -57,9 +58,11 @@ class AddProductToTrip(
 }
 
 /**
- * RF-04: código desconocido, precio primero. Sin [existingProductId] crea un producto provisional
- * (`needsReview`) con [provisionalName] de los últimos 4 dígitos; con él, asocia el código a ese
- * producto. En ambos casos agrega la línea con el precio tecleado. Una sola transacción.
+ * RF-04: código desconocido, precio primero. Sin [existingProductId] ni nombre crea un producto
+ * provisional (`needsReview`) con [provisionalName] de los últimos 4 dígitos; con [existingProductId]
+ * asocia el código a ese producto. Con `name` (tecleado sin elegir del autocompletado) usa el
+ * producto de ese nombre si existe o crea uno ya nombrado (sin revisión pendiente). Sin `code`
+ * ("Crear «texto»" desde la búsqueda) no asocia ningún código. Una sola transacción.
  */
 class AddUnknownScanned(
     private val trips: TripRepository,
@@ -70,23 +73,35 @@ class AddUnknownScanned(
 ) {
     private val lines = TripLines(trips, clock)
 
-    suspend operator fun invoke(code: String, price: Pesos, existingProductId: Long? = null): ScanOutcome {
+    suspend operator fun invoke(
+        code: String?,
+        price: Pesos,
+        existingProductId: Long? = null,
+        name: String? = null,
+    ): ScanOutcome {
         requireValidPrice(price)
-        val normalized = requireNotNull(Ean.normalize(code)) { "código inválido" }
+        val normalized = code?.let { requireNotNull(Ean.normalize(it)) { "código inválido" } }
+        val cleanName = name?.trim()?.replace(WHITESPACE, " ")?.takeIf { it.isNotEmpty() }
+        cleanName?.let { require(it.length <= MAX_NAME_LENGTH) { "nombre muy largo" } }
+        require(normalized != null || cleanName != null || existingProductId != null) {
+            "hace falta un código, un nombre o un producto"
+        }
         return session.mutate {
             val active = trips.getActive() ?: return@mutate ScanOutcome.NoActiveTrip
             val reverts = mutableListOf<Revert>()
             val now = clock.nowMillis()
-            val targetId = existingProductId ?: products.barcodeOwner(normalized)
+            val targetId = existingProductId
+                ?: cleanName?.let { products.findByNormalizedName(NameNormalizer.normalize(it))?.id }
+                ?: normalized?.let { products.barcodeOwner(it) }
             val product = if (targetId != null) {
                 requireNotNull(products.getById(targetId)) { "producto $targetId no existe" }
             } else {
                 val draft = Product(
-                    name = provisionalName(normalized.takeLast(4)),
+                    name = cleanName ?: provisionalName(requireNotNull(normalized).takeLast(4)),
                     categoryId = otherCategoryId(),
                     unitType = UnitType.UNIT,
                     refPrice = price,
-                    needsReview = true,
+                    needsReview = cleanName == null,
                     createdAt = now,
                     updatedAt = now,
                 )
@@ -94,10 +109,12 @@ class AddUnknownScanned(
                 reverts += Revert.ProductCreated(id)
                 draft.copy(id = id)
             }
-            val previousOwner = products.barcodeOwner(normalized)
-            if (previousOwner != product.id) {
-                products.linkBarcode(normalized, product.id, now)
-                reverts += Revert.BarcodeLinked(normalized, previousOwner)
+            if (normalized != null) {
+                val previousOwner = products.barcodeOwner(normalized)
+                if (previousOwner != product.id) {
+                    products.linkBarcode(normalized, product.id, now)
+                    reverts += Revert.BarcodeLinked(normalized, previousOwner)
+                }
             }
             val outcome = if (product.unitType == UnitType.KG) {
                 val lineId = lines.insert(active.trip.id, product.id, product.name, UnitType.KG, price, null, reverts)
@@ -113,6 +130,11 @@ class AddUnknownScanned(
     private suspend fun otherCategoryId(): Long =
         products.categoryByName(Category.OTHER)?.id
             ?: products.insertCategory(Category(id = 0, name = Category.OTHER, sortOrder = Int.MAX_VALUE))
+
+    private companion object {
+        const val MAX_NAME_LENGTH = 80
+        val WHITESPACE = Regex("\\s+")
+    }
 }
 
 /** RF-17: precio suelto, línea sin producto (nombre vacío = "Artículo sin nombre"). */

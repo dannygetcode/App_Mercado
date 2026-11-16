@@ -115,4 +115,26 @@ class RoomTripFlowTest {
         assertEquals(0, r.db.productDao().count())
         assertTrue(r.trips.getActive()!!.items.isEmpty())
     }
+
+    @Test
+    fun `tiendas recientes sin repetir, la mas reciente primero`() = runTest {
+        suspend fun closeAt(store: String?) {
+            startTrip()
+            now += 1_000
+            r.trips.addLooseForTest()
+            closeTrip(store = store)
+            now += 1_000
+        }
+        closeAt("La Granja")
+        closeAt("D1")
+        closeAt(null)
+        closeAt("La Granja")
+
+        assertEquals(listOf("La Granja", "D1"), r.trips.recentStores(5))
+        assertEquals(listOf("La Granja"), r.trips.recentStores(1))
+    }
+
+    private suspend fun co.daniel.mercado.data.repo.RoomTripRepository.addLooseForTest() {
+        co.daniel.mercado.domain.usecase.AddLoosePrice(this, session, clock)(Pesos(1_000))
+    }
 }

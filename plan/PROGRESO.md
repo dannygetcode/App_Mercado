@@ -14,7 +14,7 @@ Lo mantiene el agente. Una sesión nueva empieza leyendo este archivo.
 | L1 Dominio | cerrado | verde 2026-11-16 |
 | L2 Datos cifrados | cerrado | verde 2026-11-16 (2 humanos no bloqueantes pendientes) |
 | L3 Escáner | cerrado | verde 2026-11-16; prueba en modo avión 10/10 |
-| L4 Compra en curso | pendiente | — |
+| L4 Compra en curso | en curso | — |
 | L5 Resto de pantallas | pendiente | — |
 | L6 Seguridad y respaldo | pendiente | — |
 | L7 Lista, resúmenes, recordatorios | pendiente | — |
@@ -122,3 +122,18 @@ Formato por loop (copiar el bloque al empezar cada uno):
   - Fallo encontrado en el teléfono: con `PreviewView` en modo PERFORMANCE (SurfaceView) + FILL_CENTER, Compose no recortaba el visor y tapaba la barra superior y el resto de la pantalla (Daniel lo vio como "cámara apagada / pantalla de carga"). Corregido con modo COMPATIBLE (TextureView) + `clipToBounds`. No hubo ningún cierre por error: los cierres en el registro son `SwipeUpClean` (deslizar en recientes). Verificado por captura: visor en su 32 %, botones visibles, UPC-A leído con cámara → primera lectura 0,23 s. Botón del Inicio provisional ahora es un botón lleno de 56 dp. Debug: `am start ... --ez open_diagnostics true` abre el diagnóstico sin tocar la pantalla.
   - Si se cae o no lee sin red → `ZxingCppBarcodeDecoder` y repetir. Si lee < 8 de 10 → ajustar resolución/enfoque y repetir.
 - **Resultado de la prueba humana (2026-11-16, Poco X8 Pro, HyperOS / Android 16):** modo avión activo (verificado por adb: `airplane_mode_on=1`), 10 de 10 productos leídos al primer intento, sin cierres (sin entradas en el búfer de fallos ni `am_crash`/`am_anr`). Daniel: "lee muy rápido". Primera lectura medida antes: 0,23 s. **D-07 se mantiene: ML Kit bundled; zxing-cpp no hace falta.** L3 cerrado.
+
+### L4 · Compra en curso
+- Preparación de dominio: `AddUnknownScanned` acepta `name` (nombre tecleado sin elegir del autocompletado: reutiliza el producto de ese nombre o crea uno ya nombrado sin revisión pendiente) y `code` nulo ("Crear «texto»" desde la búsqueda, sin asociar código). `TripRepository.recentStores` (Room: agrupado por tienda, la más reciente primero) para los chips del cierre. 3 pruebas de dominio + 1 Room.
+- [ ] T1 — 
+- [ ] T2 — 
+- [ ] T3 — 
+- [ ] T4 — 
+- [ ] T5 — 
+- [ ] T6 — 
+- [ ] T7 — 
+- [ ] T8 — 
+- [ ] T9 — 
+- [ ] T10 — 
+- [ ] T11 — 
+**Informe de cierre**

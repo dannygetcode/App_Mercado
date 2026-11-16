@@ -110,6 +110,8 @@ class RoomTripRepository(private val db: MercadoDatabase) : TripRepository {
 
     override suspend fun spentBetween(fromMillis: Long, toMillis: Long): Pesos =
         Pesos(dao.spentBetween(fromMillis, toMillis))
+
+    override suspend fun recentStores(limit: Int): List<String> = dao.recentStores(limit)
 }
 
 class RoomBudgetRepository(db: MercadoDatabase) : BudgetRepository {

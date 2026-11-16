@@ -73,4 +73,42 @@ class AddUnknownScannedTest {
         assertTrue(f.products.all.isEmpty())
         assertNull(f.products.barcodeOwner(DESCONOCIDO))
     }
+
+    @Test
+    fun `con nombre tecleado crea el producto ya nombrado y asocia el codigo`() = runTest {
+        f.startTrip()
+
+        f.addUnknown(DESCONOCIDO, Pesos(4_200), name = "  Galletas   de avena ")
+
+        val product = f.products.all.single()
+        assertEquals("Galletas de avena", product.name)
+        assertEquals(false, product.needsReview)
+        assertEquals(product.id, f.products.barcodeOwner(DESCONOCIDO))
+    }
+
+    @Test
+    fun `con nombre de un producto existente lo reutiliza`() = runTest {
+        val arroz = f.product("Arroz Diana 1 kg", 5_900, ARROZ)
+        f.startTrip()
+
+        f.addUnknown(DESCONOCIDO, Pesos(6_000), name = "arroz diana 1 KG")
+
+        assertEquals(1, f.products.all.size)
+        assertEquals(arroz.id, f.products.barcodeOwner(DESCONOCIDO))
+        assertEquals(arroz.id, f.activeItems().single().productId)
+    }
+
+    @Test
+    fun `sin codigo con nombre crea el producto sin asociar codigos y deshacer lo borra`() = runTest {
+        f.startTrip()
+
+        f.addUnknown(null, Pesos(2_500), name = "Cilantro")
+
+        val product = f.products.all.single()
+        assertEquals("Cilantro", product.name)
+        assertTrue(f.products.barcodesOf(product.id).isEmpty())
+        assertTrue(f.undo())
+        assertTrue(f.products.all.isEmpty())
+        assertTrue(f.activeItems().isEmpty())
+    }
 }
