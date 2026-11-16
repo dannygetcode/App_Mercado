@@ -18,3 +18,11 @@ Formato: una entrada por versión (`versionName` semántico). Las fechas están 
   semáforo, normalización de nombres y meses en hora de Colombia.
 - Casos de uso de compra (escanear, desconocido, suelto, por peso, editar, deshacer, cerrar,
   descartar) y de presupuesto y catálogo, con 71 pruebas en la JVM.
+
+### L2 · Datos cifrados (2026-11-16)
+- Base Room v1 cifrada con SQLCipher; clave de 32 bytes envuelta por el Android Keystore.
+- Repositorios Room para todos los puertos del dominio, con transacciones.
+- Importador de catálogo JSON validado, idempotente y todo-o-nada; semilla real de 48
+  productos transcrita del recibo e importada en el primer arranque.
+- Ajustes con DataStore.
+

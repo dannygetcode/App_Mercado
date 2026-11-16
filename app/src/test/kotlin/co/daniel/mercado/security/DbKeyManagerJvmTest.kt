@@ -62,17 +62,20 @@ class DbKeyManagerJvmTest {
         assertThrows(DbKeyException::class.java) { manager().getOrCreateKey() }
     }
 
+    /** Proveedor del JDK explícito: Robolectric registra otro en la misma JVM. */
     private class SoftwareKeyWrapper : KeyWrapper {
-        private val kek = KeyGenerator.getInstance("AES").apply { init(256) }.generateKey()
+        private val kek = KeyGenerator.getInstance("AES", JDK_PROVIDER).apply { init(256) }.generateKey()
 
         override fun wrap(plain: ByteArray): WrappedKey {
-            val c = Cipher.getInstance("AES/GCM/NoPadding").apply { init(Cipher.ENCRYPT_MODE, kek) }
+            val c = Cipher.getInstance("AES/GCM/NoPadding", JDK_PROVIDER).apply { init(Cipher.ENCRYPT_MODE, kek) }
             return WrappedKey(c.iv, c.doFinal(plain))
         }
 
         override fun unwrap(wrapped: WrappedKey): ByteArray =
-            Cipher.getInstance("AES/GCM/NoPadding")
+            Cipher.getInstance("AES/GCM/NoPadding", JDK_PROVIDER)
                 .apply { init(Cipher.DECRYPT_MODE, kek, GCMParameterSpec(128, wrapped.iv)) }
                 .doFinal(wrapped.ciphertext)
     }
 }
+
+private const val JDK_PROVIDER = "SunJCE"

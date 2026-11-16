@@ -16,13 +16,14 @@ fun interface DatabaseFactory {
  */
 class SqlCipherDatabaseFactory(
     private val keyProvider: () -> ByteArray,
+    private val fileName: String = MercadoDatabase.FILE_NAME,
 ) : DatabaseFactory {
 
     override fun create(context: Context): MercadoDatabase {
         val key = keyProvider()
         val passphrase = rawKeyPassphrase(key)
         key.fill(0)
-        return Room.databaseBuilder(context, MercadoDatabase::class.java, MercadoDatabase.FILE_NAME)
+        return Room.databaseBuilder(context, MercadoDatabase::class.java, fileName)
             .openHelperFactory(SupportOpenHelperFactory(passphrase, null, true))
             .addCallback(MercadoDatabaseCallback)
             .build()

@@ -2,9 +2,9 @@
 
 Lo mantiene el agente. Una sesión nueva empieza leyendo este archivo.
 
-**Loop actual:** L2
+**Loop actual:** L3
 **Última actualización:** 2026-11-16
-**Pasos `[HUMANO]` pendientes:** L0 instalar APK debug y confirmar que abre (no bloqueante)
+**Pasos `[HUMANO]` pendientes:** L0 instalar APK debug y confirmar que abre; L2 correr instrumentadas y revisar la semilla (todos no bloqueantes)
 
 ## Tablero
 
@@ -12,7 +12,7 @@ Lo mantiene el agente. Una sesión nueva empieza leyendo este archivo.
 | --- | --- | --- |
 | L0 Base del proyecto | cerrado | verde 2026-11-16 (humano no bloqueante pendiente) |
 | L1 Dominio | cerrado | verde 2026-11-16 |
-| L2 Datos cifrados | en curso | — |
+| L2 Datos cifrados | cerrado | verde 2026-11-16 (2 humanos no bloqueantes pendientes) |
 | L3 Escáner | pendiente | — |
 | L4 Compra en curso | pendiente | — |
 | L5 Resto de pantallas | pendiente | — |
@@ -90,3 +90,13 @@ Formato por loop (copiar el bloque al empezar cada uno):
   12. Categorías elegidas a criterio: vinagre y filtros de café en «Granos y despensa»; jabón Tigre y guantes en «Aseo del hogar»; arepas, calados y galletas en «Panadería».
   No hay productos por peso en este recibo, así que ninguno es `KG`.
 - [x] T7 — `SettingsStore` (DataStore Preferences, archivo `settings`) con las 10 claves y valores por defecto de `03-datos.md`; `secure_screen` por defecto según variante (S-06); valida gracia {1, 5, 15} y frecuencia 1–90 días. 4 pruebas.
+- [x] T8 — `AppContainer`: ajustes disponibles al instante; la base se crea y se abre en segundo plano (`Deferred<DataGraph>`, `data()`), y en el primer arranque importa la semilla y marca `seed_imported`. `DataGraph` con repositorios Room y todos los casos de uso de L1. Pruebas JVM: `DaoTest` (8: categorías sembradas, código, búsqueda sin tildes, comodines, total y gastado del mes, cascada, claves foráneas, posición), `RoomTripFlowTest` (4: invariante con 5 inicios simultáneos, flujo completo con deshacer y cierre, KG, deshacer desconocido), `SeedImporterTest` (8: ejemplo, reimportar no duplica, actualización, categoría nueva, todo-o-nada con índice, cada validación, tamaño y cantidad, semilla real 48), `AppContainerTest`, `RawKeyTest`. Instrumentadas `EncryptedDbTest` y `DbKeyManagerTest` escritas y compiladas; no se ejecutaron (sin teléfono).
+
+**Informe de cierre**
+- Verificación: `verificar.sh completo` → VERDE (9/9). Lint: "No issues found". `compileDebugAndroidTestKotlin` OK.
+- Medido: 71 pruebas de dominio + 31 pruebas de app (JVM) en verde. APK debug 18,6 MB (incluye SQLCipher para todas las ABI en debug). Semilla real: 48 productos, cuadre exacto con el recibo ($497.870).
+- Desviaciones de la especificación: ninguna de fondo. Decisiones en DECISIONES (clave cruda de SQLCipher, `KeyWrapper`, `shopping_list_item` en v1, DataStore en memoria en pruebas por Windows).
+- Pendiente para Daniel (no bloqueante):
+  1. Con el teléfono conectado por USB y depuración USB activa, desde la carpeta del proyecto en Git Bash: `./gradlew :app:connectedDebugAndroidTest`. Deben pasar `EncryptedDbTest` y `DbKeyManagerTest` (3 + 1 pruebas). Si no tienes tiempo, dímelo y la lanzo yo en cuanto `adb devices` muestre el teléfono.
+  2. Revisar `seed/catalogo_inicial.json` con la lista de renglones dudosos de T6 (arriba). Las correcciones me las dictas o las editas en el archivo, y yo actualizo la copia de `assets`.
+
