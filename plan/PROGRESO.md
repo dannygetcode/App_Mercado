@@ -30,7 +30,7 @@ Formato por loop (copiar el bloque al empezar cada uno):
 ```
 ### L<n> · <nombre>
 - [x] T1 — `BarcodeDecoder` (interfaz de `02-arquitectura.md`) y `MlKitBarcodeDecoder` (ML Kit bundled 17.3.0, solo EAN-13, EAN-8, UPC-A, UPC-E y Code 128; cierra cada `ImageProxy`; ignora resultados tras `close()`). `ScanFilter.firstValid` acepta la primera lectura del cuadro con dígito de control válido (vía `Ean.normalize`). CameraX 1.6.2 agregado. 4 pruebas JVM.
-- [ ] T2 — 
+- [x] T2 — `ScannerView`: `PreviewView` (modo PERFORMANCE) en Compose + `ImageAnalysis` (`KEEP_ONLY_LATEST`, 1280×720, cámara trasera, autoenfoque continuo por defecto) con un hilo de análisis propio; sin `ImageCapture` (S-07). Pausa (suelta la cámara y muestra "toca para reanudar"), linterna, aviso de cámara arrancada (`STREAMING`), error de cámara visible; se suelta al salir de la composición. `CameraPermissionGate`: pide el permiso al entrar; negado → panel "Sin acceso a la cámara" + "Permitir" (abre ajustes si ya no se puede pedir) sin bloquear la pantalla; revisa al volver. `CAMERA` en el manifiesto (`camera.any` no requerida). 3 pruebas Robolectric.
 ...
 **Informe de cierre**
 - Verificación: <salida resumida de verificar.sh completo>

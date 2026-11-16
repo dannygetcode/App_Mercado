@@ -2,4 +2,8 @@
 <resources>
     <string name="app_name">Mercado</string>
     <string name="provisional_name">Producto ····%s</string>
+    <string name="camera_denied">Sin acceso a la cámara</string>
+    <string name="camera_allow">Permitir</string>
+    <string name="camera_error">No se pudo abrir la cámara</string>
+    <string name="camera_paused">Cámara en pausa · toca para reanudar</string>
 </resources>
