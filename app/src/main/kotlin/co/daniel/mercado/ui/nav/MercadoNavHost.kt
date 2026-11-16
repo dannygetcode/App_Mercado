@@ -41,6 +41,10 @@ import co.daniel.mercado.R
 import co.daniel.mercado.di.AppContainer
 import co.daniel.mercado.domain.usecase.TripLimit
 import co.daniel.mercado.scanner.SharedBarcodeSource
+import co.daniel.mercado.ui.catalog.CatalogScreen
+import co.daniel.mercado.ui.catalog.CatalogViewModel
+import co.daniel.mercado.ui.catalog.ProductEditScreen
+import co.daniel.mercado.ui.catalog.ProductEditViewModel
 import co.daniel.mercado.ui.close.CloseTripScreen
 import co.daniel.mercado.ui.close.CloseTripViewModel
 import co.daniel.mercado.ui.diagnostics.ScanDiagnosticsScreen
@@ -154,7 +158,28 @@ fun MercadoNavHost(
                     },
                 )
             }
-            composable<CatalogRoute> { PendingScreen(R.string.nav_catalog) }
+            composable<CatalogRoute> {
+                val catalog: CatalogViewModel = viewModel(factory = CatalogViewModel.Factory)
+                val catalogState by catalog.state.collectAsStateWithLifecycle()
+                CatalogScreen(
+                    state = catalogState,
+                    onEvent = catalog::onEvent,
+                    onOpenProduct = { navController.navigate(ProductEditRoute(it)) },
+                    onNewProduct = { navController.navigate(ProductEditRoute()) },
+                )
+            }
+            composable<ProductEditRoute> {
+                val edit: ProductEditViewModel = viewModel(factory = ProductEditViewModel.Factory)
+                val editState by edit.state.collectAsStateWithLifecycle()
+                LaunchedEffect(edit) { edit.effects.collect { navController.popBackStack() } }
+                ProductEditScreen(
+                    state = editState,
+                    onEvent = edit::onEvent,
+                    onBack = { navController.popBackStack() },
+                    decoderFactory = container::newBarcodeDecoder,
+                    onScanAccepted = container.scanFeedback::accepted,
+                )
+            }
             composable<HistoryRoute> { PendingScreen(R.string.nav_history) }
             composable<TripDetailRoute> { PendingScreen(R.string.nav_history) }
             composable<SettingsRoute> { PendingScreen(R.string.nav_settings) }

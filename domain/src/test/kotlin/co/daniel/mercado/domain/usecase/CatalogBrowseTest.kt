@@ -39,11 +39,13 @@ class CatalogBrowseTest {
     }
 
     @Test
-    fun `un producto desactivado sale del catalogo`() = runTest {
+    fun `un producto desactivado sale del catalogo y reactivarlo lo devuelve`() = runTest {
         val arroz = f.product("Arroz Diana", 5_900)
         DeactivateProduct(f.products, f.clock)(arroz.id)
-
         assertTrue(names(CatalogFilter()).isEmpty())
+
+        assertTrue(ReactivateProduct(f.products, f.clock)(arroz.id))
+        assertEquals(listOf("Arroz Diana"), names(CatalogFilter()))
     }
 
     @Test

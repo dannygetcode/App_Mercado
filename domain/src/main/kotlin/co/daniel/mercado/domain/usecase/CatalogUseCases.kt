@@ -119,6 +119,18 @@ class DeactivateProduct(
     }
 }
 
+/** Deshace una desactivación: el producto vuelve a búsquedas y favoritos. */
+class ReactivateProduct(
+    private val products: ProductRepository,
+    private val clock: Clock,
+) {
+    suspend operator fun invoke(productId: Long): Boolean {
+        val product = products.getById(productId) ?: return false
+        if (!product.active) products.update(product.copy(active = true, updatedAt = clock.nowMillis()))
+        return true
+    }
+}
+
 sealed interface LinkBarcodeResult {
     data object Linked : LinkBarcodeResult
     data object AlreadyLinked : LinkBarcodeResult

@@ -52,6 +52,7 @@ import co.daniel.mercado.domain.usecase.HandleScan
 import co.daniel.mercado.domain.usecase.LinkBarcode
 import co.daniel.mercado.domain.usecase.ObserveActiveTrip
 import co.daniel.mercado.domain.usecase.ObserveFavorites
+import co.daniel.mercado.domain.usecase.ReactivateProduct
 import co.daniel.mercado.domain.usecase.RemoveLine
 import co.daniel.mercado.domain.usecase.RenameLooseLine
 import co.daniel.mercado.domain.usecase.SaveProduct
@@ -168,6 +169,7 @@ class DataGraph(
     val saveProduct = SaveProduct(products, transactions, clock)
     val deactivateProduct = DeactivateProduct(products, clock)
     val linkBarcode = LinkBarcode(products, transactions, clock)
+    val reactivateProduct = ReactivateProduct(products, clock)
     val unlinkBarcode = UnlinkBarcode(products)
     val observeCatalog = ObserveCatalog(products)
     val observeNeedsReviewCount = ObserveNeedsReviewCount(products)
