@@ -40,6 +40,14 @@ import co.daniel.mercado.domain.usecase.CloseTrip
 import co.daniel.mercado.domain.usecase.DeactivateProduct
 import co.daniel.mercado.domain.usecase.DiscardTrip
 import co.daniel.mercado.domain.usecase.GetMonthStatus
+import co.daniel.mercado.domain.usecase.GetProductDetail
+import co.daniel.mercado.domain.usecase.GetTripDetail
+import co.daniel.mercado.domain.usecase.MoveFavorite
+import co.daniel.mercado.domain.usecase.ObserveCatalog
+import co.daniel.mercado.domain.usecase.ObserveClosedTrips
+import co.daniel.mercado.domain.usecase.ObserveMonthStatus
+import co.daniel.mercado.domain.usecase.ObserveNeedsReviewCount
+import co.daniel.mercado.domain.usecase.UnlinkBarcode
 import co.daniel.mercado.domain.usecase.HandleScan
 import co.daniel.mercado.domain.usecase.LinkBarcode
 import co.daniel.mercado.domain.usecase.ObserveActiveTrip
@@ -137,6 +145,7 @@ class DataGraph(
     val seedImporter = SeedImporter(db, clock)
 
     val getMonthStatus = GetMonthStatus(budgets, trips, clock)
+    val observeMonthStatus = ObserveMonthStatus(budgets, trips, getMonthStatus)
     val setMonthlyBudget = SetMonthlyBudget(budgets, clock)
     val startTrip = StartTrip(trips, getMonthStatus, tripSession, clock)
     val observeActiveTrip = ObserveActiveTrip(trips)
@@ -159,4 +168,12 @@ class DataGraph(
     val saveProduct = SaveProduct(products, transactions, clock)
     val deactivateProduct = DeactivateProduct(products, clock)
     val linkBarcode = LinkBarcode(products, transactions, clock)
+    val unlinkBarcode = UnlinkBarcode(products)
+    val observeCatalog = ObserveCatalog(products)
+    val observeNeedsReviewCount = ObserveNeedsReviewCount(products)
+    val getProductDetail = GetProductDetail(products)
+    val moveFavorite = MoveFavorite(products, transactions, clock)
+
+    val observeClosedTrips = ObserveClosedTrips(trips)
+    val getTripDetail = GetTripDetail(trips)
 }

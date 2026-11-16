@@ -44,6 +44,7 @@ import co.daniel.mercado.scanner.SharedBarcodeSource
 import co.daniel.mercado.ui.close.CloseTripScreen
 import co.daniel.mercado.ui.close.CloseTripViewModel
 import co.daniel.mercado.ui.diagnostics.ScanDiagnosticsScreen
+import co.daniel.mercado.ui.home.HomeEffect
 import co.daniel.mercado.ui.home.HomeScreen
 import co.daniel.mercado.ui.home.HomeViewModel
 import co.daniel.mercado.ui.trip.TripScreen
@@ -129,13 +130,23 @@ fun MercadoNavHost(
             composable<HomeRoute> {
                 val home: HomeViewModel = viewModel(factory = HomeViewModel.Factory)
                 val homeState by home.state.collectAsStateWithLifecycle()
+                LaunchedEffect(home) {
+                    home.effects.collect { effect ->
+                        when (effect) {
+                            HomeEffect.OpenTrip -> navController.navigate(TripRoute) { launchSingleTop = true }
+                        }
+                    }
+                }
                 HomeScreen(
                     state = homeState,
-                    onStartOrContinue = {
-                        if (homeState.openTripTotal != null) navController.navigate(TripRoute) else home.openLimitSheet()
+                    onEvent = home::onEvent,
+                    onOpenTrip = { navController.navigate(TripDetailRoute(it)) },
+                    onOpenNeedsReview = {
+                        navController.navigate(CatalogRoute(needsReviewOnly = true)) {
+                            popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                            launchSingleTop = true
+                        }
                     },
-                    onStartTrip = { limit -> home.startTrip(limit) { navController.navigate(TripRoute) } },
-                    onDismissLimit = home::dismissLimitSheet,
                     onOpenDiagnostics = if (BuildConfig.DEBUG) {
                         { navController.navigate(DiagnosticsRoute) }
                     } else {
@@ -145,6 +156,7 @@ fun MercadoNavHost(
             }
             composable<CatalogRoute> { PendingScreen(R.string.nav_catalog) }
             composable<HistoryRoute> { PendingScreen(R.string.nav_history) }
+            composable<TripDetailRoute> { PendingScreen(R.string.nav_history) }
             composable<SettingsRoute> { PendingScreen(R.string.nav_settings) }
             composable<TripRoute> {
                 val trip: TripViewModel = viewModel(factory = TripViewModel.Factory)

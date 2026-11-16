@@ -69,8 +69,25 @@
     <string name="edit_line_quantity">Cantidad</string>
     <string name="home_start_trip">Ir a mercar</string>
     <string name="home_continue_trip">Continuar compra · %s</string>
-    <string name="home_month_spent_of">Este mes · Gastado %1$s de %2$s</string>
-    <string name="home_month_spent">Este mes · Gastado %s</string>
+    <string name="home_month_spent_of">%1$s · Gastado %2$s de %3$s</string>
+    <string name="home_month_spent">%1$s · Gastado %2$s</string>
+    <string name="home_month_remaining">Quedan %s</string>
+    <string name="home_budget_edit">Toca para cambiar el presupuesto</string>
+    <string name="home_budget_inherited">Presupuesto del mes anterior · toca para cambiarlo</string>
+    <string name="home_budget_hint_title">Define tu presupuesto del mes</string>
+    <string name="home_budget_hint_text">Así cada compra arranca con lo que te queda y el semáforo te avisa.</string>
+    <string name="home_budget_hint_define">Definir</string>
+    <string name="home_last_trip">Última compra</string>
+    <string name="home_needs_review">Productos por revisar · %d</string>
+    <string name="home_needs_review_hint">Productos nuevos que esperan nombre</string>
+    <string name="budget_title">Presupuesto de %s</string>
+    <string name="budget_hint">Si un mes no tiene presupuesto, usa el del mes anterior.</string>
+    <string name="save">Guardar</string>
+    <string name="not_now">Ahora no</string>
+    <plurals name="articles">
+        <item quantity="one">%d artículo</item>
+        <item quantity="other">%d artículos</item>
+    </plurals>
     <string name="home_limit_title">Límite de esta compra</string>
     <string name="home_limit_hint">Es lo que queda del mes. Cámbialo si quieres.</string>
     <string name="home_limit_hint_none">Sin presupuesto del mes. Deja $0 para no usar límite.</string>

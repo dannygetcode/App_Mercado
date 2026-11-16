@@ -25,6 +25,8 @@ data class Settings(
     val lastReminderCycle: Long = 0,
     val lastBackupAt: Long = 0,
     val seedImported: Boolean = false,
+    /** El usuario omitió la tarjeta "Define tu presupuesto del mes" del Inicio. */
+    val budgetHintDismissed: Boolean = false,
 )
 
 val Context.settingsDataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
@@ -66,6 +68,8 @@ class SettingsStore(
 
     suspend fun setSeedImported(value: Boolean) = set(Keys.SEED_IMPORTED, value)
 
+    suspend fun setBudgetHintDismissed(value: Boolean) = set(Keys.BUDGET_HINT_DISMISSED, value)
+
     private suspend fun <T> set(key: Preferences.Key<T>, value: T) {
         dataStore.edit { it[key] = value }
     }
@@ -83,6 +87,7 @@ class SettingsStore(
             lastReminderCycle = this[Keys.LAST_REMINDER_CYCLE] ?: defaults.lastReminderCycle,
             lastBackupAt = this[Keys.LAST_BACKUP_AT] ?: defaults.lastBackupAt,
             seedImported = this[Keys.SEED_IMPORTED] ?: defaults.seedImported,
+            budgetHintDismissed = this[Keys.BUDGET_HINT_DISMISSED] ?: defaults.budgetHintDismissed,
         )
     }
 
@@ -97,6 +102,7 @@ class SettingsStore(
         val LAST_REMINDER_CYCLE = longPreferencesKey("last_reminder_cycle")
         val LAST_BACKUP_AT = longPreferencesKey("last_backup_at")
         val SEED_IMPORTED = booleanPreferencesKey("seed_imported")
+        val BUDGET_HINT_DISMISSED = booleanPreferencesKey("budget_hint_dismissed")
     }
 
     companion object {
