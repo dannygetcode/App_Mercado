@@ -160,4 +160,10 @@
     <string name="price_source_trip">Compra</string>
     <string name="price_source_manual">Editado a mano</string>
     <string name="keypad_ok">Listo</string>
+    <string name="history_empty">Aún no hay compras cerradas. Cuando cierres una, aparece aquí.</string>
+    <string name="trip_detail_title">Compra</string>
+    <string name="trip_detail_not_found">Esta compra ya no existe.</string>
+    <string name="trip_detail_paid">Total pagado según el recibo</string>
+    <string name="trip_detail_paid_hint">Si lo escribes, es lo que cuenta como gasto del mes. Deja $0 para quitarlo.</string>
+    <string name="trip_detail_qty">%1$d × %2$s</string>
 </resources>

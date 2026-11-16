@@ -48,6 +48,10 @@ import co.daniel.mercado.ui.catalog.ProductEditViewModel
 import co.daniel.mercado.ui.close.CloseTripScreen
 import co.daniel.mercado.ui.close.CloseTripViewModel
 import co.daniel.mercado.ui.diagnostics.ScanDiagnosticsScreen
+import co.daniel.mercado.ui.history.HistoryScreen
+import co.daniel.mercado.ui.history.HistoryViewModel
+import co.daniel.mercado.ui.history.TripDetailScreen
+import co.daniel.mercado.ui.history.TripDetailViewModel
 import co.daniel.mercado.ui.home.HomeEffect
 import co.daniel.mercado.ui.home.HomeScreen
 import co.daniel.mercado.ui.home.HomeViewModel
@@ -180,8 +184,16 @@ fun MercadoNavHost(
                     onScanAccepted = container.scanFeedback::accepted,
                 )
             }
-            composable<HistoryRoute> { PendingScreen(R.string.nav_history) }
-            composable<TripDetailRoute> { PendingScreen(R.string.nav_history) }
+            composable<HistoryRoute> {
+                val history: HistoryViewModel = viewModel(factory = HistoryViewModel.Factory)
+                val historyState by history.state.collectAsStateWithLifecycle()
+                HistoryScreen(state = historyState, onOpenTrip = { navController.navigate(TripDetailRoute(it)) })
+            }
+            composable<TripDetailRoute> {
+                val detail: TripDetailViewModel = viewModel(factory = TripDetailViewModel.Factory)
+                val detailState by detail.state.collectAsStateWithLifecycle()
+                TripDetailScreen(state = detailState, onEvent = detail::onEvent, onBack = { navController.popBackStack() })
+            }
             composable<SettingsRoute> { PendingScreen(R.string.nav_settings) }
             composable<TripRoute> {
                 val trip: TripViewModel = viewModel(factory = TripViewModel.Factory)

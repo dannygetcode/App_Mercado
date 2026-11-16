@@ -23,6 +23,10 @@ class RecordingFeedback : ScanFeedback {
 class ManualClock(var now: Long = 1_800_000_000_000L) : Clock {
     override fun nowMillis(): Long = now
     fun advance(ms: Long) { now += ms }
+
+    fun setBogota(year: Int, month: Int, day: Int, hour: Int = 12) {
+        now = java.time.LocalDateTime.of(year, month, day, hour, 0).atZone(co.daniel.mercado.domain.rules.Months.ZONE).toInstant().toEpochMilli()
+    }
 }
 
 /** `DataGraph` real sobre Room en memoria (Robolectric). */
