@@ -3,9 +3,11 @@ package co.daniel.mercado.domain.fakes
 import co.daniel.mercado.domain.model.Pesos
 import co.daniel.mercado.domain.model.Trip
 import co.daniel.mercado.domain.model.TripItem
+import co.daniel.mercado.domain.model.TripSummary
 import co.daniel.mercado.domain.model.TripWithItems
 import co.daniel.mercado.domain.model.sum
 import co.daniel.mercado.domain.port.TripRepository
+import co.daniel.mercado.domain.rules.LineMath
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
@@ -29,6 +31,15 @@ class InMemoryTripRepository : TripRepository {
         }
 
     override fun observeActive(): Flow<TripWithItems?> = state.map { it.active() }
+
+    override fun observeClosed(): Flow<List<TripSummary>> = state.map { s ->
+        s.trips.values.filter { !it.isOpen }.sortedByDescending { it.closedAt }.map { trip ->
+            TripSummary(trip, LineMath.articleCount(s.items.values.filter { it.tripId == trip.id }))
+        }
+    }
+
+    override suspend fun getWithItems(id: Long): TripWithItems? =
+        state.value.trips[id]?.let { TripWithItems(it, itemsOf(id)) }
 
     override suspend fun getActive(): TripWithItems? = state.value.active()
 

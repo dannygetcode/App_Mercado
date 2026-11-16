@@ -18,6 +18,9 @@ interface ProductRepository {
 
     suspend fun findByNormalizedName(normalizedName: String): Product?
 
+    /** Productos activos ordenados por nombre; se emite de nuevo con cada cambio. */
+    fun observeActive(): Flow<List<Product>>
+
     /** Favoritos activos en su orden. */
     fun observeFavorites(): Flow<List<Product>>
 
@@ -48,4 +51,7 @@ interface ProductRepository {
     suspend fun lastPricePoint(productId: Long): PricePoint?
 
     suspend fun addPricePoint(point: PricePoint)
+
+    /** Historial de precios del producto, el más reciente primero. */
+    suspend fun priceHistory(productId: Long): List<PricePoint>
 }

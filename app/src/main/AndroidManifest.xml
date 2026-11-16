@@ -36,6 +36,10 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <!-- Acceso directo "Nueva compra" (02-arquitectura, arranque). -->
+            <meta-data
+                android:name="android.app.shortcuts"
+                android:resource="@xml/shortcuts" />
         </activity>
 
         <!-- S-11: único componente exportado de dependencias; solo sirve para adb/benchmark. -->

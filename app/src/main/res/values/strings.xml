@@ -96,4 +96,9 @@
     <string name="discard_confirm_text">Se borran todas sus líneas. No se puede deshacer.</string>
     <string name="discard_confirm_yes">Descartar</string>
     <string name="cancel">Cancelar</string>
+    <string name="nav_home">Inicio</string>
+    <string name="nav_catalog">Catálogo</string>
+    <string name="nav_history">Historial</string>
+    <string name="nav_settings">Ajustes</string>
+    <string name="shortcut_new_trip">Nueva compra</string>
 </resources>

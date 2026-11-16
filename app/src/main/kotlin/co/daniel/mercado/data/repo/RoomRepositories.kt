@@ -10,6 +10,7 @@ import co.daniel.mercado.domain.model.PricePoint
 import co.daniel.mercado.domain.model.Product
 import co.daniel.mercado.domain.model.Trip
 import co.daniel.mercado.domain.model.TripItem
+import co.daniel.mercado.domain.model.TripSummary
 import co.daniel.mercado.domain.model.TripWithItems
 import co.daniel.mercado.domain.port.BudgetRepository
 import co.daniel.mercado.domain.port.ProductRepository
@@ -38,6 +39,11 @@ class RoomProductRepository(private val db: MercadoDatabase) : ProductRepository
 
     override suspend fun findByNormalizedName(normalizedName: String): Product? =
         dao.findByNameNorm(normalizedName)?.toModel()
+
+    override fun observeActive(): Flow<List<Product>> =
+        dao.observeActive().map { list -> list.map { it.toModel() } }.distinctUntilChanged()
+
+    override suspend fun priceHistory(productId: Long): List<PricePoint> = dao.priceHistory(productId).map { it.toModel() }
 
     override fun observeFavorites(): Flow<List<Product>> =
         dao.observeFavorites().map { list -> list.map { it.toModel() } }.distinctUntilChanged()
@@ -90,6 +96,11 @@ class RoomTripRepository(private val db: MercadoDatabase) : TripRepository {
 
     override suspend fun getActive(): TripWithItems? = dao.getOpen()?.toModel()
 
+    override fun observeClosed(): Flow<List<TripSummary>> =
+        dao.observeClosed().map { rows -> rows.map { TripSummary(it.trip.toModel(), it.articleCount) } }.distinctUntilChanged()
+
+    override suspend fun getWithItems(id: Long): TripWithItems? = dao.getWithItems(id)?.toModel()
+
     override suspend fun getTrip(id: Long): Trip? = dao.getTrip(id)?.toModel()
 
     override suspend fun insertTrip(trip: Trip): Long = dao.insertTrip(trip.copy(id = 0).toEntity())
@@ -123,4 +134,6 @@ class RoomBudgetRepository(db: MercadoDatabase) : BudgetRepository {
     override suspend fun latestBefore(month: YearMonth): Budget? = dao.latestBefore(month)?.toModel()
 
     override suspend fun set(budget: Budget) = dao.upsert(budget.toEntity())
+
+    override fun observeAll(): Flow<List<Budget>> = dao.observeAll().map { list -> list.map { it.toModel() } }
 }

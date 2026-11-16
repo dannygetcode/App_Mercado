@@ -15,7 +15,7 @@ Lo mantiene el agente. Una sesión nueva empieza leyendo este archivo.
 | L2 Datos cifrados | cerrado | verde 2026-11-16 (2 humanos no bloqueantes pendientes) |
 | L3 Escáner | cerrado | verde 2026-11-16; prueba en modo avión 10/10 |
 | L4 Compra en curso | cerrado | verde 2026-11-16; simulacro en casa OK |
-| L5 Resto de pantallas | pendiente | — |
+| L5 Resto de pantallas | en curso | — |
 | L6 Seguridad y respaldo | pendiente | — |
 | L7 Lista, resúmenes, recordatorios | pendiente | — |
 | L8 Release | pendiente | — |
@@ -125,8 +125,7 @@ Formato por loop (copiar el bloque al empezar cada uno):
 
 ### L4 · Compra en curso
 - Preparación de dominio: `AddUnknownScanned` acepta `name` (nombre tecleado sin elegir del autocompletado: reutiliza el producto de ese nombre o crea uno ya nombrado sin revisión pendiente) y `code` nulo ("Crear «texto»" desde la búsqueda, sin asociar código). `TripRepository.recentStores` (Room: agrupado por tienda, la más reciente primero) para los chips del cierre. 3 pruebas de dominio + 1 Room.
-- [ ] T1 — 
-- [ ] T2 — 
+- [x] T1 y T2 — `TripViewModel`, escáner, hojas, avisos, deshacer y cruces del semáforo (commit `9e0a518`; detalle en T2 de L3 y en el informe de cierre).
 - [x] T3 — `TripScreen` según el esquema: barra mínima (volver, linterna, pausar), visor al 32 % con línea guía y destello verde de 1 s al aceptar, franja "toca para reanudar" en pausa, `TotalCard`, lista (última arriba) con estado vacío, aviso con deshacer, barra inferior de 56 dp ($ Teclado, ★ Favoritos, Buscar, ✓ Cerrar). Pantalla encendida mientras está visible; pausa automática (del ViewModel). 6 pruebas de UI (vacía, teclado→línea y total, `−` a 0 + deshacer, desconocido con solo precio, crear desde búsqueda, te pasaste en rojo).
 - [x] T4 — Hoja Teclado (`KeypadSheet`): precio suelto, precio de etiqueta KG (con el nombre del producto), corregir precio (prellenado, "Cambiar"), crear producto desde la búsqueda. Se cierra sola al sumar.
 - [x] T5 — Hoja Producto nuevo: título, código pequeño, nombre opcional sin foco al abrir con autocompletado (4 sugerencias), teclado activo; elegir sugerencia prellena su precio y cambia el botón a "Asociar y sumar"; cerrar sin sumar descarta la lectura. La cámara queda en pausa mientras está abierta.
@@ -154,3 +153,7 @@ Formato por loop (copiar el bloque al empezar cada uno):
 - Desviaciones de la especificación: la navegación es provisional (enum) hasta L5. El punto "precio viejo" usa la fecha del último punto del historial de precios. Decisiones en DECISIONES.
 - Pendiente para Daniel: `[HUMANO, BLOQUEANTE]` simulacro en casa (instrucciones en el mensaje de cierre).
 - **Resultado del simulacro (2026-11-16, Poco X8 Pro):** Daniel: "funcionó bien"; no reportó nada lento ni confuso. Registro del teléfono sin fallos (`am_crash`/`am_anr` = 0, búfer de fallos vacío, sin avisos de acción rechazada). L4 cerrado.
+
+### L5 · Resto de pantallas
+- Preparación de dominio: `ObserveCatalog` (filtro `CatalogFilter`: texto sin tildes, categoría, favoritos en su orden, por revisar), `ObserveNeedsReviewCount`, `GetProductDetail` (códigos + historial de precios), `UnlinkBarcode`, `MoveFavorite`, `ObserveClosedTrips` (`TripSummary` con artículos), `GetTripDetail` (solo cerradas), `ObserveMonthStatus` (se recalcula al cambiar presupuestos o compras cerradas) y `MonthStatus.inherited`. Puertos nuevos implementados en Room y en los falsos. 9 pruebas de dominio nuevas.
+- [x] T1 — Navegación con `navigation-compose` 2.10.2 y rutas tipadas (`Routes.kt`): `MercadoNavHost` con barra inferior (Inicio · Catálogo · Historial · Ajustes, íconos vectoriales propios sin librería) solo en las cuatro de nivel superior; compra y cierre a pantalla completa; con compra abierta al arrancar abre directo la compra. Acceso directo estático "Nueva compra" (`shortcuts.xml`, copia en `src/debug` con el paquete `.debug`): abre la compra y, si no hay una, la empieza con el límite por defecto. `MainActivity` sin navegación propia; el extra de diagnóstico sigue solo en debug.

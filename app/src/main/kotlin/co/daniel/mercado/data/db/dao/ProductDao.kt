@@ -33,6 +33,9 @@ interface ProductDao {
     @Query("SELECT * FROM product WHERE favorite = 1 AND active = 1 ORDER BY favorite_order, name")
     fun observeFavorites(): Flow<List<ProductEntity>>
 
+    @Query("SELECT * FROM product WHERE active = 1 ORDER BY name COLLATE NOCASE, id")
+    fun observeActive(): Flow<List<ProductEntity>>
+
     @Query("SELECT COUNT(*) FROM product")
     suspend fun count(): Int
 

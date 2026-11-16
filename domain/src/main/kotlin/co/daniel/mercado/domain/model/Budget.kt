@@ -13,4 +13,6 @@ data class MonthStatus(
     val spent: Pesos,
     val remaining: Pesos?,
     val trafficLight: TrafficLight,
+    /** El presupuesto viene de un mes anterior (el mes no tiene uno propio). */
+    val inherited: Boolean = false,
 )

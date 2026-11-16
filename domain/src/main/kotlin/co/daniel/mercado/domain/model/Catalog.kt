@@ -28,6 +28,21 @@ data class Product(
     val updatedAt: Long = 0,
 )
 
+/** Ficha completa para el editor del catálogo. Historial de precios del más reciente al más viejo. */
+data class ProductDetail(
+    val product: Product,
+    val barcodes: List<String>,
+    val priceHistory: List<PricePoint>,
+)
+
+/** Filtro del catálogo. [query] es lo que el usuario teclea (se normaliza al filtrar). */
+data class CatalogFilter(
+    val query: String = "",
+    val categoryId: Long? = null,
+    val favoritesOnly: Boolean = false,
+    val needsReviewOnly: Boolean = false,
+)
+
 enum class PriceSource { SEED, TRIP, MANUAL }
 
 data class PricePoint(

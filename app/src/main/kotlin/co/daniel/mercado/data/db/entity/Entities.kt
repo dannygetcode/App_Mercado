@@ -131,3 +131,9 @@ data class TripWithItemsRelation(
     @Relation(entity = TripItemEntity::class, parentColumn = "id", entityColumn = "trip_id")
     val items: List<TripItemWithProduct>,
 )
+
+/** Fila del historial: compra cerrada y su número de artículos. */
+data class ClosedTripRow(
+    @Embedded val trip: TripEntity,
+    @ColumnInfo(name = "article_count") val articleCount: Int,
+)

@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import co.daniel.mercado.data.db.entity.BudgetEntity
+import kotlinx.coroutines.flow.Flow
 import java.time.YearMonth
 
 @Dao
@@ -15,6 +16,9 @@ interface BudgetDao {
     /** `AAAA-MM` ordena igual como texto que como fecha. */
     @Query("SELECT * FROM budget WHERE year_month < :month ORDER BY year_month DESC LIMIT 1")
     suspend fun latestBefore(month: YearMonth): BudgetEntity?
+
+    @Query("SELECT * FROM budget ORDER BY year_month")
+    fun observeAll(): Flow<List<BudgetEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsert(budget: BudgetEntity)

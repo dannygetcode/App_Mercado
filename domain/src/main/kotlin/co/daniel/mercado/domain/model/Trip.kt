@@ -41,6 +41,9 @@ data class TripItem(
 
 data class TripWithItems(val trip: Trip, val items: List<TripItem>)
 
+/** Fila del historial: una compra cerrada y su número de artículos (suma de cantidades; KG cuenta 1). */
+data class TripSummary(val trip: Trip, val articleCount: Int)
+
 /** Estado observable de la compra abierta: lo que pinta la tarjeta de total. */
 data class ActiveTrip(
     val trip: Trip,

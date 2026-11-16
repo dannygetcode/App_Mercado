@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
+import co.daniel.mercado.data.db.entity.ClosedTripRow
 import co.daniel.mercado.data.db.entity.TripEntity
 import co.daniel.mercado.data.db.entity.TripItemEntity
 import co.daniel.mercado.data.db.entity.TripItemWithProduct
@@ -21,6 +22,17 @@ interface TripDao {
     @Transaction
     @Query("SELECT * FROM trip WHERE closed_at IS NULL ORDER BY id LIMIT 1")
     suspend fun getOpen(): TripWithItemsRelation?
+
+    @Transaction
+    @Query("SELECT * FROM trip WHERE id = :id")
+    suspend fun getWithItems(id: Long): TripWithItemsRelation?
+
+    /** Compras cerradas con su número de artículos (suma de cantidades), la más reciente primero. */
+    @Query(
+        "SELECT t.*, COALESCE((SELECT SUM(i.quantity) FROM trip_item i WHERE i.trip_id = t.id), 0) AS article_count " +
+            "FROM trip t WHERE t.closed_at IS NOT NULL ORDER BY t.closed_at DESC, t.id DESC",
+    )
+    fun observeClosed(): Flow<List<ClosedTripRow>>
 
     @Query("SELECT COUNT(*) FROM trip WHERE closed_at IS NULL")
     suspend fun countOpen(): Int

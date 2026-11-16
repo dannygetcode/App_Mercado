@@ -32,6 +32,13 @@ class InMemoryProductRepository : ProductRepository {
     override suspend fun findByNormalizedName(normalizedName: String): Product? =
         products.value.values.firstOrNull { NameNormalizer.normalize(it.name) == normalizedName }
 
+    override fun observeActive(): Flow<List<Product>> = products.map { map ->
+        map.values.filter { it.active }.sortedBy { it.name }
+    }
+
+    override suspend fun priceHistory(productId: Long): List<PricePoint> =
+        priceHistory.filter { it.productId == productId }.sortedByDescending { it.at }
+
     override fun observeFavorites(): Flow<List<Product>> = products.map { map ->
         map.values.filter { it.favorite && it.active }.sortedWith(compareBy({ it.favoriteOrder }, { it.name }))
     }
