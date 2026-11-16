@@ -50,6 +50,16 @@ android {
             if (hasReleaseKey) signingConfig = signingConfigs.getByName("release")
             ndk { abiFilters += listOf("arm64-v8a", "armeabi-v7a") }
         }
+        // Igual a release (R8, no depurable, ABIs ARM) pero firmada con la llave de debug y con otro
+        // applicationId: sirve para probar la optimización en el teléfono sin la llave de Daniel y
+        // sin ocupar el paquete de la app final.
+        create("qa") {
+            initWith(getByName("release"))
+            applicationIdSuffix = ".qa"
+            versionNameSuffix = "-qa"
+            signingConfig = signingConfigs.getByName("debug")
+            matchingFallbacks += listOf("release")
+        }
     }
 
     compileOptions {

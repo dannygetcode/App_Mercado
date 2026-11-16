@@ -18,7 +18,7 @@ Lo mantiene el agente. Una sesión nueva empieza leyendo este archivo.
 | L5 Resto de pantallas | cerrado | verde 2026-11-16 (humano no bloqueante pendiente) |
 | L6 Seguridad y respaldo | cerrado | verde 2026-11-16; prueba en el teléfono OK |
 | L7 Lista, resúmenes, recordatorios | cerrado | verde 2026-11-16 |
-| L8 Release | pendiente | — |
+| L8 Release | en curso | — |
 | L9 Prueba de campo | pendiente | — |
 
 Estados: `pendiente` · `en curso` · `esperando humano` · `cerrado`.
@@ -215,3 +215,6 @@ Formato por loop (copiar el bloque al empezar cada uno):
 - Medido: APK release sin firmar 35,1 MB tras ML Kit de texto (RNF-10 ≤ 40 MB). Con 4 meses de ejemplo (`SampleDataTest`): ~9 compras, la lista sugiere y la suma por categorías cuadra con el gastado del mes.
 - Desviaciones de la especificación: T0 agregado a pedido de Daniel (etiqueta del estante, dependencia nueva). Recordatorio de respaldo bajo el mismo interruptor de recordatorios. Resto en DECISIONES.
 - Pendiente para Daniel (no bloqueante): probar el modo "Etiqueta" en el supermercado; ver la lista y el resumen (en debug: Diagnóstico → "Cargar 4 meses de ejemplo" agrega compras de ejemplo a tus datos de prueba).
+
+### L8 · Endurecimiento y release
+- [x] T1 — R8: las librerías traen sus reglas (SQLCipher, Room, ML Kit, CameraX, WorkManager, serialización); `proguard-rules.pro` agrega las propias (DTOs `@Serializable`, enums guardados por nombre, trazas solo con archivo y línea). Tipo de build nuevo `qa` = release (R8 + recursos reducidos, no depurable, ABIs ARM) firmado con la llave de debug y con paquete `co.daniel.mercado.qa`, para probar la optimización en el teléfono sin la llave de Daniel. **Fallo encontrado en el teléfono:** con R8 en modo completo, ML Kit no encontraba los constructores de sus `ComponentRegistrar` (`NoSuchMethodException` al arrancar): el escáner y el lector de etiquetas habrían fallado solo en release. Regla agregada (`-keep class * implements com.google.firebase.components.ComponentRegistrar { <init>(); }`); tras ella, arranque limpio en el Poco X8 Pro (sin errores ni fallos; base cifrada abierta y semilla importada en el primer arranque), 297 ms hasta la primera ventana.

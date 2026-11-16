@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Copia de qa: el paquete lleva el sufijo .debug (los recursos XML no admiten marcadores). -->
+    <shortcut
+        android:shortcutId="new_trip"
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_new_trip"
+        android:shortcutShortLabel="@string/shortcut_new_trip"
+        android:shortcutLongLabel="@string/shortcut_new_trip">
+        <intent
+            android:action="co.daniel.mercado.action.NEW_TRIP"
+            android:targetPackage="co.daniel.mercado.qa"
+            android:targetClass="co.daniel.mercado.MainActivity" />
+    </shortcut>
+</shortcuts>
