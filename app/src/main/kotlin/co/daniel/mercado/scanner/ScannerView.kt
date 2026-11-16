@@ -28,6 +28,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -71,7 +72,10 @@ fun ScannerView(
 
     val previewView = remember {
         PreviewView(context).apply {
-            implementationMode = PreviewView.ImplementationMode.PERFORMANCE
+            // COMPATIBLE (TextureView): Compose sí lo recorta y respeta el orden de capas. Con
+            // PERFORMANCE (SurfaceView) y FILL_CENTER el visor se desbordaba por encima de la barra
+            // y del resto de la pantalla en el Poco X8 Pro.
+            implementationMode = PreviewView.ImplementationMode.COMPATIBLE
             scaleType = PreviewView.ScaleType.FILL_CENTER
         }
     }
@@ -134,7 +138,7 @@ fun ScannerView(
         if (cam.cameraInfo.hasFlashUnit()) cam.cameraControl.enableTorch(torchOn)
     }
 
-    Box(modifier = modifier.background(Color.Black), contentAlignment = Alignment.Center) {
+    Box(modifier = modifier.clipToBounds().background(Color.Black), contentAlignment = Alignment.Center) {
         when {
             paused -> CameraMessage(
                 text = stringResource(R.string.camera_paused),

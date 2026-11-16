@@ -22,7 +22,11 @@ class MainActivity : ComponentActivity() {
         setContent {
             MercadoTheme {
                 // Navegación provisional hasta L5 (MercadoNavHost).
-                var showDiagnostics by rememberSaveable { mutableStateOf(false) }
+                var showDiagnostics by rememberSaveable {
+                    // Solo debug: `adb shell am start ... --ez open_diagnostics true` abre el
+                    // diagnóstico sin tocar la pantalla (HyperOS no deja inyectar toques por adb).
+                    mutableStateOf(BuildConfig.DEBUG && intent.getBooleanExtra(EXTRA_OPEN_DIAGNOSTICS, false))
+                }
                 if (BuildConfig.DEBUG && showDiagnostics) {
                     val source = remember { SharedBarcodeSource() }
                     ScanDiagnosticsScreen(
@@ -43,5 +47,9 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    private companion object {
+        const val EXTRA_OPEN_DIAGNOSTICS = "open_diagnostics"
     }
 }

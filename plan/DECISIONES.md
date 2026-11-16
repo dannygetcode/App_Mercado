@@ -46,3 +46,4 @@ las que surjan al implementar: versiones elegidas, detalles no especificados, ca
 | 2026-11-16 | L3-T4 | Mientras no exista la pantalla de compra (L4), `ScannerSmokeTest` abre la pantalla de diagnóstico | Es la única con visor en L3; en L4 se agrega el humo de la compra |
 | 2026-11-16 | L3-T3 | El pitido usa el canal de notificaciones (`ToneGenerator`, 80 ms) y no suena con el teléfono en silencio; el código desconocido solo vibra doble | Respeta el modo silencio en el supermercado; `04-ux` pide solo vibración doble para desconocido |
 | 2026-11-16 | L3-T2 | Al abrir una pantalla con visor se pide el permiso de cámara de inmediato; si ya fue negado para siempre, "Permitir" abre los ajustes de la app | Menos toques; nunca bloquea la pantalla |
+| 2026-11-16 | L3-T2 | `PreviewView` en modo COMPATIBLE (TextureView) en vez de PERFORMANCE | En el Poco X8 Pro el SurfaceView no se recortaba dentro de Compose y tapaba la pantalla; la lectura sigue en 0,23 s |
