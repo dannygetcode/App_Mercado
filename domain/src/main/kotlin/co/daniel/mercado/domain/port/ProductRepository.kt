@@ -1,6 +1,7 @@
 package co.daniel.mercado.domain.port
 
 import co.daniel.mercado.domain.model.Category
+import co.daniel.mercado.domain.model.Pesos
 import co.daniel.mercado.domain.model.PricePoint
 import co.daniel.mercado.domain.model.Product
 import kotlinx.coroutines.flow.Flow
@@ -47,6 +48,12 @@ interface ProductRepository {
     suspend fun categoryByName(name: String): Category?
 
     suspend fun insertCategory(category: Category): Long
+
+    /** RF-13: tope mensual de la categoría; nulo lo quita. */
+    suspend fun setCategoryBudget(categoryId: Long, amount: Pesos?)
+
+    /** Productos por id (activos o no), para nombres y categorías de resúmenes y lista. */
+    suspend fun getByIds(ids: Collection<Long>): List<Product>
 
     suspend fun lastPricePoint(productId: Long): PricePoint?
 

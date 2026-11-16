@@ -32,6 +32,7 @@ class TripFixture {
     val trips = InMemoryTripRepository()
     val budgets = InMemoryBudgetRepository()
     val tx = ImmediateTransactionRunner()
+    val shoppingList = InMemoryShoppingListRepository()
     val session = TripSession(tx)
 
     val monthStatus = GetMonthStatus(budgets, trips, clock)
@@ -48,7 +49,7 @@ class TripFixture {
     val removeLine = RemoveLine(trips, session)
     val renameLoose = RenameLooseLine(trips, session)
     val undo = UndoLastAction(trips, products, session)
-    val closeTrip = CloseTrip(trips, products, session, clock)
+    val closeTrip = CloseTrip(trips, products, session, clock, shoppingList)
     val discardTrip = DiscardTrip(trips, session)
     val setPaidTotal = SetPaidTotal(trips)
 

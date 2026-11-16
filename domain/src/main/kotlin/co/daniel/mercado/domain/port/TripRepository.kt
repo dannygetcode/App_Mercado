@@ -1,5 +1,6 @@
 package co.daniel.mercado.domain.port
 
+import co.daniel.mercado.domain.model.ClosedLine
 import co.daniel.mercado.domain.model.Pesos
 import co.daniel.mercado.domain.model.Trip
 import co.daniel.mercado.domain.model.TripItem
@@ -44,6 +45,12 @@ interface TripRepository {
 
     /** Una compra (abierta o cerrada) con sus líneas, la última primero. */
     suspend fun getWithItems(id: Long): TripWithItems?
+
+    /** Líneas de compras cerradas en `[fromMillis, toMillis)`, para sugerencias y resúmenes. */
+    suspend fun closedLines(fromMillis: Long, toMillis: Long): List<ClosedLine>
+
+    /** Cierre de la compra cerrada más reciente, o nulo. */
+    suspend fun lastClosedAt(): Long?
 
     /** Tiendas usadas en compras cerradas, la más reciente primero, sin repetir. */
     suspend fun recentStores(limit: Int): List<String>

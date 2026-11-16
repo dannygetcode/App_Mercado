@@ -1,6 +1,7 @@
 package co.daniel.mercado.domain.fakes
 
 import co.daniel.mercado.domain.model.Category
+import co.daniel.mercado.domain.model.Pesos
 import co.daniel.mercado.domain.model.PricePoint
 import co.daniel.mercado.domain.model.Product
 import co.daniel.mercado.domain.port.ProductRepository
@@ -81,6 +82,13 @@ class InMemoryProductRepository : ProductRepository {
         categories += category.copy(id = id)
         return id
     }
+
+    override suspend fun setCategoryBudget(categoryId: Long, amount: Pesos?) {
+        val i = categories.indexOfFirst { it.id == categoryId }
+        if (i >= 0) categories[i] = categories[i].copy(monthlyBudget = amount)
+    }
+
+    override suspend fun getByIds(ids: Collection<Long>): List<Product> = ids.mapNotNull { products.value[it] }
 
     override suspend fun lastPricePoint(productId: Long): PricePoint? =
         priceHistory.filter { it.productId == productId }.maxByOrNull { it.at }

@@ -1,5 +1,6 @@
 package co.daniel.mercado.domain.fakes
 
+import co.daniel.mercado.domain.model.ClosedLine
 import co.daniel.mercado.domain.model.Pesos
 import co.daniel.mercado.domain.model.Trip
 import co.daniel.mercado.domain.model.TripItem
@@ -37,6 +38,15 @@ class InMemoryTripRepository : TripRepository {
             TripSummary(trip, LineMath.articleCount(s.items.values.filter { it.tripId == trip.id }))
         }
     }
+
+    override suspend fun closedLines(fromMillis: Long, toMillis: Long): List<ClosedLine> =
+        state.value.trips.values
+            .filter { t -> t.closedAt?.let { it in fromMillis until toMillis } == true }
+            .flatMap { trip ->
+                itemsOf(trip.id).map { ClosedLine(trip.id, trip.closedAt!!, it.productId, it.quantity, it.unitPrice, it.unitType) }
+            }
+
+    override suspend fun lastClosedAt(): Long? = state.value.trips.values.mapNotNull { it.closedAt }.maxOrNull()
 
     override suspend fun getWithItems(id: Long): TripWithItems? =
         state.value.trips[id]?.let { TripWithItems(it, itemsOf(id)) }

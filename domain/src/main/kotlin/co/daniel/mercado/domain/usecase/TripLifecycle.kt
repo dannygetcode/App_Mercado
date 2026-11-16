@@ -10,6 +10,7 @@ import co.daniel.mercado.domain.model.PricePoint
 import co.daniel.mercado.domain.model.PriceSource
 import co.daniel.mercado.domain.port.Clock
 import co.daniel.mercado.domain.port.ProductRepository
+import co.daniel.mercado.domain.port.ShoppingListRepository
 import co.daniel.mercado.domain.port.TripRepository
 import co.daniel.mercado.domain.rules.BudgetRules
 import co.daniel.mercado.domain.rules.LineMath
@@ -94,6 +95,8 @@ class CloseTrip(
     private val products: ProductRepository,
     private val session: TripSession,
     private val clock: Clock,
+    /** RF-08: los productos de la lista que se compraron quedan marcados. */
+    private val shoppingList: ShoppingListRepository? = null,
 ) {
     suspend operator fun invoke(totalPaid: Pesos? = null, store: String? = null): CloseTripResult {
         totalPaid?.let { require(it.value >= 0) { "total pagado negativo" } }
@@ -116,6 +119,10 @@ class CloseTrip(
                     updateReference(product, price, now)
                     if (product.needsReview) needsReview += product
                 }
+            shoppingList?.let { list ->
+                val bought = active.items.mapNotNull { it.productId }.toSet()
+                list.getAll().filter { it.productId in bought && !it.checked }.forEach { list.upsert(it.copy(checked = true)) }
+            }
             trips.updateTrip(
                 active.trip.copy(
                     closedAt = now,
