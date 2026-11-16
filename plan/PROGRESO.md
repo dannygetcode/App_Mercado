@@ -13,7 +13,7 @@ Lo mantiene el agente. Una sesión nueva empieza leyendo este archivo.
 | L0 Base del proyecto | cerrado | verde 2026-11-16 (humano no bloqueante pendiente) |
 | L1 Dominio | cerrado | verde 2026-11-16 |
 | L2 Datos cifrados | cerrado | verde 2026-11-16 (2 humanos no bloqueantes pendientes) |
-| L3 Escáner | pendiente | — |
+| L3 Escáner | en curso | — |
 | L4 Compra en curso | pendiente | — |
 | L5 Resto de pantallas | pendiente | — |
 | L6 Seguridad y respaldo | pendiente | — |
@@ -29,7 +29,7 @@ Formato por loop (copiar el bloque al empezar cada uno):
 
 ```
 ### L<n> · <nombre>
-- [ ] T1 — 
+- [x] T1 — `BarcodeDecoder` (interfaz de `02-arquitectura.md`) y `MlKitBarcodeDecoder` (ML Kit bundled 17.3.0, solo EAN-13, EAN-8, UPC-A, UPC-E y Code 128; cierra cada `ImageProxy`; ignora resultados tras `close()`). `ScanFilter.firstValid` acepta la primera lectura del cuadro con dígito de control válido (vía `Ean.normalize`). CameraX 1.6.2 agregado. 4 pruebas JVM.
 - [ ] T2 — 
 ...
 **Informe de cierre**
@@ -100,3 +100,11 @@ Formato por loop (copiar el bloque al empezar cada uno):
   1. Con el teléfono conectado por USB y depuración USB activa, desde la carpeta del proyecto en Git Bash: `./gradlew :app:connectedDebugAndroidTest`. Deben pasar `EncryptedDbTest` y `DbKeyManagerTest` (3 + 1 pruebas). Si no tienes tiempo, dímelo y la lanzo yo en cuanto `adb devices` muestre el teléfono.
   2. Revisar `seed/catalogo_inicial.json` con la lista de renglones dudosos de T6 (arriba). Las correcciones me las dictas o las editas en el archivo, y yo actualizo la copia de `assets`.
 
+### L3 · Escáner
+- [ ] T1 — 
+- [ ] T2 — 
+- [ ] T3 — 
+- [ ] T4 — 
+- [ ] T5 — 
+- [ ] T6 — 
+**Informe de cierre**
