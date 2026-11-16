@@ -1,0 +1,486 @@
+{
+  "version": 1,
+  "source": "Recibo La Granja (Tunja) 13/10/2026, factura E04S108800",
+  "products": [
+    {
+      "name": "Detergente líquido AK-1 1800 ml",
+      "category": "Aseo del hogar",
+      "unit": "UNIT",
+      "price": 19500,
+      "barcodes": [
+        "7702310048088"
+      ],
+      "favorite": false
+    },
+    {
+      "name": "Detergente Dersa bicarbonato y manzana 250 g",
+      "category": "Aseo del hogar",
+      "unit": "UNIT",
+      "price": 3150,
+      "barcodes": [
+        "7702166002456"
+      ],
+      "favorite": false
+    },
+    {
+      "name": "Lavaloza La Joya 720 ml",
+      "category": "Aseo del hogar",
+      "unit": "UNIT",
+      "price": 5150,
+      "barcodes": [
+        "7702088208936"
+      ],
+      "favorite": false
+    },
+    {
+      "name": "Detergente líquido AK-1 manzana verde 1800 ml",
+      "category": "Aseo del hogar",
+      "unit": "UNIT",
+      "price": 19500,
+      "barcodes": [
+        "7702310048118"
+      ],
+      "favorite": false
+    },
+    {
+      "name": "Vinagre blanco Sudespensa 3000 ml",
+      "category": "Granos y despensa",
+      "unit": "UNIT",
+      "price": 5250,
+      "barcodes": [
+        "7707309255805"
+      ],
+      "favorite": false
+    },
+    {
+      "name": "Seda dental Cuidado Total yerbabuena 200 m",
+      "category": "Cuidado personal",
+      "unit": "UNIT",
+      "price": 13550,
+      "barcodes": [
+        "7704631903770"
+      ],
+      "favorite": false
+    },
+    {
+      "name": "Shampoo Dove largos fortalecidos biotina 400 ml",
+      "category": "Cuidado personal",
+      "unit": "UNIT",
+      "price": 23550,
+      "barcodes": [
+        "7891150064881"
+      ],
+      "favorite": false
+    },
+    {
+      "name": "Crema dental Oral-B extra blanco bicarbonato 150 ml",
+      "category": "Cuidado personal",
+      "unit": "UNIT",
+      "price": 12550,
+      "barcodes": [
+        "7500435176989"
+      ],
+      "favorite": false
+    },
+    {
+      "name": "Jabón Tigre azul 300 g",
+      "category": "Aseo del hogar",
+      "unit": "UNIT",
+      "price": 2700,
+      "barcodes": [
+        "7703522000628"
+      ],
+      "favorite": false
+    },
+    {
+      "name": "Guantes Milenio talla 9",
+      "category": "Aseo del hogar",
+      "unit": "UNIT",
+      "price": 6200,
+      "barcodes": [
+        "7702764034002"
+      ],
+      "favorite": false
+    },
+    {
+      "name": "Pan Emanuel integral",
+      "category": "Panadería",
+      "unit": "UNIT",
+      "price": 4300,
+      "barcodes": [
+        "7709916044834"
+      ],
+      "favorite": false
+    },
+    {
+      "name": "Champiñones enteros 250 g",
+      "category": "Frutas y verduras",
+      "unit": "UNIT",
+      "price": 8050,
+      "barcodes": [
+        "769602369907"
+      ],
+      "favorite": true
+    },
+    {
+      "name": "Gelatina Frutiño sin sabor 3 x 14 g",
+      "category": "Granos y despensa",
+      "unit": "UNIT",
+      "price": 3850,
+      "barcodes": [
+        "7702354960827"
+      ],
+      "favorite": false
+    },
+    {
+      "name": "Mayonesa Fruco 80 g",
+      "category": "Granos y despensa",
+      "unit": "UNIT",
+      "price": 1700,
+      "barcodes": [
+        "7702047141014"
+      ],
+      "favorite": false
+    },
+    {
+      "name": "Flor de Jamaica Jardín Medicinal 15 g",
+      "category": "Granos y despensa",
+      "unit": "UNIT",
+      "price": 2850,
+      "barcodes": [
+        "7707195750286"
+      ],
+      "favorite": false
+    },
+    {
+      "name": "Pimienta molida Superchef 15 g",
+      "category": "Granos y despensa",
+      "unit": "UNIT",
+      "price": 1450,
+      "barcodes": [
+        "7707341250097"
+      ],
+      "favorite": false
+    },
+    {
+      "name": "Canela tipo media Superchef 30 g",
+      "category": "Granos y despensa",
+      "unit": "UNIT",
+      "price": 3300,
+      "barcodes": [
+        "7707341250271"
+      ],
+      "favorite": false
+    },
+    {
+      "name": "Crema de maní natural Manitoba 200 g",
+      "category": "Granos y despensa",
+      "unit": "UNIT",
+      "price": 9650,
+      "barcodes": [
+        "7707713942445"
+      ],
+      "favorite": false
+    },
+    {
+      "name": "Aromática Herbar yerbabuena 20 und",
+      "category": "Granos y despensa",
+      "unit": "UNIT",
+      "price": 2150,
+      "barcodes": [
+        "7709990078176"
+      ],
+      "favorite": false
+    },
+    {
+      "name": "Cúrcuma Jardín Medicinal 12 g",
+      "category": "Granos y despensa",
+      "unit": "UNIT",
+      "price": 2250,
+      "barcodes": [
+        "7707195750422"
+      ],
+      "favorite": false
+    },
+    {
+      "name": "Salsa de tomate Fruco",
+      "category": "Granos y despensa",
+      "unit": "UNIT",
+      "price": 1700,
+      "barcodes": [
+        "7702047141373"
+      ],
+      "favorite": false
+    },
+    {
+      "name": "Cilantro Jardín Medicinal",
+      "category": "Granos y despensa",
+      "unit": "UNIT",
+      "price": 2500,
+      "barcodes": [
+        "7707195750330"
+      ],
+      "favorite": false
+    },
+    {
+      "name": "Guantes Milenio doméstico talla 7½",
+      "category": "Aseo del hogar",
+      "unit": "UNIT",
+      "price": 4300,
+      "barcodes": [
+        "7702764023006"
+      ],
+      "favorite": false
+    },
+    {
+      "name": "Calado especial de Samacá 5 und",
+      "category": "Panadería",
+      "unit": "UNIT",
+      "price": 3000,
+      "barcodes": [
+        "614143035746"
+      ],
+      "favorite": false
+    },
+    {
+      "name": "Té Hindú premium chai",
+      "category": "Granos y despensa",
+      "unit": "UNIT",
+      "price": 12000,
+      "barcodes": [
+        "7702746011120"
+      ],
+      "favorite": false
+    },
+    {
+      "name": "Chocolate La Especial cocoa 400 g",
+      "category": "Granos y despensa",
+      "unit": "UNIT",
+      "price": 8150,
+      "barcodes": [
+        "7702007086607"
+      ],
+      "favorite": false
+    },
+    {
+      "name": "Mezcla nueces mixtas Darvida 180 g",
+      "category": "Granos y despensa",
+      "unit": "UNIT",
+      "price": 9400,
+      "barcodes": [
+        "7702020043168"
+      ],
+      "favorite": false
+    },
+    {
+      "name": "Orégano picado Jardín Medicinal 12 g",
+      "category": "Granos y despensa",
+      "unit": "UNIT",
+      "price": 2250,
+      "barcodes": [
+        "7707195750248"
+      ],
+      "favorite": false
+    },
+    {
+      "name": "Avena en hojuelas De La Abuela 2 kg",
+      "category": "Granos y despensa",
+      "unit": "UNIT",
+      "price": 14400,
+      "barcodes": [
+        "7707287463223"
+      ],
+      "favorite": false
+    },
+    {
+      "name": "Cepillo dental Fluocardent blancura máx x2",
+      "category": "Cuidado personal",
+      "unit": "UNIT",
+      "price": 14300,
+      "barcodes": [
+        "7702560036286"
+      ],
+      "favorite": false
+    },
+    {
+      "name": "Arepa de maíz peto paisa Juanita 5 und",
+      "category": "Panadería",
+      "unit": "UNIT",
+      "price": 2350,
+      "barcodes": [
+        "7709657019689"
+      ],
+      "favorite": false
+    },
+    {
+      "name": "Jamón sándwich Zenú 230 g",
+      "category": "Carnes",
+      "unit": "UNIT",
+      "price": 10100,
+      "barcodes": [
+        "7701101280638"
+      ],
+      "favorite": false
+    },
+    {
+      "name": "Salchicha perro caliente Zenú 240 g",
+      "category": "Carnes",
+      "unit": "UNIT",
+      "price": 9850,
+      "barcodes": [
+        "7701101261521"
+      ],
+      "favorite": false
+    },
+    {
+      "name": "Queso mozzarella Colanta 250 g",
+      "category": "Lácteos y huevos",
+      "unit": "UNIT",
+      "price": 13000,
+      "barcodes": [
+        "7702129020800"
+      ],
+      "favorite": false
+    },
+    {
+      "name": "Kéfir Alpina Plus",
+      "category": "Lácteos y huevos",
+      "unit": "UNIT",
+      "price": 6850,
+      "barcodes": [
+        "7702001175635"
+      ],
+      "favorite": false
+    },
+    {
+      "name": "Yogurt griego fresa Colanta 125 g",
+      "category": "Lácteos y huevos",
+      "unit": "UNIT",
+      "price": 3500,
+      "barcodes": [
+        "7702129041355"
+      ],
+      "favorite": false
+    },
+    {
+      "name": "Café Tostao selecto 454 g",
+      "category": "Granos y despensa",
+      "unit": "UNIT",
+      "price": 22320,
+      "barcodes": [
+        "7708024204611"
+      ],
+      "favorite": false
+    },
+    {
+      "name": "Leche en polvo Alquería 330 g",
+      "category": "Lácteos y huevos",
+      "unit": "UNIT",
+      "price": 12750,
+      "barcodes": [
+        "7702177019542"
+      ],
+      "favorite": false
+    },
+    {
+      "name": "Doritos mega queso",
+      "category": "Granos y despensa",
+      "unit": "UNIT",
+      "price": 3800,
+      "barcodes": [
+        "7702189059642"
+      ],
+      "favorite": false
+    },
+    {
+      "name": "Queso campesino Colanta 250 g",
+      "category": "Lácteos y huevos",
+      "unit": "UNIT",
+      "price": 9000,
+      "barcodes": [
+        "7702129015523"
+      ],
+      "favorite": false
+    },
+    {
+      "name": "Mix maní, almendra y marañón Manitoba 420 g",
+      "category": "Granos y despensa",
+      "unit": "UNIT",
+      "price": 18000,
+      "barcodes": [
+        "7707713944340"
+      ],
+      "favorite": false
+    },
+    {
+      "name": "Filtro de papel para café #2 x40",
+      "category": "Granos y despensa",
+      "unit": "UNIT",
+      "price": 7950,
+      "barcodes": [
+        "7709968621045"
+      ],
+      "favorite": false
+    },
+    {
+      "name": "Kumis entero Bachué",
+      "category": "Lácteos y huevos",
+      "unit": "UNIT",
+      "price": 13000,
+      "barcodes": [
+        "7708511407341"
+      ],
+      "favorite": false
+    },
+    {
+      "name": "Maní natural Maniksero",
+      "category": "Granos y despensa",
+      "unit": "UNIT",
+      "price": 6250,
+      "barcodes": [
+        "7707770308826"
+      ],
+      "favorite": false
+    },
+    {
+      "name": "Maní con uvas Maniksero 225 g",
+      "category": "Granos y despensa",
+      "unit": "UNIT",
+      "price": 6250,
+      "barcodes": [
+        "7707770304491"
+      ],
+      "favorite": false
+    },
+    {
+      "name": "Yogurt griego natural sin azúcar Alpina 500 g",
+      "category": "Lácteos y huevos",
+      "unit": "UNIT",
+      "price": 17750,
+      "barcodes": [
+        "7702001163885"
+      ],
+      "favorite": false
+    },
+    {
+      "name": "Galletas Digestive Diet Nature 400 g",
+      "category": "Panadería",
+      "unit": "UNIT",
+      "price": 18200,
+      "barcodes": [
+        "8410376023831"
+      ],
+      "favorite": false
+    },
+    {
+      "name": "Leche entera La Arboleda 6 x 1100 ml",
+      "category": "Lácteos y huevos",
+      "unit": "UNIT",
+      "price": 25400,
+      "barcodes": [
+        "7707248770780"
+      ],
+      "favorite": false
+    }
+  ]
+}

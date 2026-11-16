@@ -74,3 +74,19 @@ Formato por loop (copiar el bloque al empezar cada uno):
 - [x] T3 — `DbKeyManager` (S-03): 32 bytes de `SecureRandom`, envueltos por `KeystoreKeyWrapper` (AES-256-GCM, alias `mercado_db_kek`, StrongBox si existe y si no TEE, sin autenticación por D-09), archivo `noBackupFilesDir/db.key` con formato `MDK1`, escritura atómica. Nunca regenera la clave si la base ya existe (`DbKeyException`). 4 pruebas JVM con envoltorio por software.
 - [x] T4 — Repositorios Room: `RoomProductRepository`, `RoomTripRepository`, `RoomBudgetRepository` y `RoomTransactionRunner` (`withTransaction`), con mapeadores entidad↔modelo; `name_norm` se calcula al mapear; borrar un producto provisional limpia códigos, historial y lista en una transacción. Las operaciones transaccionales de `03-datos.md` corren dentro de `TripSession.mutate` → `withTransaction`. Pruebas en T8.
 - [x] T5 — `SeedImporter` + `SeedFileDto`/`SeedProductDto`: límite 2 MB y 5.000 productos, versión 1, nombre 1–80, categoría (se crea si no existe), unidad `UNIT`/`KG`, precio 1–50.000.000, códigos por `Ean` y sin repetirse entre productos; valida todo y escribe en una transacción; error con índice del producto. Idempotente por `name_norm`; punto `SEED` en el historial solo para `UNIT` y si cambió. `InitialCatalogLoader` importa `assets/seed/catalogo_inicial.json` si la base no tiene productos (la bandera `seed_imported` se conecta en T8). Pruebas en T8.
+- [x] T6 — Semilla real desde `seed/recibo.pdf` (La Granja, 13/10/2026, 57 renglones, total $497.870): 48 productos en `seed/catalogo_inicial.json`, copiado a `app/src/main/assets/seed/`. Todos `UNIT` con su código (todos pasan `Ean`). Cuadre: exento $99.850 ✓, IVA 5 % $59.270 ✓, IVA 19 % $335.500 + renglón 30 ($3.250) = $338.750 ✓, total $497.870 ✓. Los repetidos (crema dental, jabón Tigre, crema de maní, nueces, avena, queso campesino, filtro) quedaron una sola vez.
+  **Renglones dudosos para que Daniel revise** (en el catálogo o en la app):
+  1. Renglón 30: no aparece en el PDF (salto de página). Vale $3.250 con IVA 19 %. No se incluyó: ¿qué producto era?
+  2. Renglón 25 «Cilantro Jardín Medicinal»: el recibo se lee `7707195760330` (dígito de control inválido); se usó `7707195750330`, que sí valida y sigue la serie de Jardín Medicinal. Confirmar escaneándolo.
+  3. Renglón 44 «Café Tostao selecto 454 g»: precio de lista $24.800 con 10 % de descuento; se tomó lo pagado, $22.320.
+  4. Renglón 13 «Pan Emanuel integral»: el tamaño quedó cortado («X 45… G»).
+  5. Renglón 24 «Salsa de tomate Fruco»: tamaño ilegible («X8»).
+  6. Renglón 41 «Kéfir Alpina Plus»: tamaño ilegible («X 24»).
+  7. Renglón 46 «Doritos mega queso»: tamaño ilegible («X 8»).
+  8. Renglón 51 «Kumis entero Bachué»: el recibo dice 200 ml pero vale $13.000; ¿es de 2.000 ml?
+  9. Renglón 52 «Maní natural Maniksero»: tamaño cortado («X 2…5G», quizá 225 g); confirmar también la marca «Maniksero».
+  10. Renglón 14 «Champiñones enteros 250 g»: marca ilegible («CHAMPI Y»); único marcado favorito (verdura).
+  11. Renglón 28 «Té Hindú premium chai»: el recibo dice «X2 UND X 32 G» por $12.000; confirmar presentación.
+  12. Categorías elegidas a criterio: vinagre y filtros de café en «Granos y despensa»; jabón Tigre y guantes en «Aseo del hogar»; arepas, calados y galletas en «Panadería».
+  No hay productos por peso en este recibo, así que ninguno es `KG`.
+
