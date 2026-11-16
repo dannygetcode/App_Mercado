@@ -1,12 +1,16 @@
 package co.daniel.mercado.scanner
 
 import android.Manifest
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import android.content.Intent
+import androidx.compose.ui.test.junit4.createEmptyComposeRule
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import co.daniel.mercado.MainActivity
+import co.daniel.mercado.MercadoApp
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.RuleChain
@@ -43,19 +47,30 @@ class ScannerSmokeTest {
                         )
                     }
                 }
+                // La compuerta de bloqueo (S-05) se prueba en JVM; aquí se abre sin huella.
+                (target.applicationContext as MercadoApp).container.appLock.unlock()
                 base.evaluate()
             }
         }
     }
 
-    private val compose = createAndroidComposeRule<MainActivity>()
+    private val compose = createEmptyComposeRule()
 
     @get:Rule
     val rules: RuleChain = RuleChain.outerRule(grantCamera).around(compose)
 
     @Test
     fun visorAbreConPermisoYNoSeCae() {
-        compose.onNodeWithText("Diagnóstico del escáner").performClick()
+        // Abre el diagnóstico directo (extra de debug), aunque haya una compra abierta.
+        val target = InstrumentationRegistry.getInstrumentation().targetContext
+        val intent = Intent(target, MainActivity::class.java).putExtra("open_diagnostics", true)
+        ActivityScenario.launch<MainActivity>(intent).use { runSmoke() }
+    }
+
+    private fun runSmoke() {
+        compose.waitUntil(CAMERA_WARMUP_MS) {
+            compose.onAllNodesWithText("Pausar cámara").fetchSemanticsNodes().isNotEmpty()
+        }
         Thread.sleep(CAMERA_WARMUP_MS)
         compose.waitForIdle()
         compose.onNodeWithText("Sin acceso a la cámara").assertDoesNotExist()

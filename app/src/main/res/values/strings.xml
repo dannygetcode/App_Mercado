@@ -218,4 +218,6 @@
     <string name="quantity_more">Agregar uno de %s</string>
     <string name="data_error_title">No se pudieron abrir tus datos</string>
     <string name="data_error_text">La base cifrada de este teléfono no abrió. No desinstales la app ni borres sus datos: así se perderían. Cierra Mercado y ábrelo de nuevo. Si sigue igual, no borres nada: los datos siguen guardados en el teléfono.</string>
+    <string name="lock_prompt_title">Desbloquear Mercado</string>
+    <string name="lock_unlock">Desbloquear</string>
 </resources>

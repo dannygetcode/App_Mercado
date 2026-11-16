@@ -62,6 +62,7 @@ import co.daniel.mercado.domain.usecase.SetPaidTotal
 import co.daniel.mercado.domain.usecase.StartTrip
 import co.daniel.mercado.domain.usecase.TripSession
 import co.daniel.mercado.domain.usecase.UndoLastAction
+import co.daniel.mercado.security.AppLock
 import co.daniel.mercado.security.DbKeyManager
 import co.daniel.mercado.security.KeystoreKeyWrapper
 import co.daniel.mercado.util.AppLog
@@ -97,6 +98,9 @@ class AppContainer(
     }
 
     fun newBarcodeDecoder(): BarcodeDecoder = MlKitBarcodeDecoder()
+
+    /** Compuerta de bloqueo, una por proceso (S-05). */
+    val appLock = AppLock(clock)
 
     /** La cámara de la compra ofrece aquí y el `TripViewModel` escucha. */
     val tripBarcodeSource: BarcodeSource = SharedBarcodeSource()

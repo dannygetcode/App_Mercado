@@ -16,7 +16,7 @@ Lo mantiene el agente. Una sesión nueva empieza leyendo este archivo.
 | L3 Escáner | cerrado | verde 2026-11-16; prueba en modo avión 10/10 |
 | L4 Compra en curso | cerrado | verde 2026-11-16; simulacro en casa OK |
 | L5 Resto de pantallas | cerrado | verde 2026-11-16 (humano no bloqueante pendiente) |
-| L6 Seguridad y respaldo | pendiente | — |
+| L6 Seguridad y respaldo | en curso | — |
 | L7 Lista, resúmenes, recordatorios | pendiente | — |
 | L8 Release | pendiente | — |
 | L9 Prueba de campo | pendiente | — |
@@ -169,3 +169,6 @@ Formato por loop (copiar el bloque al empezar cada uno):
 - Medido: APK debug 53,8 MB (debug sin R8, todas las ABI). Arranque en frío en el teléfono (`am start -W`): 230 ms hasta la primera ventana.
 - Desviaciones de la especificación: ninguna de fondo. Detalles en DECISIONES (acceso directo con límite por defecto, íconos vectoriales propios, clave `budget_hint_dismissed`, desactivar sin confirmación con "Reactivar", orden de favoritos con ↑/↓, topes por categoría en L7). La tarjeta "Lista de mercado" del Inicio llega con L7.
 - Pendiente para Daniel: `[HUMANO, no bloqueante]` recorrer todas las pantallas en el teléfono, en tema claro y en oscuro (el APK debug ya está instalado). Ver el mensaje de cierre de la sesión.
+
+### L6 · Seguridad y respaldo
+- [x] T1 — `AppLock` (`security/`, uno por proceso en el `AppContainer`): estado `CHECKING`/`LOCKED`/`UNLOCKED`; bloquea al abrir el proceso y al volver de segundo plano si pasó la gracia (1/5/15 min); desactivado o sin bloqueo de pantalla en el teléfono entra directo. `MainActivity` pasa a `FragmentActivity` (lo pide `BiometricPrompt`), avisa `onStart`/`onStop` y solo compone la navegación con `UNLOCKED`; con `CHECKING` muestra el fondo vacío y con `LOCKED` la pantalla de Bloqueo (logo, "Mercado", diálogo del sistema lanzado solo, "Desbloquear" si se cancela). `showUnlockPrompt` con `BIOMETRIC_STRONG or DEVICE_CREDENTIAL` (Android 9–10: `BIOMETRIC_WEAK or DEVICE_CREDENTIAL`, la combinación fuerte no existe ahí). Dependencia `androidx.biometric` 1.1.0 (ya en el catálogo); agrega `USE_BIOMETRIC` y `USE_FINGERPRINT`, ambos en la lista blanca. `AppLockTest` (7: bloquea al inicio, no bloquea dentro de la gracia, bloquea pasada la gracia, gracia elegida, desactivado nunca bloquea, sin bloqueo del teléfono entra directo, salir estando bloqueada) + `LockScreenTest` (1). `ScannerSmokeTest` abre el diagnóstico con el extra de debug y abre la compuerta en el proceso de prueba.
