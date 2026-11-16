@@ -8,6 +8,7 @@ import co.daniel.mercado.data.db.dao.BackupDao
 import co.daniel.mercado.data.db.dao.BudgetDao
 import co.daniel.mercado.data.db.dao.CategoryDao
 import co.daniel.mercado.data.db.dao.ProductDao
+import co.daniel.mercado.data.db.dao.ShoppingListDao
 import co.daniel.mercado.data.db.dao.TripDao
 import co.daniel.mercado.data.db.entity.BarcodeEntity
 import co.daniel.mercado.data.db.entity.BudgetEntity
@@ -39,6 +40,7 @@ abstract class MercadoDatabase : RoomDatabase() {
     abstract fun tripDao(): TripDao
     abstract fun budgetDao(): BudgetDao
     abstract fun backupDao(): BackupDao
+    abstract fun shoppingListDao(): ShoppingListDao
 
     companion object {
         const val FILE_NAME = "mercado.db"

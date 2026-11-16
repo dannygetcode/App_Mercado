@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
+import co.daniel.mercado.data.db.entity.ClosedLineRow
 import co.daniel.mercado.data.db.entity.ClosedTripRow
 import co.daniel.mercado.data.db.entity.TripEntity
 import co.daniel.mercado.data.db.entity.TripItemEntity
@@ -33,6 +34,19 @@ interface TripDao {
             "FROM trip t WHERE t.closed_at IS NOT NULL ORDER BY t.closed_at DESC, t.id DESC",
     )
     fun observeClosed(): Flow<List<ClosedTripRow>>
+
+    /** Líneas de compras cerradas en `[from, to)` con el tipo de unidad de su producto (sueltas: UNIT). */
+    @Query(
+        "SELECT i.trip_id AS tripId, t.closed_at AS closedAt, i.product_id AS productId, i.quantity AS quantity, " +
+            "i.unit_price AS unitPrice, COALESCE(p.unit_type, 'UNIT') AS unitType " +
+            "FROM trip_item i JOIN trip t ON t.id = i.trip_id LEFT JOIN product p ON p.id = i.product_id " +
+            "WHERE t.closed_at IS NOT NULL AND t.closed_at >= :fromMillis AND t.closed_at < :toMillis " +
+            "ORDER BY t.closed_at, i.position",
+    )
+    suspend fun closedLines(fromMillis: Long, toMillis: Long): List<ClosedLineRow>
+
+    @Query("SELECT MAX(closed_at) FROM trip WHERE closed_at IS NOT NULL")
+    suspend fun lastClosedAt(): Long?
 
     @Query("SELECT COUNT(*) FROM trip WHERE closed_at IS NULL")
     suspend fun countOpen(): Int

@@ -5,15 +5,18 @@ import co.daniel.mercado.data.db.MercadoDatabase
 import co.daniel.mercado.data.db.entity.BarcodeEntity
 import co.daniel.mercado.domain.model.Budget
 import co.daniel.mercado.domain.model.Category
+import co.daniel.mercado.domain.model.ClosedLine
 import co.daniel.mercado.domain.model.Pesos
 import co.daniel.mercado.domain.model.PricePoint
 import co.daniel.mercado.domain.model.Product
+import co.daniel.mercado.domain.model.ShoppingListItem
 import co.daniel.mercado.domain.model.Trip
 import co.daniel.mercado.domain.model.TripItem
 import co.daniel.mercado.domain.model.TripSummary
 import co.daniel.mercado.domain.model.TripWithItems
 import co.daniel.mercado.domain.port.BudgetRepository
 import co.daniel.mercado.domain.port.ProductRepository
+import co.daniel.mercado.domain.port.ShoppingListRepository
 import co.daniel.mercado.domain.port.TransactionRunner
 import co.daniel.mercado.domain.port.TripRepository
 import kotlinx.coroutines.flow.Flow
@@ -74,6 +77,11 @@ class RoomProductRepository(private val db: MercadoDatabase) : ProductRepository
 
     override suspend fun insertCategory(category: Category): Long = categoryDao.insert(category.copy(id = 0).toEntity())
 
+    override suspend fun setCategoryBudget(categoryId: Long, amount: Pesos?) = categoryDao.setMonthlyBudget(categoryId, amount)
+
+    override suspend fun getByIds(ids: Collection<Long>): List<Product> =
+        ids.distinct().chunked(MAX_SQL_ARGS).flatMap { chunk -> dao.getByIds(chunk).map { it.toModel() } }
+
     override suspend fun lastPricePoint(productId: Long): PricePoint? = dao.lastPricePoint(productId)?.toModel()
 
     override suspend fun addPricePoint(point: PricePoint) {
@@ -81,6 +89,8 @@ class RoomProductRepository(private val db: MercadoDatabase) : ProductRepository
     }
 
     companion object {
+        private const val MAX_SQL_ARGS = 900
+
         /** `%texto%` con los comodines del usuario escapados para `LIKE ... ESCAPE '\'`. */
         fun likePattern(query: String): String =
             "%" + query.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_") + "%"
@@ -123,6 +133,24 @@ class RoomTripRepository(private val db: MercadoDatabase) : TripRepository {
         Pesos(dao.spentBetween(fromMillis, toMillis))
 
     override suspend fun recentStores(limit: Int): List<String> = dao.recentStores(limit)
+
+    override suspend fun closedLines(fromMillis: Long, toMillis: Long): List<ClosedLine> =
+        dao.closedLines(fromMillis, toMillis).map { ClosedLine(it.tripId, it.closedAt, it.productId, it.quantity, it.unitPrice, it.unitType) }
+
+    override suspend fun lastClosedAt(): Long? = dao.lastClosedAt()
+}
+
+class RoomShoppingListRepository(db: MercadoDatabase) : ShoppingListRepository {
+
+    private val dao = db.shoppingListDao()
+
+    override fun observeAll(): Flow<List<ShoppingListItem>> = dao.observeAll().map { list -> list.map { it.toModel() } }
+
+    override suspend fun getAll(): List<ShoppingListItem> = dao.all().map { it.toModel() }
+
+    override suspend fun upsert(item: ShoppingListItem) = dao.upsert(item.toEntity())
+
+    override suspend fun delete(productId: Long) = dao.delete(productId)
 }
 
 class RoomBudgetRepository(db: MercadoDatabase) : BudgetRepository {

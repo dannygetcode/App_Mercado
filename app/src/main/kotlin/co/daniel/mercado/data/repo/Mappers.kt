@@ -1,5 +1,8 @@
 package co.daniel.mercado.data.repo
 
+import co.daniel.mercado.data.db.entity.ShoppingListItemEntity
+import co.daniel.mercado.domain.model.ListSource
+import co.daniel.mercado.domain.model.ShoppingListItem
 import co.daniel.mercado.data.db.entity.BudgetEntity
 import co.daniel.mercado.data.db.entity.CategoryEntity
 import co.daniel.mercado.data.db.entity.PriceHistoryEntity
@@ -88,3 +91,9 @@ internal fun TripWithItemsRelation.toModel() = TripWithItems(
 
 internal fun BudgetEntity.toModel() = Budget(yearMonth, amount)
 internal fun Budget.toEntity() = BudgetEntity(yearMonth, amount)
+
+internal fun ShoppingListItemEntity.toModel() =
+    ShoppingListItem(productId, suggestedQty, checked, ListSource.valueOf(source), dismissedUntil)
+
+internal fun ShoppingListItem.toEntity() =
+    ShoppingListItemEntity(productId, suggestedQty, checked, source.name, dismissedUntil)

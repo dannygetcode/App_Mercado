@@ -137,3 +137,13 @@ data class ClosedTripRow(
     @Embedded val trip: TripEntity,
     @ColumnInfo(name = "article_count") val articleCount: Int,
 )
+
+/** Línea de compra cerrada para sugerencias y resúmenes. */
+data class ClosedLineRow(
+    val tripId: Long,
+    val closedAt: Long,
+    val productId: Long?,
+    val quantity: Int,
+    val unitPrice: Pesos,
+    val unitType: UnitType,
+)

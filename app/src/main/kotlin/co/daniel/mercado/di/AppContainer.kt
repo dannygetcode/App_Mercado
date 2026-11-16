@@ -10,6 +10,7 @@ import co.daniel.mercado.data.db.MercadoDatabase
 import co.daniel.mercado.data.db.SqlCipherDatabaseFactory
 import co.daniel.mercado.data.repo.RoomBudgetRepository
 import co.daniel.mercado.data.repo.RoomProductRepository
+import co.daniel.mercado.data.repo.RoomShoppingListRepository
 import co.daniel.mercado.data.repo.RoomTransactionRunner
 import co.daniel.mercado.data.repo.RoomTripRepository
 import co.daniel.mercado.data.seed.InitialCatalogLoader
@@ -32,6 +33,16 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import co.daniel.mercado.domain.port.Clock
 import co.daniel.mercado.domain.rules.ScanDebouncer
+import co.daniel.mercado.domain.usecase.AddListItem
+import co.daniel.mercado.domain.usecase.BuildSuggestedList
+import co.daniel.mercado.domain.usecase.GetMonthSummary
+import co.daniel.mercado.domain.usecase.GetMonthsComparison
+import co.daniel.mercado.domain.usecase.GetPriceChanges
+import co.daniel.mercado.domain.usecase.ObserveShoppingList
+import co.daniel.mercado.domain.usecase.RemoveListItem
+import co.daniel.mercado.domain.usecase.SetCategoryBudget
+import co.daniel.mercado.domain.usecase.ShouldRemindShopping
+import co.daniel.mercado.domain.usecase.ToggleListItem
 import co.daniel.mercado.domain.usecase.AddLoosePrice
 import co.daniel.mercado.domain.usecase.AddProductToTrip
 import co.daniel.mercado.domain.usecase.AddUnknownScanned
@@ -150,6 +161,7 @@ class DataGraph(
     val products = RoomProductRepository(db)
     val trips = RoomTripRepository(db)
     val budgets = RoomBudgetRepository(db)
+    val shoppingList = RoomShoppingListRepository(db)
     val transactions = RoomTransactionRunner(db)
     val tripSession = TripSession(transactions)
     val seedImporter = SeedImporter(db, clock)
@@ -170,7 +182,7 @@ class DataGraph(
     val removeLine = RemoveLine(trips, tripSession)
     val renameLooseLine = RenameLooseLine(trips, tripSession)
     val undoLastAction = UndoLastAction(trips, products, tripSession)
-    val closeTrip = CloseTrip(trips, products, tripSession, clock)
+    val closeTrip = CloseTrip(trips, products, tripSession, clock, shoppingList)
     val discardTrip = DiscardTrip(trips, tripSession)
     val setPaidTotal = SetPaidTotal(trips)
 
@@ -188,4 +200,15 @@ class DataGraph(
 
     val observeClosedTrips = ObserveClosedTrips(trips)
     val getTripDetail = GetTripDetail(trips)
+
+    val buildSuggestedList = BuildSuggestedList(trips, shoppingList, transactions, clock)
+    val observeShoppingList = ObserveShoppingList(trips, products, shoppingList, clock)
+    val toggleListItem = ToggleListItem(shoppingList)
+    val addListItem = AddListItem(shoppingList)
+    val removeListItem = RemoveListItem(trips, shoppingList, clock)
+    val setCategoryBudget = SetCategoryBudget(products)
+    val getPriceChanges = GetPriceChanges(trips, products)
+    val getMonthSummary = GetMonthSummary(trips, products, getMonthStatus, getPriceChanges)
+    val getMonthsComparison = GetMonthsComparison(getMonthStatus)
+    val shouldRemindShopping = ShouldRemindShopping(trips, buildSuggestedList, clock)
 }

@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import co.daniel.mercado.data.db.entity.CategoryEntity
+import co.daniel.mercado.domain.model.Pesos
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -19,4 +20,7 @@ interface CategoryDao {
 
     @Insert
     suspend fun insert(category: CategoryEntity): Long
+
+    @Query("UPDATE category SET monthly_budget = :amount WHERE id = :id")
+    suspend fun setMonthlyBudget(id: Long, amount: Pesos?)
 }

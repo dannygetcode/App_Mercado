@@ -20,6 +20,9 @@ interface ProductDao {
     @Query("SELECT * FROM product WHERE id = :id")
     suspend fun getById(id: Long): ProductEntity?
 
+    @Query("SELECT * FROM product WHERE id IN (:ids)")
+    suspend fun getByIds(ids: List<Long>): List<ProductEntity>
+
     /** [pattern] ya viene con `%` y los comodines del usuario escapados con `\`. */
     @Query(
         "SELECT * FROM product WHERE name_norm LIKE :pattern ESCAPE '\\' AND active = 1 " +
