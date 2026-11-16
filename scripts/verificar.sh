@@ -101,4 +101,10 @@ HITS=$(grep -rn 'fallbackToDestructiveMigration' app/src domain/src || true)
 if [ -z "$HITS" ]; then pass "sin fallbackToDestructiveMigration"
 else fail "sin fallbackToDestructiveMigration" "$(echo "$HITS" | head -3 | tr '\n' ' ')"; fi
 
+# S-15: solo Google Maven y Maven Central (ni otros repositorios ni versiones dinámicas).
+HITS=$(grep -nE '^\s*(gradlePluginPortal|jcenter|mavenLocal|maven)\b' settings.gradle.kts build.gradle.kts ./*/build.gradle.kts 2>/dev/null || true)
+HITS="$HITS$(grep -nE '=\s*"[^"]*[+][^"]*"' gradle/libs.versions.toml || true)"
+if [ -z "$HITS" ]; then pass "solo Google Maven y Maven Central, versiones fijas (S-15)"
+else fail "solo Google Maven y Maven Central, versiones fijas (S-15)" "$(echo "$HITS" | head -3 | tr '\n' ' ')"; fi
+
 summary
