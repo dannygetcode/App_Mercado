@@ -127,11 +127,11 @@ Formato por loop (copiar el bloque al empezar cada uno):
 - Preparación de dominio: `AddUnknownScanned` acepta `name` (nombre tecleado sin elegir del autocompletado: reutiliza el producto de ese nombre o crea uno ya nombrado sin revisión pendiente) y `code` nulo ("Crear «texto»" desde la búsqueda, sin asociar código). `TripRepository.recentStores` (Room: agrupado por tienda, la más reciente primero) para los chips del cierre. 3 pruebas de dominio + 1 Room.
 - [ ] T1 — 
 - [ ] T2 — 
-- [ ] T3 — 
-- [ ] T4 — 
-- [ ] T5 — 
-- [ ] T6 — 
-- [ ] T7 — 
+- [x] T3 — `TripScreen` según el esquema: barra mínima (volver, linterna, pausar), visor al 32 % con línea guía y destello verde de 1 s al aceptar, franja "toca para reanudar" en pausa, `TotalCard`, lista (última arriba) con estado vacío, aviso con deshacer, barra inferior de 56 dp ($ Teclado, ★ Favoritos, Buscar, ✓ Cerrar). Pantalla encendida mientras está visible; pausa automática (del ViewModel). 6 pruebas de UI (vacía, teclado→línea y total, `−` a 0 + deshacer, desconocido con solo precio, crear desde búsqueda, te pasaste en rojo).
+- [x] T4 — Hoja Teclado (`KeypadSheet`): precio suelto, precio de etiqueta KG (con el nombre del producto), corregir precio (prellenado, "Cambiar"), crear producto desde la búsqueda. Se cierra sola al sumar.
+- [x] T5 — Hoja Producto nuevo: título, código pequeño, nombre opcional sin foco al abrir con autocompletado (4 sugerencias), teclado activo; elegir sugerencia prellena su precio y cambia el botón a "Asociar y sumar"; cerrar sin sumar descarta la lectura. La cámara queda en pausa mientras está abierta.
+- [x] T6 — Hoja Favoritos/Buscar (~70 % del alto): pestañas, total visible arriba, rejilla de 3 columnas (nombre en 2 líneas y precio; KG dice "por peso"); tocar agrega sin cerrar la hoja y vibra; buscar con foco, resultados al teclear, "Crear «texto»" sin resultados; Enter agrega el primero.
+- [x] T7 — Hoja Editar línea (renombrar si es suelta, precio → teclado, cantidad −/+ de 56 dp, eliminar) y deslizar a la izquierda para eliminar (`SwipeToDismissBox`), ambos con deshacer.
 - [ ] T8 — 
 - [ ] T9 — 
 - [ ] T10 — 
