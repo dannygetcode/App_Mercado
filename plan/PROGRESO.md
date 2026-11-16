@@ -104,7 +104,7 @@ Formato por loop (copiar el bloque al empezar cada uno):
 - [ ] T1 — 
 - [ ] T2 — 
 - [x] T3 — `ScanFeedback` / `DefaultScanFeedback`: aceptada = vibración 30 ms + pitido corto (`ToneGenerator`, canal de notificaciones: respeta el modo silencio); desconocida = vibración doble sin pitido. Lee los ajustes `scanSound`/`scanVibration` en cada lectura desde un `StateFlow` del `AppContainer`. Permiso `VIBRATE`. `AppContainer.newBarcodeDecoder()` entrega ML Kit. 5 pruebas JVM.
-- [ ] T4 — 
+- [x] T4 — Pantalla de diagnóstico (solo debug; botón "Diagnóstico del escáner" en el Inicio provisional, nulo en release): visor al 32 %, linterna, pausa/reanudar, pantalla encendida; muestra cámara → primera lectura (se reinicia al reanudar), lecturas en el último minuto, leídas y rebotes ignorados (mismo `ScanDebouncer` de 1.500 ms), y la lista de códigos con el tiempo desde la lectura anterior. Cada lectura aceptada vibra/pita. Estado inmutable `ScanDiagnostics` con 7 pruebas JVM. `BarcodeSource`/`SharedBarcodeSource`: la cámara solo hace `offer(code)`.
 - [ ] T5 — 
 - [ ] T6 — 
 **Informe de cierre**

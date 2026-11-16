@@ -6,4 +6,16 @@
     <string name="camera_allow">Permitir</string>
     <string name="camera_error">No se pudo abrir la cámara</string>
     <string name="camera_paused">Cámara en pausa · toca para reanudar</string>
+    <string name="camera_pause">Pausar cámara</string>
+    <string name="camera_resume">Reanudar cámara</string>
+    <string name="torch_on">Linterna</string>
+    <string name="torch_off">Apagar linterna</string>
+    <string name="back">Volver</string>
+    <string name="diag_open">Diagnóstico del escáner</string>
+    <string name="diag_title">Diagnóstico del escáner</string>
+    <string name="diag_waiting">esperando…</string>
+    <string name="diag_first_read">Cámara → primera lectura: %s</string>
+    <string name="diag_per_minute">Lecturas en el último minuto: %d</string>
+    <string name="diag_counts">Leídas: %1$d · Rebotes ignorados: %2$d</string>
+    <string name="diag_empty">Apunta la cámara a un código de barras</string>
 </resources>
