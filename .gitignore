@@ -1,0 +1,14 @@
+.gradle/
+build/
+local.properties
+*.jks
+*.keystore
+keystore.properties
+*.mercado
+*.apk
+.idea/
+captures/
+seed/recibo.*
+.kotlin/
+*.iml
+.DS_Store

@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "source": "Ejemplo para pruebas (no son precios reales)",
+  "products": [
+    { "name": "Arroz 1 kg", "category": "Granos y despensa", "unit": "UNIT", "price": 5900, "barcodes": ["7702511000014"], "favorite": false },
+    { "name": "Leche entera 1 L", "category": "Lácteos y huevos", "unit": "UNIT", "price": 4300, "barcodes": ["7702004003508"], "favorite": false },
+    { "name": "Huevos x 30", "category": "Lácteos y huevos", "unit": "UNIT", "price": 18500, "barcodes": [], "favorite": true },
+    { "name": "Jabón en polvo 2 kg", "category": "Aseo del hogar", "unit": "UNIT", "price": 21900, "barcodes": ["7701001234564"], "favorite": false },
+    { "name": "Tomate chonto", "category": "Frutas y verduras", "unit": "KG", "price": 4200, "barcodes": [], "favorite": true },
+    { "name": "Limón", "category": "Frutas y verduras", "unit": "KG", "price": 3500, "barcodes": [], "favorite": true },
+    { "name": "Pechuga de pollo", "category": "Carnes", "unit": "KG", "price": 16800, "barcodes": [], "favorite": true }
+  ]
+}
