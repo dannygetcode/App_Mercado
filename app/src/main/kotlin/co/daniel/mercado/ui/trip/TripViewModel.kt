@@ -338,7 +338,6 @@ class TripViewModel(
         }
     }
 
-    fun dismissNotice() = _state.update { it.copy(notice = null) }
 
     // ---- Cámara ----
 

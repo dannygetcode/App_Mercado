@@ -44,11 +44,3 @@ class SqlCipherDatabaseFactory(
         private const val HEX = "0123456789ABCDEF"
     }
 }
-
-/** Para pruebas JVM (Robolectric): Room en memoria sin cifrar, con el mismo callback. */
-class InMemoryDatabaseFactory : DatabaseFactory {
-    override fun create(context: Context): MercadoDatabase =
-        Room.inMemoryDatabaseBuilder(context, MercadoDatabase::class.java)
-            .addCallback(MercadoDatabaseCallback)
-            .build()
-}
