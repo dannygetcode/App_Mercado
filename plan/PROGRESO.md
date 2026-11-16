@@ -18,7 +18,7 @@ Lo mantiene el agente. Una sesión nueva empieza leyendo este archivo.
 | L5 Resto de pantallas | cerrado | verde 2026-11-16 (humano no bloqueante pendiente) |
 | L6 Seguridad y respaldo | cerrado | verde 2026-11-16; prueba en el teléfono OK |
 | L7 Lista, resúmenes, recordatorios | cerrado | verde 2026-11-16 |
-| L8 Release | en curso | — |
+| L8 Release | esperando humano | T1–T5 hechos; falta la llave de firma (T6) |
 | L9 Prueba de campo | pendiente | — |
 
 Estados: `pendiente` · `en curso` · `esperando humano` · `cerrado`.
@@ -222,3 +222,4 @@ Formato por loop (copiar el bloque al empezar cada uno):
 - [x] T3 — Tamaño: APK optimizado 35,2 MB (RNF-10 ≤ 40 MB). Reparto: ML Kit texto 17,8 MB (lib arm64 11,1 + v7a 6,8), ML Kit códigos 8,2 MB, SQLCipher 3,2 MB, `classes.dex` 2,8 MB, modelos 2,2 MB, recursos 0,7 MB. Filtros de ABI del plan (arm64-v8a + armeabi-v7a) y `isShrinkResources` ya activos. Si algún día hiciera falta, quitar armeabi-v7a (el Poco es arm64) bajaría ~11 MB; no se toca porque lo fija la arquitectura.
 - [x] T4 — Lint a cero: `lintDebug` y `lintRelease` "No issues found"; cero advertencias del compilador de Kotlin en `:app` y `:domain`. Código muerto quitado: `TripDao.itemCount`, `TripViewModel.dismissNotice`. La fábrica de base **sin cifrar** de pruebas (`InMemoryDatabaseFactory`) pasa de `main` a `src/test`: ya no existe en el código de la app.
 - [x] T5 — Documentación: `README.md` reescrito para la app (qué hace, compilar con debug/qa/release, instalar incluido HyperOS, respaldar, pasar datos de debug a la final) conservando el mapa del paquete del agente; `CHANGELOG.md` con la entrada `[1.0.0]` y el historial L5–L8; `docs/` al día con lo que cambió: RF-18 en 01-producto, ML Kit texto, modo etiqueta, regla de R8, tipos de build y recordatorios en 02-arquitectura, claves nuevas de DataStore en 03-datos, selector Código|Etiqueta, pestaña Lista y tarjetas del Inicio en 04-ux, instalación en HyperOS y build `qa` en 07-release. `versionName` 1.0.0.
+- [ ] T6 — Build release firmado y `apksigner verify`: esperando la llave de Daniel (`[HUMANO, BLOQUEANTE]`, instrucciones en `docs/07-release.md` y en el mensaje de la sesión).
