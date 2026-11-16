@@ -18,4 +18,19 @@
     <string name="diag_per_minute">Lecturas en el último minuto: %d</string>
     <string name="diag_counts">Leídas: %1$d · Rebotes ignorados: %2$d</string>
     <string name="diag_empty">Apunta la cámara a un código de barras</string>
+    <string name="undo">Deshacer</string>
+    <string name="keypad_add">Sumar</string>
+    <string name="keypad_backspace">⌫</string>
+    <string name="loose_item_name">Artículo sin nombre</string>
+    <string name="trip_remaining">Quedan %1$s de %2$s</string>
+    <string name="trip_over">Te pasaste por %s</string>
+    <string name="trip_percent">%d %%</string>
+    <plurals name="trip_items">
+        <item quantity="one">%d artíc.</item>
+        <item quantity="other">%d artíc.</item>
+    </plurals>
+    <string name="line_unit_price">%s c/u</string>
+    <string name="line_old_price">precio viejo</string>
+    <string name="line_by_weight">por peso</string>
+    <string name="line_weight_grams">%d g</string>
 </resources>
