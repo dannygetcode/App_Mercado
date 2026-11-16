@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Carrito simple sobre la zona segura de 66dp del ícono adaptativo. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="@color/launcher_foreground"
+        android:pathData="M32,36h7l6,24h26l5,-17h-33l-1.5,-4h40l-7.5,25h-32l-1,4h33v4h-38l2.5,-9.5l-6.5,-22.5h-4.5z" />
+    <path
+        android:fillColor="@color/launcher_foreground"
+        android:pathData="M48,76m-4,0a4,4 0,1 1,8 0a4,4 0,1 1,-8 0" />
+    <path
+        android:fillColor="@color/launcher_foreground"
+        android:pathData="M68,76m-4,0a4,4 0,1 1,8 0a4,4 0,1 1,-8 0" />
+</vector>
