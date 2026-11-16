@@ -42,3 +42,7 @@ las que surjan al implementar: versiones elegidas, detalles no especificados, ca
 | 2026-11-16 | L2-T5 | Categoría de la semilla: 1–40 caracteres | Límite no especificado; evita textos absurdos en los chips |
 | 2026-11-16 | L2-T7 | Las pruebas JVM de `SettingsStore` usan un `DataStore<Preferences>` en memoria | El DataStore de archivo falla en la JVM de Windows al reemplazar su archivo (`renameTo`); en Android no ocurre |
 | 2026-11-16 | L2-T7 | Frecuencia de mercado válida: 1–90 días | Rango no especificado; cubre de semanal a trimestral |
+| 2026-11-16 | L3-T5 | `FakeBarcodeSource` vive en `app/src/debug` | La comparten las pruebas JVM y las instrumentadas sin configurar un source set extra, y no entra en release |
+| 2026-11-16 | L3-T4 | Mientras no exista la pantalla de compra (L4), `ScannerSmokeTest` abre la pantalla de diagnóstico | Es la única con visor en L3; en L4 se agrega el humo de la compra |
+| 2026-11-16 | L3-T3 | El pitido usa el canal de notificaciones (`ToneGenerator`, 80 ms) y no suena con el teléfono en silencio; el código desconocido solo vibra doble | Respeta el modo silencio en el supermercado; `04-ux` pide solo vibración doble para desconocido |
+| 2026-11-16 | L3-T2 | Al abrir una pantalla con visor se pide el permiso de cámara de inmediato; si ya fue negado para siempre, "Permitir" abre los ajustes de la app | Menos toques; nunca bloquea la pantalla |
