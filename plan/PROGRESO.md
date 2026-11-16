@@ -2,9 +2,9 @@
 
 Lo mantiene el agente. Una sesión nueva empieza leyendo este archivo.
 
-**Loop actual:** L4
+**Loop actual:** L5
 **Última actualización:** 2026-11-16
-**Pasos `[HUMANO]` pendientes:** **L4 simulacro de compra en casa (BLOQUEANTE)**; L2 revisar la semilla (no bloqueante)
+**Pasos `[HUMANO]` pendientes:** L2 revisar la semilla (no bloqueante)
 
 ## Tablero
 
@@ -14,7 +14,7 @@ Lo mantiene el agente. Una sesión nueva empieza leyendo este archivo.
 | L1 Dominio | cerrado | verde 2026-11-16 |
 | L2 Datos cifrados | cerrado | verde 2026-11-16 (2 humanos no bloqueantes pendientes) |
 | L3 Escáner | cerrado | verde 2026-11-16; prueba en modo avión 10/10 |
-| L4 Compra en curso | esperando humano | verde 2026-11-16; falta simulacro en casa (bloqueante) |
+| L4 Compra en curso | cerrado | verde 2026-11-16; simulacro en casa OK |
 | L5 Resto de pantallas | pendiente | — |
 | L6 Seguridad y respaldo | pendiente | — |
 | L7 Lista, resúmenes, recordatorios | pendiente | — |
@@ -153,3 +153,4 @@ Formato por loop (copiar el bloque al empezar cada uno):
 - Medido: conteo de toques en T11 (cumple las cuatro metas). APK debug 48,3 MB.
 - Desviaciones de la especificación: la navegación es provisional (enum) hasta L5. El punto "precio viejo" usa la fecha del último punto del historial de precios. Decisiones en DECISIONES.
 - Pendiente para Daniel: `[HUMANO, BLOQUEANTE]` simulacro en casa (instrucciones en el mensaje de cierre).
+- **Resultado del simulacro (2026-11-16, Poco X8 Pro):** Daniel: "funcionó bien"; no reportó nada lento ni confuso. Registro del teléfono sin fallos (`am_crash`/`am_anr` = 0, búfer de fallos vacío, sin avisos de acción rechazada). L4 cerrado.
