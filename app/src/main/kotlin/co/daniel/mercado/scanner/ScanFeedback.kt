@@ -19,6 +19,13 @@ data class ScanFeedbackPrefs(val sound: Boolean = true, val vibration: Boolean =
 interface ScanFeedback {
     fun accepted()
     fun unknown()
+
+    /**
+     * Cruce del semáforo hacia amarillo ([red] = false) o rojo (RF-07): vibración distinta, una vez
+     * por cruce. No depende del ajuste de vibración del escáner: es un aviso de presupuesto.
+     */
+    fun budgetWarning(red: Boolean) = Unit
+
     fun release()
 }
 
@@ -48,11 +55,17 @@ class DefaultScanFeedback(
         if (prefs().vibration) haptics.vibrate(UNKNOWN_PATTERN)
     }
 
+    override fun budgetWarning(red: Boolean) {
+        haptics.vibrate(if (red) RED_PATTERN else YELLOW_PATTERN)
+    }
+
     override fun release() = onRelease()
 
     companion object {
         val ACCEPTED_PATTERN = longArrayOf(0, 30)
         val UNKNOWN_PATTERN = longArrayOf(0, 40, 90, 40)
+        val YELLOW_PATTERN = longArrayOf(0, 150, 120, 150)
+        val RED_PATTERN = longArrayOf(0, 300, 120, 300, 120, 300)
 
         fun create(context: Context, prefs: () -> ScanFeedbackPrefs): DefaultScanFeedback {
             val beeper = ToneBeeper()

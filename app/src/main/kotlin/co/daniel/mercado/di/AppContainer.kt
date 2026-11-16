@@ -18,6 +18,8 @@ import co.daniel.mercado.data.seed.SeedResult
 import co.daniel.mercado.data.settings.SettingsStore
 import co.daniel.mercado.data.settings.settingsDataStore
 import co.daniel.mercado.scanner.BarcodeDecoder
+import co.daniel.mercado.scanner.BarcodeSource
+import co.daniel.mercado.scanner.SharedBarcodeSource
 import co.daniel.mercado.scanner.DefaultScanFeedback
 import co.daniel.mercado.scanner.MlKitBarcodeDecoder
 import co.daniel.mercado.scanner.ScanFeedback
@@ -86,6 +88,9 @@ class AppContainer(
     }
 
     fun newBarcodeDecoder(): BarcodeDecoder = MlKitBarcodeDecoder()
+
+    /** La cámara de la compra ofrece aquí y el `TripViewModel` escucha. */
+    val tripBarcodeSource: BarcodeSource = SharedBarcodeSource()
 
     private val dataGraph: Deferred<DataGraph> = scope.async(ioDispatcher) {
         val db = databaseFactory.create(appContext)

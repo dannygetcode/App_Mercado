@@ -51,4 +51,15 @@ class ScanFeedbackTest {
         assertEquals(1, beeps)
         assertEquals(1, vibrations.size)
     }
+
+    @Test
+    fun `avisos de presupuesto vibran distinto aunque la vibracion del escaner este apagada`() {
+        prefs = ScanFeedbackPrefs(sound = false, vibration = false)
+        feedback.budgetWarning(red = false)
+        feedback.budgetWarning(red = true)
+        assertEquals(2, vibrations.size)
+        assertEquals(4, vibrations[0].size)
+        assertEquals(6, vibrations[1].size)
+        assertEquals(0, beeps)
+    }
 }
