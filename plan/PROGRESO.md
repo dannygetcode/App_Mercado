@@ -2,7 +2,7 @@
 
 Lo mantiene el agente. Una sesión nueva empieza leyendo este archivo.
 
-**Loop actual:** L2 (siguiente sesión)
+**Loop actual:** L2
 **Última actualización:** 2026-11-16
 **Pasos `[HUMANO]` pendientes:** L0 instalar APK debug y confirmar que abre (no bloqueante)
 
@@ -12,7 +12,7 @@ Lo mantiene el agente. Una sesión nueva empieza leyendo este archivo.
 | --- | --- | --- |
 | L0 Base del proyecto | cerrado | verde 2026-11-16 (humano no bloqueante pendiente) |
 | L1 Dominio | cerrado | verde 2026-11-16 |
-| L2 Datos cifrados | pendiente | — |
+| L2 Datos cifrados | en curso | — |
 | L3 Escáner | pendiente | — |
 | L4 Compra en curso | pendiente | — |
 | L5 Resto de pantallas | pendiente | — |
@@ -68,3 +68,5 @@ Formato por loop (copiar el bloque al empezar cada uno):
 - Desviaciones de la especificación: ninguna de fondo. Detalles decididos con "la vara única" en DECISIONES (Code 128 solo alfanumérico, `TransactionRunner`, deshacer de varios pasos, reglas de historial al cerrar, reasignación de códigos). `Clock`, `LineMath`, `GetMonthStatus` y `SetMonthlyBudget` se adelantaron a la tarea que los necesitó.
 - Pendiente para Daniel: nada de L1. Sigue pendiente el paso no bloqueante de L0 (instalar el APK debug).
 
+### L2 · Datos cifrados
+- [x] T1 — Entidades de las 8 tablas de `03-datos.md` (incluida `shopping_list_item` ya en v1), `Converters` (`Pesos`↔INTEGER, `YearMonth`↔TEXT), DAOs (`CategoryDao`, `ProductDao`, `TripDao`, `BudgetDao`) con las consultas pedidas, compra abierta con líneas y producto en una sola consulta `@Transaction`, `MercadoDatabase` v1 con `exportSchema` a `app/schemas/`, callback que siembra las 10 categorías y activa `foreign_keys`.
