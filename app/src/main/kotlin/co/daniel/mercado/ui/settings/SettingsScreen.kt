@@ -1,5 +1,7 @@
 package co.daniel.mercado.ui.settings
 
+import android.Manifest
+import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
@@ -26,6 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.lifecycle.compose.LifecycleResumeEffect
+import co.daniel.mercado.reminders.Reminders
 import co.daniel.mercado.security.BackupError
 import co.daniel.mercado.security.isDeviceSecure
 import kotlinx.coroutines.flow.Flow
@@ -101,8 +104,13 @@ fun SettingsScreen(
         }
     }
     var deviceSecure by remember { mutableStateOf(context.isDeviceSecure()) }
+    var canNotify by remember { mutableStateOf(Reminders.canNotify(context)) }
+    val askNotifications = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        canNotify = granted || Reminders.canNotify(context)
+    }
     LifecycleResumeEffect(Unit) {
         deviceSecure = context.isDeviceSecure()
+        canNotify = Reminders.canNotify(context)
         onPauseOrDispose { }
     }
     val s = state.settings
@@ -136,8 +144,26 @@ fun SettingsScreen(
 
             Section(R.string.settings_market)
             FrequencyRow(s.shoppingFrequencyDays, onChange = { onEvent(SettingsEvent.FrequencyDays(it)) })
-            SwitchRow(R.string.settings_reminders, R.string.settings_reminders_hint, s.remindersEnabled) {
-                onEvent(SettingsEvent.Reminders(it))
+            SwitchRow(R.string.settings_reminders, R.string.settings_reminders_hint, s.remindersEnabled) { on ->
+                onEvent(SettingsEvent.Reminders(on))
+                // Permiso en contexto: al activar los recordatorios (Android 13+).
+                if (on && !canNotify && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    askNotifications.launch(Manifest.permission.POST_NOTIFICATIONS)
+                }
+            }
+            if (s.remindersEnabled && !canNotify) {
+                Row(Modifier.padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        stringResource(R.string.settings_notifications_off),
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.weight(1f),
+                    )
+                    TextButton(onClick = {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            askNotifications.launch(Manifest.permission.POST_NOTIFICATIONS)
+                        }
+                    }) { Text(stringResource(R.string.settings_notifications_allow)) }
+                }
             }
 
             Section(R.string.settings_scanner)

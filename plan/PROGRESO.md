@@ -2,7 +2,7 @@
 
 Lo mantiene el agente. Una sesión nueva empieza leyendo este archivo.
 
-**Loop actual:** L7
+**Loop actual:** L8
 **Última actualización:** 2026-11-16
 **Pasos `[HUMANO]` pendientes:** L2 revisar la semilla; L5 recorrer las pantallas en claro y oscuro; L7-T0 probar el modo etiqueta en el supermercado (todos no bloqueantes)
 
@@ -17,7 +17,7 @@ Lo mantiene el agente. Una sesión nueva empieza leyendo este archivo.
 | L4 Compra en curso | cerrado | verde 2026-11-16; simulacro en casa OK |
 | L5 Resto de pantallas | cerrado | verde 2026-11-16 (humano no bloqueante pendiente) |
 | L6 Seguridad y respaldo | cerrado | verde 2026-11-16; prueba en el teléfono OK |
-| L7 Lista, resúmenes, recordatorios | en curso | — |
+| L7 Lista, resúmenes, recordatorios | cerrado | verde 2026-11-16 |
 | L8 Release | pendiente | — |
 | L9 Prueba de campo | pendiente | — |
 
@@ -209,3 +209,9 @@ Formato por loop (copiar el bloque al empezar cada uno):
 - [x] T2 — Datos: `shopping_list_item` ya existía desde v1 (sin migración; el esquema exportado no cambia). `ShoppingListDao` + `RoomShoppingListRepository`; `TripDao.closedLines` (trip_item ⨝ trip, LEFT JOIN product para el tipo de unidad; sueltas como UNIT) y `lastClosedAt`; `CategoryDao.setMonthlyBudget`; `ProductDao.getByIds` (en trozos de 900 por el límite de argumentos de SQLite). `DataGraph` con los casos de uso de L7 y `CloseTrip` con la lista. `InsightsDaoTest` 2.
 - [x] T3 — Lista de mercado (`ShoppingListScreen` + `ShoppingListViewModel`, ruta `ShoppingListRoute` desde la tarjeta del Inicio): al abrir recalcula los sugeridos; secciones "Sugeridos" (con "Cada ~28 días, última hace 24") y "Agregados por ti"; marcar con casilla (tachado), "Quitar" (sugerido: silenciado hasta su próximo ciclo), "Agregar producto" con búsqueda. Inicio: tarjeta "Lista de mercado · N sugeridos o pendientes". Compra: tercera pestaña "Lista · N" en la hoja Favoritos/Buscar con lo que falta y aún no está en el carrito; tocar agrega y sale de la pestaña; al cerrar la compra quedan marcados. Pruebas: `ShoppingListViewModelTest` 2, `HomeViewModelTest` +1.
 - [x] T4 — Resumen del mes (`SummaryScreen` + `SummaryViewModel`, desde la tarjeta "Resumen del mes" del Inicio y el botón del Historial): selector de mes (← →, no pasa del actual), tarjeta gastado vs presupuesto con el semáforo, "Por categoría" (con tope: "Tope $X · quedan $Y" o "te pasaste por $Y" y una marca en la barra), "Lo que más gastó" (top 10 con cantidad), "Subieron/Bajaron de precio" (anterior → actual, ±%), "Últimos 6 meses" con la marca del presupuesto. Barras con `ValueBar` (Canvas, D-14): un tono (el primario; el semáforo queda solo para presupuesto), extremo redondeado de 4 dp, valor siempre en texto y barra invisible para el lector de pantalla. "Topes por categoría" en Ajustes (`CategoryCapsScreen`; $0 quita el tope). Solo debug: "Cargar 4 meses de ejemplo" en el diagnóstico (`loadSampleMonths`: agrega ~9 compras cada 12–16 días con productos de siempre y precios que suben 3 % por mes; no borra nada). Pruebas: `SummaryViewModelTest` 2, `SampleDataTest` 1 (la lista sugiere, la suma por categorías cuadra con el gastado, hay subidas y 4 meses con gasto).
+- [x] T5 — Recordatorios (`reminders/`): `ReminderCheck` (lógica probada en JVM) avisa "Se acerca el mercado · N productos sugeridos" una vez por ciclo (falta ≤ 1 día para la frecuencia desde la última compra cerrada; no avisa con una compra abierta) y "Haz un respaldo de Mercado" una vez al mes; `ReminderWorker` (`CoroutineWorker`) diario con WorkManager (`enqueueUniquePeriodicWork`, KEEP), programado al arrancar y al cambiar el interruptor; canal "Recordatorios"; la notificación abre la app y no lleva nombres ni montos. `POST_NOTIFICATIONS` se pide al activar los recordatorios (Android 13+) y Ajustes muestra "Permitir notificaciones" si están apagadas. Clave nueva de DataStore `last_backup_reminder_at`. Manifiesto (S-11): `SystemJobService` de WorkManager con `exported="false"` y `DiagnosticsReceiver` quitado; `verificar.sh` sigue en "solo el lanzador exportado". Pruebas: `ReminderCheckTest` 2; instrumentada `ReminderWorkerDeviceTest` en el Poco X8 Pro: el trabajo corre con el servicio no exportado (OK).
+**Informe de cierre**
+- Verificación: `./scripts/verificar.sh completo` → VERDE, 11/11. Lint: "No issues found". Pruebas: 108 de dominio + 167 JVM de la app, 0 fallas. Instrumentada nueva `ReminderWorkerDeviceTest` OK en el teléfono.
+- Medido: APK release sin firmar 35,1 MB tras ML Kit de texto (RNF-10 ≤ 40 MB). Con 4 meses de ejemplo (`SampleDataTest`): ~9 compras, la lista sugiere y la suma por categorías cuadra con el gastado del mes.
+- Desviaciones de la especificación: T0 agregado a pedido de Daniel (etiqueta del estante, dependencia nueva). Recordatorio de respaldo bajo el mismo interruptor de recordatorios. Resto en DECISIONES.
+- Pendiente para Daniel (no bloqueante): probar el modo "Etiqueta" en el supermercado; ver la lista y el resumen (en debug: Diagnóstico → "Cargar 4 meses de ejemplo" agrega compras de ejemplo a tus datos de prueba).

@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import co.daniel.mercado.MercadoApp
+import co.daniel.mercado.reminders.Reminders
 import co.daniel.mercado.data.seed.SeedError
 import co.daniel.mercado.data.seed.SeedResult
 import co.daniel.mercado.data.settings.Settings
@@ -121,6 +122,8 @@ class SettingsViewModel(
     private val store: SettingsStore,
     private val clock: Clock,
     private val io: CoroutineDispatcher = Dispatchers.IO,
+    /** Programa o cancela la revisión diaria (WorkManager). */
+    private val onRemindersChanged: (Boolean) -> Unit = {},
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SettingsUiState())
@@ -147,7 +150,10 @@ class SettingsViewModel(
             is SettingsEvent.FrequencyDays -> viewModelScope.launch {
                 store.setShoppingFrequencyDays(event.days.coerceIn(SettingsStore.FREQUENCY_RANGE))
             }
-            is SettingsEvent.Reminders -> viewModelScope.launch { store.setRemindersEnabled(event.on) }
+            is SettingsEvent.Reminders -> viewModelScope.launch {
+                store.setRemindersEnabled(event.on)
+                onRemindersChanged(event.on)
+            }
             is SettingsEvent.ImportCatalog -> importCatalog(event.open)
             SettingsEvent.DismissImportMessage -> _state.update { it.copy(importMessage = null) }
             is SettingsEvent.LockEnabled -> viewModelScope.launch { store.setLockEnabled(event.on) }
@@ -306,7 +312,9 @@ class SettingsViewModel(
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 val app = this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as MercadoApp
-                SettingsViewModel(app.container::data, app.container.settings, app.container.clock)
+                SettingsViewModel(app.container::data, app.container.settings, app.container.clock) { on ->
+                    Reminders.schedule(app, on)
+                }
             }
         }
     }

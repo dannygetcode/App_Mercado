@@ -10,6 +10,8 @@
     <!-- S-14: permisos mínimos. La app sigue usable sin cámara (teclado, favoritos, búsqueda). -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <!-- RF-11: se pide en contexto, al activar los recordatorios (Android 13+). -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-feature android:name="android.hardware.camera.any" android:required="false" />
 
     <!-- S-04: sin copias automáticas (nube ni transferencia entre dispositivos). -->
@@ -41,6 +43,16 @@
                 android:name="android.app.shortcuts"
                 android:resource="@xml/shortcuts" />
         </activity>
+
+        <!-- S-11: WorkManager exporta su servicio de JobScheduler; el sistema lo enlaza igual sin
+             exportarlo (como hace datatransport de ML Kit). El receptor de diagnóstico es para adb. -->
+        <service
+            android:name="androidx.work.impl.background.systemjob.SystemJobService"
+            android:exported="false"
+            tools:replace="android:exported" />
+        <receiver
+            android:name="androidx.work.impl.diagnostics.DiagnosticsReceiver"
+            tools:node="remove" />
 
         <!-- S-11: único componente exportado de dependencias; solo sirve para adb/benchmark. -->
         <receiver

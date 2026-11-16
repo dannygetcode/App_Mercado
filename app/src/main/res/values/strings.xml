@@ -300,5 +300,16 @@
     <string name="caps_title">Tope de %s</string>
     <string name="caps_zero_hint">Deja $0 para quitar el tope.</string>
     <string name="diag_load_sample">Cargar 4 meses de ejemplo</string>
-    <string name="diag_sample_loaded">%d compras de ejemplo agregadas</string>
+    <string name="diag_sample_loaded">Compras de ejemplo agregadas: %d</string>
+    <string name="reminder_channel">Recordatorios</string>
+    <string name="reminder_shopping_title">Se acerca el mercado</string>
+    <plurals name="reminder_shopping_text">
+        <item quantity="one">%d producto sugerido en tu lista</item>
+        <item quantity="other">%d productos sugeridos en tu lista</item>
+    </plurals>
+    <string name="reminder_shopping_text_none">Revisa tu lista de mercado</string>
+    <string name="reminder_backup_title">Haz un respaldo de Mercado</string>
+    <string name="reminder_backup_text">Pasó un mes desde el último. Ajustes → Exportar respaldo.</string>
+    <string name="settings_notifications_off">Las notificaciones están apagadas para Mercado.</string>
+    <string name="settings_notifications_allow">Permitir notificaciones</string>
 </resources>
