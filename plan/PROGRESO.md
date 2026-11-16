@@ -117,4 +117,5 @@ Formato por loop (copiar el bloque al empezar cada uno):
   3. Abrir Mercado → "Diagnóstico del escáner" → aceptar el permiso de cámara.
   4. Leer 10 productos de la casa, uno tras otro, apuntando a unos 15–25 cm.
   5. Reportar: ¿se cerró la app en algún momento?, ¿cuántos de los 10 leyó al primer intento?, ¿se sintió instantáneo?, y el valor de "Cámara → primera lectura" y los tiempos "+x,xx s" de la lista.
+  - Revisión de código posterior (skill engineering:code-review): el hilo de análisis se apagaba antes de soltar la cámara (posible `RejectedExecutionException` al salir) y un fallo de `ProcessCameraProvider` no se capturaba (cierre de la app). Corregido: un ejecutor por enlace apagado tras `unbind`, y cualquier fallo al abrir la cámara muestra "No se pudo abrir la cámara". `verificar.sh completo` VERDE de nuevo.
   - Si se cae o no lee sin red → `ZxingCppBarcodeDecoder` y repetir. Si lee < 8 de 10 → ajustar resolución/enfoque y repetir.

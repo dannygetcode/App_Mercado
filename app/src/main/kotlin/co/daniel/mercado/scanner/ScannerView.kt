@@ -38,6 +38,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import co.daniel.mercado.R
 import co.daniel.mercado.util.AppLog
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.awaitCancellation
 import java.util.concurrent.Executors
 
@@ -74,9 +75,6 @@ fun ScannerView(
             scaleType = PreviewView.ScaleType.FILL_CENTER
         }
     }
-    val analysisExecutor = remember { Executors.newSingleThreadExecutor() }
-    DisposableEffect(Unit) { onDispose { analysisExecutor.shutdown() } }
-
     DisposableEffect(previewView, lifecycleOwner) {
         val observer = Observer<PreviewView.StreamState> { state ->
             if (state == PreviewView.StreamState.STREAMING) currentOnStarted()
@@ -87,8 +85,11 @@ fun ScannerView(
 
     LaunchedEffect(paused, lifecycleOwner) {
         if (paused) return@LaunchedEffect
-        val provider = ProcessCameraProvider.awaitInstance(context)
-        val decoder = decoderFactory()
+        // Un hilo de análisis por enlace: se apaga solo después de soltar la cámara, para que
+        // CameraX nunca entregue un cuadro a un ejecutor ya cerrado.
+        val analysisExecutor = Executors.newSingleThreadExecutor()
+        var provider: ProcessCameraProvider? = null
+        var decoder: BarcodeDecoder? = null
         val preview = Preview.Builder()
             .setResolutionSelector(RESOLUTION)
             .build()
@@ -97,10 +98,14 @@ fun ScannerView(
             .setResolutionSelector(RESOLUTION)
             .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
             .build()
-        analysis.setAnalyzer(analysisExecutor) { image ->
-            decoder.analyze(image) { codes -> ScanFilter.firstValid(codes)?.let(currentOnCode) }
-        }
         try {
+            provider = ProcessCameraProvider.awaitInstance(context)
+            val activeDecoder = decoderFactory().also { decoder = it }
+            analysis.setAnalyzer(analysisExecutor) { image ->
+                activeDecoder.analyze(image) { codes ->
+                    ScanFilter.firstValid(codes)?.let(currentOnCode)
+                }
+            }
             val bound = provider.bindToLifecycle(
                 lifecycleOwner, CameraSelector.DEFAULT_BACK_CAMERA, preview, analysis,
             )
@@ -108,16 +113,18 @@ fun ScannerView(
             failed = false
             currentOnTorch(bound.cameraInfo.hasFlashUnit())
             awaitCancellation()
-        } catch (e: IllegalArgumentException) {
-            AppLog.w("ScannerView: sin cámara trasera utilizable", e)
-            failed = true
-        } catch (e: IllegalStateException) {
-            AppLog.w("ScannerView: no se pudo enlazar la cámara", e)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            // Sin cámara trasera, cámara ocupada por otra app o fallo al iniciar CameraX:
+            // se muestra el aviso y la pantalla sigue usable (teclado, favoritos, búsqueda).
+            AppLog.w("ScannerView: no se pudo abrir la cámara", e)
             failed = true
         } finally {
             analysis.clearAnalyzer()
-            provider.unbind(preview, analysis)
-            decoder.close()
+            provider?.unbind(preview, analysis)
+            decoder?.close()
+            analysisExecutor.shutdown()
             camera = null
         }
     }
