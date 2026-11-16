@@ -26,10 +26,23 @@ class ScannerSmokeTest {
         object : Statement() {
             override fun evaluate() {
                 val instrumentation = InstrumentationRegistry.getInstrumentation()
-                instrumentation.uiAutomation.grantRuntimePermission(
-                    instrumentation.targetContext.packageName,
-                    Manifest.permission.CAMERA,
-                )
+                val target = instrumentation.targetContext
+                if (!target.hasCameraPermission()) {
+                    // HyperOS niega este atajo salvo con "Depuración USB (ajustes de seguridad)";
+                    // la alternativa es conceder el permiso a mano una vez desde la app.
+                    try {
+                        instrumentation.uiAutomation.grantRuntimePermission(
+                            target.packageName,
+                            Manifest.permission.CAMERA,
+                        )
+                    } catch (e: SecurityException) {
+                        throw AssertionError(
+                            "Sin permiso de cámara: ábrela una vez desde Diagnóstico y acepta, " +
+                                "o activa 'Depuración USB (ajustes de seguridad)'",
+                            e,
+                        )
+                    }
+                }
                 base.evaluate()
             }
         }
