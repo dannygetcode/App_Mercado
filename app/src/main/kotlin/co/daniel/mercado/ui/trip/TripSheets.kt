@@ -1,5 +1,6 @@
 package co.daniel.mercado.ui.trip
 
+import co.daniel.mercado.domain.model.ShoppingListEntry
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.foundation.clickable
@@ -188,6 +189,11 @@ private fun PickerSheet(sheet: TripSheet.Picker, state: TripUiState, viewModel: 
                     onClick = { viewModel.openPicker(PickerTab.SEARCH) },
                     text = { Text(stringResource(R.string.picker_search)) },
                 )
+                Tab(
+                    selected = sheet.tab == PickerTab.LIST,
+                    onClick = { viewModel.openPicker(PickerTab.LIST) },
+                    text = { Text(stringResource(R.string.picker_list, state.listPending.size)) },
+                )
             }
         }
         state.trip?.let {
@@ -200,6 +206,39 @@ private fun PickerSheet(sheet: TripSheet.Picker, state: TripUiState, viewModel: 
         when (sheet.tab) {
             PickerTab.FAVORITES -> FavoritesGrid(state.favorites, viewModel::pickProduct)
             PickerTab.SEARCH -> SearchTab(state, viewModel)
+            PickerTab.LIST -> ListTab(state.listPending, viewModel::pickProduct)
+        }
+    }
+}
+
+/** Lo que falta de la lista; tocar agrega (y sale de aquí porque ya está en el carrito). */
+@Composable
+private fun ListTab(pending: List<ShoppingListEntry>, onPick: (Long) -> Unit) {
+    if (pending.isEmpty()) {
+        Text(
+            text = stringResource(R.string.picker_list_empty),
+            modifier = Modifier.padding(16.dp),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        return
+    }
+    LazyColumn(Modifier.padding(horizontal = 16.dp)) {
+        items(pending, key = { it.product.id }) { entry ->
+            Row(
+                modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).clickable { onPick(entry.product.id) },
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(entry.product.name, modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                if (entry.item.suggestedQty > 1) {
+                    Text(stringResource(R.string.list_qty, entry.item.suggestedQty), modifier = Modifier.padding(horizontal = 8.dp))
+                }
+                Text(
+                    text = if (entry.product.unitType == UnitType.KG) stringResource(R.string.line_by_weight) else MoneyFormat.format(entry.product.refPrice),
+                    style = MoneyTextStyle,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            }
+            HorizontalDivider()
         }
     }
 }

@@ -69,6 +69,7 @@ class TripViewModel(
             launch { g.observeActiveTrip().collect(::onTrip) }
             launch { g.observeFavorites().collect { favs -> _state.update { it.copy(favorites = favs) } } }
             launch { source.codes.collect(::onCode) }
+            launch { g.observeShoppingList.pendingForTrip().collect { l -> _state.update { it.copy(listPending = l) } } }
             restartAutoPause()
         }
     }

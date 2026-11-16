@@ -29,6 +29,8 @@ data class HomeUiState(
     val month: MonthStatus? = null,
     val lastTrip: TripSummary? = null,
     val needsReviewCount: Int = 0,
+    /** Ítems de la lista sin marcar (tarjeta "Lista de mercado · N"). */
+    val listPending: Int = 0,
     val budgetHintDismissed: Boolean = true,
     val sheet: HomeSheet? = null,
 ) {
@@ -77,6 +79,10 @@ class HomeViewModel(
             launch { g.observeMonthStatus().collect { month -> _state.update { it.copy(month = month) } } }
             launch { g.observeClosedTrips().collect { trips -> _state.update { it.copy(lastTrip = trips.firstOrNull()) } } }
             launch { g.observeNeedsReviewCount().collect { n -> _state.update { it.copy(needsReviewCount = n) } } }
+            launch {
+                g.buildSuggestedList()
+                g.observeShoppingList().collect { l -> _state.update { it.copy(listPending = l.count { e -> !e.item.checked }) } }
+            }
         }
         viewModelScope.launch {
             settings.settings.collect { s -> _state.update { it.copy(budgetHintDismissed = s.budgetHintDismissed) } }

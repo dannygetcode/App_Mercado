@@ -133,4 +133,13 @@ class HomeViewModelTest {
         assertEquals(1, await { it.needsReviewCount == 1 }.needsReviewCount)
         assertNull(await { it.openTripTotal == null }.openTripTotal)
     }
+
+    @Test
+    fun `la tarjeta de la lista cuenta lo pendiente`() {
+        val pan = runBlocking { t.product("Pan", 3_000) }
+        start()
+        assertEquals(0, vm.state.value.listPending)
+        runBlocking { t.graph.addListItem(pan) }
+        assertEquals(1, await { it.listPending == 1 }.listPending)
+    }
 }

@@ -24,6 +24,9 @@ data class ProductEditRoute(val productId: Long = 0)
 data class TripDetailRoute(val tripId: Long)
 
 @Serializable
+data object ShoppingListRoute
+
+@Serializable
 data object TripRoute
 
 @Serializable

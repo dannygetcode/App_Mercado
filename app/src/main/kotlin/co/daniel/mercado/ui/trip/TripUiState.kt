@@ -3,6 +3,7 @@ package co.daniel.mercado.ui.trip
 import co.daniel.mercado.domain.model.ActiveTrip
 import co.daniel.mercado.domain.model.Pesos
 import co.daniel.mercado.domain.model.Product
+import co.daniel.mercado.domain.model.ShoppingListEntry
 import co.daniel.mercado.ui.components.TotalCardModel
 
 /** Estado de la pantalla "Compra en curso". */
@@ -23,6 +24,8 @@ data class TripUiState(
     /** La cámara lee la etiqueta del estante (texto + código) en vez de solo códigos. */
     val labelMode: Boolean = false,
     val favorites: List<Product> = emptyList(),
+    /** Pestaña Lista: lo de la lista de mercado que aún no está en el carrito (RF-09). */
+    val listPending: List<ShoppingListEntry> = emptyList(),
     /** Texto del buscador (hoja Buscar) o del nombre en "Producto nuevo". */
     val query: String = "",
     val results: List<Product> = emptyList(),
@@ -81,4 +84,4 @@ sealed interface KeypadPurpose {
     data class CreateProduct(val name: String) : KeypadPurpose
 }
 
-enum class PickerTab { FAVORITES, SEARCH }
+enum class PickerTab { FAVORITES, SEARCH, LIST }

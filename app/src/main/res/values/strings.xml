@@ -257,4 +257,24 @@
     <string name="mode_label">Etiqueta</string>
     <string name="label_mode_hint">Apunta al precio de la etiqueta del estante</string>
     <string name="shelf_price_title">Precio de la etiqueta</string>
+    <string name="picker_list">Lista · %d</string>
+    <string name="picker_list_empty">No falta nada de la lista.</string>
+    <string name="list_qty">×%d</string>
+    <string name="list_title">Lista de mercado</string>
+    <string name="list_suggested">Sugeridos</string>
+    <string name="list_added">Agregados por ti</string>
+    <string name="list_add">Agregar producto</string>
+    <string name="list_remove">Quitar %s de la lista</string>
+    <string name="list_empty">Nada en la lista todavía. Los sugeridos salen solos de tus compras (cada producto necesita al menos dos); también puedes agregar a mano.</string>
+    <string name="list_reason">Cada ~%1$s, última hace %2$s</string>
+    <plurals name="list_days">
+        <item quantity="one">%d día</item>
+        <item quantity="other">%d días</item>
+    </plurals>
+    <string name="home_list">Lista de mercado</string>
+    <plurals name="home_list_pending">
+        <item quantity="one">%d sugerido o pendiente</item>
+        <item quantity="other">%d sugeridos o pendientes</item>
+    </plurals>
+    <string name="home_list_empty">Agrega lo que te falta</string>
 </resources>

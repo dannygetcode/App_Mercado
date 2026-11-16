@@ -59,6 +59,8 @@ import co.daniel.mercado.ui.history.TripDetailViewModel
 import co.daniel.mercado.ui.home.HomeEffect
 import co.daniel.mercado.ui.home.HomeScreen
 import co.daniel.mercado.ui.home.HomeViewModel
+import co.daniel.mercado.ui.list.ShoppingListScreen
+import co.daniel.mercado.ui.list.ShoppingListViewModel
 import co.daniel.mercado.ui.settings.SettingsScreen
 import co.daniel.mercado.ui.settings.SettingsViewModel
 import co.daniel.mercado.ui.trip.TripScreen
@@ -187,6 +189,7 @@ private fun MercadoNavigation(
                     state = homeState,
                     onEvent = home::onEvent,
                     onOpenTrip = { navController.navigate(TripDetailRoute(it)) },
+                    onOpenList = { navController.navigate(ShoppingListRoute) },
                     onOpenNeedsReview = {
                         navController.navigate(CatalogRoute(needsReviewOnly = true)) {
                             popUpTo(navController.graph.findStartDestination().id) { saveState = true }
@@ -236,6 +239,11 @@ private fun MercadoNavigation(
                 val settings: SettingsViewModel = viewModel(factory = SettingsViewModel.Factory)
                 val settingsState by settings.state.collectAsStateWithLifecycle()
                 SettingsScreen(state = settingsState, onEvent = settings::onEvent, effects = settings.effects)
+            }
+            composable<ShoppingListRoute> {
+                val list: ShoppingListViewModel = viewModel(factory = ShoppingListViewModel.Factory)
+                val listState by list.state.collectAsStateWithLifecycle()
+                ShoppingListScreen(state = listState, onEvent = list::onEvent, onBack = { navController.popBackStack() })
             }
             composable<TripRoute> {
                 val trip: TripViewModel = viewModel(factory = TripViewModel.Factory)

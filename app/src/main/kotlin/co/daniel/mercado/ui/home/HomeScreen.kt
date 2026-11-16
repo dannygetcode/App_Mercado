@@ -57,6 +57,7 @@ fun HomeScreen(
     onOpenTrip: (Long) -> Unit,
     onOpenNeedsReview: () -> Unit,
     modifier: Modifier = Modifier,
+    onOpenList: () -> Unit = {},
     onOpenDiagnostics: (() -> Unit)? = null,
 ) {
     Surface(modifier = modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
@@ -68,6 +69,7 @@ fun HomeScreen(
                 state.month?.let { MonthHeader(it, onClick = { onEvent(HomeEvent.EditBudget) }) }
                 if (state.showBudgetHint) BudgetHintCard(onEvent)
                 state.lastTrip?.let { LastTripCard(it, onClick = { onOpenTrip(it.trip.id) }) }
+                if (!state.loading) ListCard(state.listPending, onOpenList)
                 if (state.needsReviewCount > 0) NeedsReviewCard(state.needsReviewCount, onOpenNeedsReview)
                 if (onOpenDiagnostics != null) {
                     TextButton(onClick = onOpenDiagnostics, modifier = Modifier.heightIn(min = 48.dp)) {
@@ -198,6 +200,20 @@ private fun LastTripCard(summary: TripSummary, onClick: () -> Unit) {
                 )
             }
             Text(MoneyFormat.format(trip.effectiveTotal), style = MaterialTheme.typography.titleLarge.merge(MoneyTextStyle))
+        }
+    }
+}
+
+@Composable
+private fun ListCard(pending: Int, onClick: () -> Unit) {
+    Card(onClick = onClick, modifier = Modifier.fillMaxWidth()) {
+        Column(Modifier.padding(16.dp)) {
+            Text(stringResource(R.string.home_list), style = MaterialTheme.typography.titleMedium)
+            Text(
+                text = if (pending > 0) pluralStringResource(R.plurals.home_list_pending, pending, pending) else stringResource(R.string.home_list_empty),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         }
     }
 }
