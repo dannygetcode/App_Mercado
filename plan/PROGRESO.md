@@ -2,15 +2,15 @@
 
 Lo mantiene el agente. Una sesión nueva empieza leyendo este archivo.
 
-**Loop actual:** L0
+**Loop actual:** L1
 **Última actualización:** 2026-11-16
-**Pasos `[HUMANO]` pendientes:** ninguno (el recibo ya está en `seed/recibo.pdf`)
+**Pasos `[HUMANO]` pendientes:** L0 instalar APK debug y confirmar que abre (no bloqueante)
 
 ## Tablero
 
 | Loop | Estado | Puerta de salida |
 | --- | --- | --- |
-| L0 Base del proyecto | en curso | — |
+| L0 Base del proyecto | cerrado | verde 2026-11-16 (humano no bloqueante pendiente) |
 | L1 Dominio | pendiente | — |
 | L2 Datos cifrados | pendiente | — |
 | L3 Escáner | pendiente | — |
@@ -47,3 +47,11 @@ Formato por loop (copiar el bloque al empezar cada uno):
 - [x] T5 — `MercadoApp`, `MainActivity` (retrato, edge-to-edge), tema M3 propio claro/oscuro con colores de `04-ux.md` y semáforo en `LocalTrafficLightColors`, estilos con cifras tabulares, `HomeScreen` provisional "Mercado", `AppContainer` vacío, `AppLog` (no-op en release), ícono adaptativo vectorial. `assembleDebug` OK.
 - [x] T6 — `scripts/verificar.sh` (`rapido`/`completo`) con todos los chequeos de `06-pruebas.md` más dos de S-11 (release no depurable, solo el lanzador exportado); resumen de una línea por chequeo. Patrones probados en negativo. Pruebas triviales: `DomainSmokeTest` (JUnit Jupiter) y `HomeScreenTest` (Robolectric + Compose). Lint sin hallazgos.
 - [x] T7 — `CHANGELOG.md` inicial. El primer commit se hizo en T3 (al hacer `git init`), porque el protocolo pide un commit por tarea; T7 agrega el changelog en su propio commit.
+**Informe de cierre**
+- Verificación: `verificar.sh completo` → VERDE (gradle pruebas + lint + assembleDebug + manifiesto release; permisos en lista blanca; allowBackup=false; release no depurable; solo el lanzador exportado; sin Log/println; dominio sin android; sin Float/Double; sin migración destructiva). Lint: "No issues found".
+- Medido: APK debug 11,9 MB (`app/build/outputs/apk/debug/app-debug.apk`); 2 pruebas (1 dominio, 1 Robolectric) en verde; build completo en frío ≈ 2 min, incremental < 15 s.
+- Desviaciones de la especificación: Kotlin 2.4.21 (sobre el 2.2.10 que trae AGP), compile/target SDK 37, Robolectric con sdk=34 por JDK 17, receptor de profileinstaller eliminado, dos chequeos extra en `verificar.sh`. Todo en DECISIONES.
+- Pendiente para Daniel: `[HUMANO, no bloqueante]` con el teléfono conectado por USB (depuración USB activa), desde esta carpeta en Git Bash:
+  `"$LOCALAPPDATA/Android/Sdk/platform-tools/adb.exe" install -r app/build/outputs/apk/debug/app-debug.apk`
+  y confirmar que el ícono "Mercado" abre y muestra la palabra "Mercado" centrada. (Al momento del cierre `adb devices` no mostró ningún teléfono.)
+
