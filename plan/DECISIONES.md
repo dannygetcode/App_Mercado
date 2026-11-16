@@ -40,3 +40,5 @@ las que surjan al implementar: versiones elegidas, detalles no especificados, ca
 | 2026-11-16 | L2-T3 | Si existe `mercado.db` pero falta o no descifra `db.key`, se lanza `DbKeyException` en vez de crear una clave nueva | Crear otra clave dejaría la base ilegible sin aviso; cómo se le muestra al usuario (restaurar respaldo) se resuelve en L5/L6 |
 | 2026-11-16 | L2-T5 | Reimportar no cambia `unit`, `favorite` ni el nombre visible de un producto existente; un código de la semilla que ya era de otro producto se reasigna; un mismo código en dos productos distintos del archivo es error | `03-datos.md` solo pide actualizar precio, categoría y agregar códigos; lo demás pudo editarlo Daniel |
 | 2026-11-16 | L2-T5 | Categoría de la semilla: 1–40 caracteres | Límite no especificado; evita textos absurdos en los chips |
+| 2026-11-16 | L2-T7 | Las pruebas JVM de `SettingsStore` usan un `DataStore<Preferences>` en memoria | El DataStore de archivo falla en la JVM de Windows al reemplazar su archivo (`renameTo`); en Android no ocurre |
+| 2026-11-16 | L2-T7 | Frecuencia de mercado válida: 1–90 días | Rango no especificado; cubre de semanal a trimestral |

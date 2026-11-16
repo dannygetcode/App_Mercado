@@ -89,4 +89,4 @@ Formato por loop (copiar el bloque al empezar cada uno):
   11. Renglón 28 «Té Hindú premium chai»: el recibo dice «X2 UND X 32 G» por $12.000; confirmar presentación.
   12. Categorías elegidas a criterio: vinagre y filtros de café en «Granos y despensa»; jabón Tigre y guantes en «Aseo del hogar»; arepas, calados y galletas en «Panadería».
   No hay productos por peso en este recibo, así que ninguno es `KG`.
-
+- [x] T7 — `SettingsStore` (DataStore Preferences, archivo `settings`) con las 10 claves y valores por defecto de `03-datos.md`; `secure_screen` por defecto según variante (S-06); valida gracia {1, 5, 15} y frecuencia 1–90 días. 4 pruebas.
