@@ -20,6 +20,8 @@ data class TripUiState(
     /** Pausa sola tras 2 min sin lecturas (04-ux). */
     val cameraAutoPaused: Boolean = false,
     val torchOn: Boolean = false,
+    /** La cámara lee la etiqueta del estante (texto + código) en vez de solo códigos. */
+    val labelMode: Boolean = false,
     val favorites: List<Product> = emptyList(),
     /** Texto del buscador (hoja Buscar) o del nombre en "Producto nuevo". */
     val query: String = "",
@@ -55,7 +57,7 @@ sealed interface TripSheet {
     data class Keypad(val purpose: KeypadPurpose, val initial: Pesos? = null) : TripSheet
 
     /** Código desconocido: precio primero, nombre opcional con autocompletado. */
-    data class NewProduct(val code: String, val selected: Product? = null) : TripSheet
+    data class NewProduct(val code: String, val selected: Product? = null, val price: Pesos? = null) : TripSheet
 
     data class Picker(val tab: PickerTab) : TripSheet
 
@@ -71,6 +73,9 @@ sealed interface KeypadPurpose {
 
     /** Corregir el precio unitario de una línea. */
     data class FixPrice(val lineId: Long, val name: String) : KeypadPurpose
+
+    /** Producto identificado en la etiqueta del estante, con el precio leído prellenado. */
+    data class ShelfPrice(val productId: Long, val productName: String) : KeypadPurpose
 
     /** "Crear «texto»" desde la búsqueda. */
     data class CreateProduct(val name: String) : KeypadPurpose

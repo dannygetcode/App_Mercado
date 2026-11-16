@@ -243,6 +243,7 @@ private fun MercadoNavigation(
                     viewModel = trip,
                     cameraSource = container.tripBarcodeSource,
                     decoderFactory = container::newBarcodeDecoder,
+                    labelReaderFactory = container::newLabelReader,
                     onBack = { navController.backToHome() },
                     onClose = {
                         trip.dismissSheet()

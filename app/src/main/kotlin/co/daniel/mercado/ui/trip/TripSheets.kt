@@ -93,7 +93,11 @@ fun TripSheets(state: TripUiState, viewModel: TripViewModel) {
 private fun KeypadSheet(sheet: TripSheet.Keypad, viewModel: TripViewModel) {
     var keypad by remember(sheet) { mutableStateOf(KeypadState.prefilled(sheet.initial)) }
     val (title, subtitle, action) = when (val p = sheet.purpose) {
-        KeypadPurpose.LoosePrice -> Triple(stringResource(R.string.keypad_price_title), null, stringResource(R.string.keypad_add))
+        KeypadPurpose.LoosePrice -> Triple(
+            stringResource(if (sheet.initial != null) R.string.shelf_price_title else R.string.keypad_price_title),
+            null,
+            stringResource(R.string.keypad_add),
+        )
         is KeypadPurpose.LabelPrice -> Triple(stringResource(R.string.label_price_title), p.productName, stringResource(R.string.keypad_add))
         is KeypadPurpose.FixPrice -> Triple(
             stringResource(R.string.fix_price_title),
@@ -101,6 +105,7 @@ private fun KeypadSheet(sheet: TripSheet.Keypad, viewModel: TripViewModel) {
             stringResource(R.string.keypad_change),
         )
         is KeypadPurpose.CreateProduct -> Triple(stringResource(R.string.create_price_title, p.name), null, stringResource(R.string.keypad_add))
+        is KeypadPurpose.ShelfPrice -> Triple(stringResource(R.string.shelf_price_title), p.productName, stringResource(R.string.keypad_add))
     }
     if (subtitle != null) {
         Text(
@@ -126,7 +131,7 @@ private fun KeypadSheet(sheet: TripSheet.Keypad, viewModel: TripViewModel) {
 @Composable
 private fun NewProductSheet(sheet: TripSheet.NewProduct, state: TripUiState, viewModel: TripViewModel) {
     var keypad by remember(sheet.selected?.id) {
-        mutableStateOf(sheet.selected?.let { KeypadState.prefilled(it.refPrice) } ?: KeypadState())
+        mutableStateOf(KeypadState.prefilled(sheet.price ?: sheet.selected?.refPrice))
     }
     Column(Modifier.padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Text(stringResource(R.string.new_product_title), style = MaterialTheme.typography.titleLarge)

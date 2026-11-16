@@ -37,7 +37,11 @@ class HandleScan(
     }
 }
 
-/** Agrega por id de producto (favoritos, búsqueda, lista). `KG` pide el precio de la etiqueta. */
+/**
+ * Agrega por id de producto (favoritos, búsqueda, lista). `KG` pide el precio de la etiqueta.
+ * Con [price] (leído de la etiqueta del estante) la línea usa ese precio; un `KG` con precio se
+ * agrega como bolsa nueva.
+ */
 class AddProductToTrip(
     private val trips: TripRepository,
     private val products: ProductRepository,
@@ -46,14 +50,24 @@ class AddProductToTrip(
 ) {
     private val lines = TripLines(trips, clock)
 
-    suspend operator fun invoke(productId: Long): ScanOutcome = session.mutate {
-        val active = trips.getActive() ?: return@mutate ScanOutcome.NoActiveTrip
-        val product = requireNotNull(products.getById(productId)) { "producto $productId no existe" }
-        if (product.unitType == UnitType.KG) {
-            return@mutate ScanOutcome.NeedsLabelPrice(product.id, product.name)
+    suspend operator fun invoke(productId: Long, price: Pesos? = null): ScanOutcome {
+        price?.let(::requireValidPrice)
+        return session.mutate {
+            val active = trips.getActive() ?: return@mutate ScanOutcome.NoActiveTrip
+            val product = requireNotNull(products.getById(productId)) { "producto $productId no existe" }
+            val reverts = mutableListOf<Revert>()
+            val outcome = when {
+                product.unitType == UnitType.KG && price == null ->
+                    return@mutate ScanOutcome.NeedsLabelPrice(product.id, product.name)
+                product.unitType == UnitType.KG && price != null -> {
+                    val id = lines.insert(active.trip.id, product.id, product.name, UnitType.KG, price, null, reverts)
+                    ScanOutcome.Added(id, product.name, price)
+                }
+                else -> lines.addUnit(active, product, price ?: product.refPrice, reverts)
+            }
+            session.undo.record(reverts)
+            outcome
         }
-        val reverts = mutableListOf<Revert>()
-        lines.addUnit(active, product, reverts = reverts).also { session.undo.record(reverts) }
     }
 }
 

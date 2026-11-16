@@ -61,10 +61,14 @@ fun ScannerView(
     onResumeRequest: () -> Unit = {},
     onCameraStarted: () -> Unit = {},
     onTorchAvailable: (Boolean) -> Unit = {},
+    labelMode: Boolean = false,
+    labelReaderFactory: (() -> LabelReader)? = null,
+    onLabel: (LabelRead) -> Unit = {},
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val currentOnCode by rememberUpdatedState(onCode)
+    val currentOnLabel by rememberUpdatedState(onLabel)
     val currentOnStarted by rememberUpdatedState(onCameraStarted)
     val currentOnTorch by rememberUpdatedState(onTorchAvailable)
     var camera by remember { mutableStateOf<Camera?>(null) }
@@ -87,13 +91,14 @@ fun ScannerView(
         onDispose { previewView.previewStreamState.removeObserver(observer) }
     }
 
-    LaunchedEffect(paused, lifecycleOwner) {
+    LaunchedEffect(paused, lifecycleOwner, labelMode) {
         if (paused) return@LaunchedEffect
         // Un hilo de análisis por enlace: se apaga solo después de soltar la cámara, para que
         // CameraX nunca entregue un cuadro a un ejecutor ya cerrado.
         val analysisExecutor = Executors.newSingleThreadExecutor()
         var provider: ProcessCameraProvider? = null
         var decoder: BarcodeDecoder? = null
+        var labelReader: LabelReader? = null
         val preview = Preview.Builder()
             .setResolutionSelector(RESOLUTION)
             .build()
@@ -104,10 +109,17 @@ fun ScannerView(
             .build()
         try {
             provider = ProcessCameraProvider.awaitInstance(context)
-            val activeDecoder = decoderFactory().also { decoder = it }
-            analysis.setAnalyzer(analysisExecutor) { image ->
-                activeDecoder.analyze(image) { codes ->
-                    ScanFilter.firstValid(codes)?.let(currentOnCode)
+            val readerFactory = labelReaderFactory
+            if (labelMode && readerFactory != null) {
+                // Etiqueta del estante: texto y código en el mismo cuadro.
+                val activeReader = readerFactory().also { labelReader = it }
+                analysis.setAnalyzer(analysisExecutor) { image -> activeReader.analyze(image) { currentOnLabel(it) } }
+            } else {
+                val activeDecoder = decoderFactory().also { decoder = it }
+                analysis.setAnalyzer(analysisExecutor) { image ->
+                    activeDecoder.analyze(image) { codes ->
+                        ScanFilter.firstValid(codes)?.let(currentOnCode)
+                    }
                 }
             }
             val bound = provider.bindToLifecycle(
@@ -128,6 +140,7 @@ fun ScannerView(
             analysis.clearAnalyzer()
             provider?.unbind(preview, analysis)
             decoder?.close()
+            labelReader?.close()
             analysisExecutor.shutdown()
             camera = null
         }

@@ -13,8 +13,10 @@ import co.daniel.mercado.domain.model.ScanOutcome
 import co.daniel.mercado.domain.model.TrafficLight
 import co.daniel.mercado.domain.port.Clock
 import co.daniel.mercado.domain.rules.BudgetRules
+import co.daniel.mercado.domain.rules.LabelStabilizer
 import co.daniel.mercado.domain.usecase.EditResult
 import co.daniel.mercado.scanner.BarcodeSource
+import co.daniel.mercado.scanner.LabelRead
 import co.daniel.mercado.scanner.ScanFeedback
 import co.daniel.mercado.util.AppLog
 import kotlinx.coroutines.CancellationException
@@ -57,6 +59,7 @@ class TripViewModel(
     private var searchJob: Job? = null
     private var lastLight: TrafficLight? = null
     private val staleCache = HashMap<Long, StalePrice?>()
+    private val labelStabilizer = LabelStabilizer(clock)
 
     private data class StalePrice(val price: Pesos, val at: Long)
 
@@ -112,6 +115,39 @@ class TripViewModel(
             val outcome = guarded { graph().handleScan(code) } ?: return@launch
             if (outcome !is ScanOutcome.Ignored) restartAutoPause()
             handleOutcome(outcome, fromScan = true)
+        }
+    }
+
+    /** Cambia entre leer códigos y leer la etiqueta del estante. */
+    fun toggleLabelMode() {
+        labelStabilizer.reset()
+        _state.update { it.copy(labelMode = !it.labelMode) }
+        restartAutoPause()
+    }
+
+    /**
+     * Etiqueta del estante leída (modo etiqueta). Nunca suma sola: abre el teclado con el precio
+     * leído para confirmar con "Sumar" (la lectura de texto puede equivocarse).
+     */
+    fun onLabel(read: LabelRead) {
+        val price = read.price ?: return
+        val current = _state.value
+        if (current.trip == null || !current.labelMode || current.sheet != null) return
+        if (!labelStabilizer.offer(read.code, price)) return
+        restartAutoPause()
+        viewModelScope.launch {
+            val code = read.code
+            val product = code?.let { guarded { graph().products.findByBarcode(it) } }
+            if (_state.value.sheet != null) return@launch
+            feedback.accepted()
+            when {
+                product != null -> openSheet(TripSheet.Keypad(KeypadPurpose.ShelfPrice(product.id, product.name), initial = price))
+                code != null -> {
+                    _state.update { it.copy(query = "", results = emptyList()) }
+                    openSheet(TripSheet.NewProduct(code, price = price))
+                }
+                else -> openSheet(TripSheet.Keypad(KeypadPurpose.LoosePrice, initial = price))
+            }
         }
     }
 
@@ -177,6 +213,8 @@ class TripViewModel(
                 KeypadPurpose.LoosePrice -> guarded { g.addLoosePrice(price) }?.let { handleOutcome(it, false) }
                 is KeypadPurpose.LabelPrice ->
                     guarded { g.addWeighedItem(purpose.productId, price) }?.let { handleOutcome(it, false) }
+                is KeypadPurpose.ShelfPrice ->
+                    guarded { g.addProductToTrip(purpose.productId, price) }?.let { handleOutcome(it, false) }
                 is KeypadPurpose.CreateProduct ->
                     guarded { g.addUnknownScanned(null, price, name = purpose.name) }?.let { handleOutcome(it, false) }
                 is KeypadPurpose.FixPrice -> {

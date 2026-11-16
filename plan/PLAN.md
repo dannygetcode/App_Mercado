@@ -231,6 +231,12 @@ Lee: `docs/05-seguridad.md` completo, `docs/03-datos.md` (Respaldo cifrado).
 
 Lee: `docs/01-producto.md` (RF-09 a RF-13), `docs/04-ux.md` (Lista, Historial y resumen).
 
+- **T0 · Etiqueta del estante** (pedido de Daniel, 2026-11-16): modo "Código | Etiqueta" en el
+  visor de la compra. En modo etiqueta la cámara lee texto (ML Kit text recognition bundled, sin
+  red) y código en el mismo cuadro; el precio grande de la etiqueta prellena el teclado (producto
+  conocido → "Precio de la etiqueta" con su nombre; código desconocido → "Producto nuevo"; sin
+  código → precio suelto). Nunca suma solo: confirma con "Sumar". `[HUMANO, no bloqueante]`
+  probarlo en el supermercado.
 - **T1 · Dominio:** `SuggestionRules`, `BuildSuggestedList`, `ObserveShoppingList`,
   `ToggleListItem`, `AddListItem`, `GetMonthSummary`, `GetMonthsComparison`, `GetPriceChanges`,
   `SetCategoryBudget`, `ShouldRemindShopping`, con pruebas.

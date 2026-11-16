@@ -21,7 +21,9 @@ import co.daniel.mercado.scanner.BarcodeDecoder
 import co.daniel.mercado.scanner.BarcodeSource
 import co.daniel.mercado.scanner.SharedBarcodeSource
 import co.daniel.mercado.scanner.DefaultScanFeedback
+import co.daniel.mercado.scanner.LabelReader
 import co.daniel.mercado.scanner.MlKitBarcodeDecoder
+import co.daniel.mercado.scanner.MlKitLabelReader
 import co.daniel.mercado.scanner.ScanFeedback
 import co.daniel.mercado.scanner.ScanFeedbackPrefs
 import kotlinx.coroutines.flow.SharingStarted
@@ -99,6 +101,8 @@ class AppContainer(
     }
 
     fun newBarcodeDecoder(): BarcodeDecoder = MlKitBarcodeDecoder()
+
+    fun newLabelReader(): LabelReader = MlKitLabelReader()
 
     /** Compuerta de bloqueo, una por proceso (S-05). */
     val appLock = AppLock(clock)

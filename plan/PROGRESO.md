@@ -4,7 +4,7 @@ Lo mantiene el agente. Una sesión nueva empieza leyendo este archivo.
 
 **Loop actual:** L7
 **Última actualización:** 2026-11-16
-**Pasos `[HUMANO]` pendientes:** L2 revisar la semilla; L5 recorrer las pantallas en claro y oscuro (ambos no bloqueantes)
+**Pasos `[HUMANO]` pendientes:** L2 revisar la semilla; L5 recorrer las pantallas en claro y oscuro; L7-T0 probar el modo etiqueta en el supermercado (todos no bloqueantes)
 
 ## Tablero
 
@@ -17,7 +17,7 @@ Lo mantiene el agente. Una sesión nueva empieza leyendo este archivo.
 | L4 Compra en curso | cerrado | verde 2026-11-16; simulacro en casa OK |
 | L5 Resto de pantallas | cerrado | verde 2026-11-16 (humano no bloqueante pendiente) |
 | L6 Seguridad y respaldo | cerrado | verde 2026-11-16; prueba en el teléfono OK |
-| L7 Lista, resúmenes, recordatorios | pendiente | — |
+| L7 Lista, resúmenes, recordatorios | en curso | — |
 | L8 Release | pendiente | — |
 | L9 Prueba de campo | pendiente | — |
 
@@ -202,3 +202,6 @@ Formato por loop (copiar el bloque al empezar cada uno):
 - Desviaciones de la especificación: ninguna de fondo. En DECISIONES: autenticadores en Android 9–10, la navegación se rearma al desbloquear, detección de bloqueo del teléfono con `KeyguardManager`, vista previa del respaldo antes de confirmar, tope de 64 MB descomprimido, respaldo sin ajustes, S-15 sin portal de plugins. S-12 (firma) queda para L8, como dice el plan.
 - Pendiente para Daniel: `[HUMANO, BLOQUEANTE]` prueba en el teléfono (APK debug instalado 2026-11-16 17:42). Instrucciones en el mensaje de cierre de la sesión.
 - **Resultado de la prueba humana (2026-11-16, Poco X8 Pro):** Daniel: "todo funcionó bien" en los 4 puntos (bloqueo al abrir, gracia, recientes en blanco, exportar → borrar datos → restaurar). L6 cerrado: fin del MVP.
+
+### L7 · Lista, resúmenes, recordatorios
+- [x] T0 — Etiqueta del estante (pedido de Daniel tras L6). Dominio: `ShelfPrice.find` (el número más alto de la etiqueta con "$" o separador de miles; descarta cantidades con unidad, porcentajes, códigos, números sueltos y precios por unidad de medida con centavos; rango $50–$5.000.000) y `LabelStabilizer` (mismo código y precio dos veces en 2 s; la ya aceptada no se repite mientras siga en cuadro, vuelve a contar tras 3 s sin verla); `AddProductToTrip(productId, price)` (UNIT con ese precio; KG como bolsa nueva). App: `MlKitLabelReader` (texto latino + códigos del mismo cuadro, sin disco), `ScannerView` con `labelMode`, selector "Código | Etiqueta" sobre el visor (48 dp) con aviso "Apunta al precio de la etiqueta del estante", `TripViewModel.onLabel`: producto conocido → teclado "Precio de la etiqueta" con su nombre y el precio prellenado; código desconocido → "Producto nuevo" con el precio; solo precio → precio suelto prellenado. Siempre se confirma con "Sumar" (1 toque). Dependencia nueva `com.google.mlkit:text-recognition` 16.0.1 (DECISIONES). Pruebas: `ShelfPriceTest` 8, `ShelfLabelTest` 3, `LabelModeTest` 7. `verificar.sh completo` VERDE (manifiesto de release sin permisos de red). APK release sin firmar: 35,1 MB (RNF-10 ≤ 40 MB).

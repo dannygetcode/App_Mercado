@@ -1,5 +1,10 @@
 package co.daniel.mercado.ui.trip
 
+import co.daniel.mercado.scanner.LabelReader
+import co.daniel.mercado.scanner.LabelRead
+import androidx.compose.ui.semantics.Role
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -71,6 +76,7 @@ fun TripScreen(
     onNoActiveTrip: () -> Unit,
     modifier: Modifier = Modifier,
     showCamera: Boolean = true,
+    labelReaderFactory: (() -> LabelReader)? = null,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -103,6 +109,9 @@ fun TripScreen(
                     cameraSource = cameraSource,
                     decoderFactory = decoderFactory,
                     onResume = viewModel::resumeCamera,
+                    labelReaderFactory = labelReaderFactory,
+                    onLabel = viewModel::onLabel,
+                    onToggleLabelMode = viewModel::toggleLabelMode,
                 )
                 state.totalCard?.let { TotalCard(it, Modifier.padding(horizontal = 8.dp, vertical = 6.dp)) }
                 Lines(
@@ -158,6 +167,9 @@ private fun CameraArea(
     cameraSource: BarcodeSource,
     decoderFactory: () -> BarcodeDecoder,
     onResume: () -> Unit,
+    labelReaderFactory: (() -> LabelReader)?,
+    onLabel: (LabelRead) -> Unit,
+    onToggleLabelMode: () -> Unit,
 ) {
     if (state.cameraPaused) {
         // Visor colapsado a una franja: la lista gana espacio. Se reanuda tocándola.
@@ -191,15 +203,63 @@ private fun CameraArea(
                 onCode = cameraSource::offer,
                 modifier = Modifier.fillMaxSize(),
                 torchOn = state.torchOn,
+                labelMode = state.labelMode && labelReaderFactory != null,
+                labelReaderFactory = labelReaderFactory,
+                onLabel = onLabel,
             )
-            // Línea guía horizontal.
+            if (state.labelMode) {
+                Text(
+                    text = stringResource(R.string.label_mode_hint),
+                    color = Color.White,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .padding(8.dp)
+                        .background(Color.Black.copy(alpha = 0.55f), RoundedCornerShape(8.dp))
+                        .padding(horizontal = 10.dp, vertical = 4.dp),
+                )
+            } else {
+                // Línea guía horizontal.
+                Box(
+                    Modifier
+                        .align(Alignment.Center)
+                        .fillMaxWidth(0.8f)
+                        .height(2.dp)
+                        .background(Color.White.copy(alpha = 0.7f)),
+                )
+            }
+            if (labelReaderFactory != null) {
+                ModeSwitch(
+                    labelMode = state.labelMode,
+                    onToggle = onToggleLabelMode,
+                    modifier = Modifier.align(Alignment.BottomStart).padding(8.dp),
+                )
+            }
+        }
+    }
+}
+
+/** "Código | Etiqueta" sobre el visor: qué lee la cámara. */
+@Composable
+private fun ModeSwitch(labelMode: Boolean, onToggle: () -> Unit, modifier: Modifier = Modifier) {
+    Row(
+        modifier = modifier
+            .background(Color.Black.copy(alpha = 0.55f), RoundedCornerShape(24.dp))
+            .padding(4.dp),
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        listOf(false to R.string.mode_code, true to R.string.mode_label).forEach { (isLabel, label) ->
+            val selected = labelMode == isLabel
             Box(
-                Modifier
-                    .align(Alignment.Center)
-                    .fillMaxWidth(0.8f)
-                    .height(2.dp)
-                    .background(Color.White.copy(alpha = 0.7f)),
-            )
+                modifier = Modifier
+                    .heightIn(min = 48.dp)
+                    .background(if (selected) Color.White else Color.Transparent, RoundedCornerShape(20.dp))
+                    .selectable(selected = selected, role = Role.RadioButton, onClick = { if (!selected) onToggle() })
+                    .padding(horizontal = 16.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(stringResource(label), color = if (selected) Color.Black else Color.White, style = MaterialTheme.typography.labelLarge)
+            }
         }
     }
 }

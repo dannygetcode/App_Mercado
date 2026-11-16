@@ -253,4 +253,8 @@
     <string name="backup_newer">El respaldo es de una versión más nueva de la app.</string>
     <string name="backup_invalid">El respaldo está dañado.</string>
     <string name="backup_nothing_changed">Tus datos no cambiaron.</string>
+    <string name="mode_code">Código</string>
+    <string name="mode_label">Etiqueta</string>
+    <string name="label_mode_hint">Apunta al precio de la etiqueta del estante</string>
+    <string name="shelf_price_title">Precio de la etiqueta</string>
 </resources>
