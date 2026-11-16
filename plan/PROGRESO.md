@@ -2,9 +2,9 @@
 
 Lo mantiene el agente. Una sesión nueva empieza leyendo este archivo.
 
-**Loop actual:** L3
+**Loop actual:** L4
 **Última actualización:** 2026-11-16
-**Pasos `[HUMANO]` pendientes:** **L3 prueba del escáner en modo avión (BLOQUEANTE)**; L2 revisar la semilla (no bloqueante)
+**Pasos `[HUMANO]` pendientes:** L2 revisar la semilla (no bloqueante)
 
 ## Tablero
 
@@ -13,7 +13,7 @@ Lo mantiene el agente. Una sesión nueva empieza leyendo este archivo.
 | L0 Base del proyecto | cerrado | verde 2026-11-16 (humano no bloqueante pendiente) |
 | L1 Dominio | cerrado | verde 2026-11-16 |
 | L2 Datos cifrados | cerrado | verde 2026-11-16 (2 humanos no bloqueantes pendientes) |
-| L3 Escáner | esperando humano | verde 2026-11-16; falta prueba en modo avión (bloqueante) |
+| L3 Escáner | cerrado | verde 2026-11-16; prueba en modo avión 10/10 |
 | L4 Compra en curso | pendiente | — |
 | L5 Resto de pantallas | pendiente | — |
 | L6 Seguridad y respaldo | pendiente | — |
@@ -121,3 +121,4 @@ Formato por loop (copiar el bloque al empezar cada uno):
   - 2026-11-16, en el Poco X8 Pro (HyperOS, Android 16): APK debug instalado y abre (cierra el humano de L0). `EncryptedDbTest` 1/1 y `DbKeyManagerTest` 3/3 pasan en el teléfono (cierra el humano de L2). `ScannerSmokeTest` falló al conceder el permiso por shell (HyperOS lo niega: `GRANT_RUNTIME_PERMISSIONS`); ahora usa el permiso si ya fue concedido desde la app; con el permiso dado a mano, `ScannerSmokeTest` 1/1 pasa en el teléfono (abre el visor, arranca la cámara con ML Kit, pausa y reanuda sin caerse). Instalación: `adb install` y `connectedDebugAndroidTest` fallan en HyperOS (`INSTALL_FAILED_USER_RESTRICTED` / flag `-g`); funciona `adb push` a `/data/local/tmp` + `adb shell pm install -r -t` y `am instrument -w`. En Git Bash hace falta `MSYS_NO_PATHCONV=1` para rutas del teléfono.
   - Fallo encontrado en el teléfono: con `PreviewView` en modo PERFORMANCE (SurfaceView) + FILL_CENTER, Compose no recortaba el visor y tapaba la barra superior y el resto de la pantalla (Daniel lo vio como "cámara apagada / pantalla de carga"). Corregido con modo COMPATIBLE (TextureView) + `clipToBounds`. No hubo ningún cierre por error: los cierres en el registro son `SwipeUpClean` (deslizar en recientes). Verificado por captura: visor en su 32 %, botones visibles, UPC-A leído con cámara → primera lectura 0,23 s. Botón del Inicio provisional ahora es un botón lleno de 56 dp. Debug: `am start ... --ez open_diagnostics true` abre el diagnóstico sin tocar la pantalla.
   - Si se cae o no lee sin red → `ZxingCppBarcodeDecoder` y repetir. Si lee < 8 de 10 → ajustar resolución/enfoque y repetir.
+- **Resultado de la prueba humana (2026-11-16, Poco X8 Pro, HyperOS / Android 16):** modo avión activo (verificado por adb: `airplane_mode_on=1`), 10 de 10 productos leídos al primer intento, sin cierres (sin entradas en el búfer de fallos ni `am_crash`/`am_anr`). Daniel: "lee muy rápido". Primera lectura medida antes: 0,23 s. **D-07 se mantiene: ML Kit bundled; zxing-cpp no hace falta.** L3 cerrado.
