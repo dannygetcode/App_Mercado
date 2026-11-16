@@ -75,6 +75,7 @@ fun SettingsScreen(
     onEvent: (SettingsEvent) -> Unit,
     modifier: Modifier = Modifier,
     effects: Flow<SettingsEffect> = emptyFlow(),
+    onOpenCategoryCaps: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val pickCatalog = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
@@ -127,7 +128,11 @@ fun SettingsScreen(
                     )
                 },
             )
-            DisabledRow(R.string.settings_category_caps, R.string.settings_coming_l7)
+            ListItem(
+                modifier = Modifier.clickable(onClick = onOpenCategoryCaps),
+                headlineContent = { Text(stringResource(R.string.settings_category_caps)) },
+                supportingContent = { Text(stringResource(R.string.caps_hint)) },
+            )
 
             Section(R.string.settings_market)
             FrequencyRow(s.shoppingFrequencyDays, onChange = { onEvent(SettingsEvent.FrequencyDays(it)) })
@@ -247,14 +252,6 @@ private fun SwitchRow(title: Int, hint: Int?, checked: Boolean, enabled: Boolean
         headlineContent = { Text(stringResource(title)) },
         supportingContent = hint?.let { { Text(stringResource(it)) } },
         trailingContent = { Switch(checked = checked, onCheckedChange = null, enabled = enabled) },
-    )
-}
-
-@Composable
-private fun DisabledRow(title: Int, hint: Int) {
-    ListItem(
-        headlineContent = { Text(stringResource(title), color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)) },
-        supportingContent = { Text(stringResource(hint)) },
     )
 }
 

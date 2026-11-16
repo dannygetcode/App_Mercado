@@ -52,6 +52,8 @@ fun ScanDiagnosticsScreen(
     clock: Clock,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
+    onLoadSample: (() -> Unit)? = null,
+    sampleMessage: String? = null,
 ) {
     var state by remember { mutableStateOf(ScanDiagnostics()) }
     val debouncer = remember { ScanDebouncer(clock) }
@@ -95,6 +97,12 @@ fun ScanDiagnosticsScreen(
                 }
             }
 
+            if (onLoadSample != null) {
+                Row(Modifier.padding(horizontal = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                    TextButton(onClick = onLoadSample) { Text(stringResource(R.string.diag_load_sample)) }
+                    sampleMessage?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
+                }
+            }
             CameraPermissionGate(modifier = Modifier.fillMaxWidth().fillMaxHeight(CAMERA_FRACTION)) {
                 ScannerView(
                     decoderFactory = decoderFactory,

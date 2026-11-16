@@ -171,7 +171,6 @@
     <string name="settings_budget_none">Sin definir · toca para definirlo</string>
     <string name="settings_budget_inherited">%s · del mes anterior</string>
     <string name="settings_category_caps">Topes por categoría</string>
-    <string name="settings_coming_l7">Llega con la lista sugerida y los resúmenes</string>
     <string name="settings_market">Mercado</string>
     <string name="settings_frequency">Frecuencia del mercado</string>
     <plurals name="settings_frequency_days">
@@ -277,4 +276,29 @@
         <item quantity="other">%d sugeridos o pendientes</item>
     </plurals>
     <string name="home_list_empty">Agrega lo que te falta</string>
+    <string name="summary_title">Resumen del mes</string>
+    <string name="summary_prev">Mes anterior</string>
+    <string name="summary_next">Mes siguiente</string>
+    <string name="summary_spent_of">Gastado %1$s de %2$s</string>
+    <string name="summary_spent">Gastado %s</string>
+    <string name="summary_categories">Por categoría</string>
+    <string name="summary_top">Lo que más gastó</string>
+    <string name="summary_ups">Subieron de precio</string>
+    <string name="summary_downs">Bajaron de precio</string>
+    <string name="summary_months">Últimos 6 meses</string>
+    <string name="summary_nothing">Sin compras este mes.</string>
+    <string name="summary_cap_left">Tope %1$s · quedan %2$s</string>
+    <string name="summary_cap_over">Tope %1$s · te pasaste por %2$s</string>
+    <string name="summary_price_change">%1$s → %2$s</string>
+    <string name="summary_percent_up">+%d %%</string>
+    <string name="summary_percent_down">−%d %%</string>
+    <string name="summary_budget">Presupuesto %s</string>
+    <string name="home_summary">Resumen del mes</string>
+    <string name="home_summary_hint">Por categoría, productos y precios</string>
+    <string name="caps_hint">Un tope por categoría para ver su avance en el resumen del mes.</string>
+    <string name="caps_none">Sin tope</string>
+    <string name="caps_title">Tope de %s</string>
+    <string name="caps_zero_hint">Deja $0 para quitar el tope.</string>
+    <string name="diag_load_sample">Cargar 4 meses de ejemplo</string>
+    <string name="diag_sample_loaded">%d compras de ejemplo agregadas</string>
 </resources>

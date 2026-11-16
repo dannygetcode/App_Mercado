@@ -27,6 +27,12 @@ data class TripDetailRoute(val tripId: Long)
 data object ShoppingListRoute
 
 @Serializable
+data object SummaryRoute
+
+@Serializable
+data object CategoryCapsRoute
+
+@Serializable
 data object TripRoute
 
 @Serializable

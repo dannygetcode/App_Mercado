@@ -21,6 +21,7 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,10 +51,20 @@ import co.daniel.mercado.ui.theme.MoneyTextStyle
 
 /** Historial (04-ux): compras por mes con fecha, tienda, total y artículos. */
 @Composable
-fun HistoryScreen(state: HistoryUiState, onOpenTrip: (Long) -> Unit, modifier: Modifier = Modifier) {
+fun HistoryScreen(
+    state: HistoryUiState,
+    onOpenTrip: (Long) -> Unit,
+    modifier: Modifier = Modifier,
+    onOpenSummary: () -> Unit = {},
+) {
     Surface(modifier = modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
         Column(Modifier.statusBarsPadding()) {
-            ScreenTitle(stringResource(R.string.nav_history))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                ScreenTitle(stringResource(R.string.nav_history), Modifier.weight(1f))
+                if (state.months.isNotEmpty()) {
+                    TextButton(onClick = onOpenSummary, modifier = Modifier.padding(end = 8.dp)) { Text(stringResource(R.string.home_summary)) }
+                }
+            }
             if (!state.loading && state.months.isEmpty()) {
                 Text(
                     text = stringResource(R.string.history_empty),

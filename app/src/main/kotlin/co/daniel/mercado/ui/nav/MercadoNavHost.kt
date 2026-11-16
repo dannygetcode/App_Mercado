@@ -21,6 +21,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -52,6 +53,7 @@ import co.daniel.mercado.ui.catalog.ProductEditViewModel
 import co.daniel.mercado.ui.close.CloseTripScreen
 import co.daniel.mercado.ui.close.CloseTripViewModel
 import co.daniel.mercado.ui.diagnostics.ScanDiagnosticsScreen
+import co.daniel.mercado.ui.diagnostics.loadSampleMonths
 import co.daniel.mercado.ui.history.HistoryScreen
 import co.daniel.mercado.ui.history.HistoryViewModel
 import co.daniel.mercado.ui.history.TripDetailScreen
@@ -62,11 +64,16 @@ import co.daniel.mercado.ui.home.HomeViewModel
 import co.daniel.mercado.ui.list.ShoppingListScreen
 import co.daniel.mercado.ui.list.ShoppingListViewModel
 import co.daniel.mercado.ui.settings.SettingsScreen
+import co.daniel.mercado.ui.summary.CategoryCapsScreen
+import co.daniel.mercado.ui.summary.CategoryCapsViewModel
+import co.daniel.mercado.ui.summary.SummaryScreen
+import co.daniel.mercado.ui.summary.SummaryViewModel
 import co.daniel.mercado.ui.settings.SettingsViewModel
 import co.daniel.mercado.ui.trip.TripScreen
 import co.daniel.mercado.ui.trip.TripViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlin.reflect.KClass
 
 /** Lo que pide el arranque: nada, abrir la compra (acceso directo) o el diagnóstico (solo debug). */
@@ -190,6 +197,7 @@ private fun MercadoNavigation(
                     onEvent = home::onEvent,
                     onOpenTrip = { navController.navigate(TripDetailRoute(it)) },
                     onOpenList = { navController.navigate(ShoppingListRoute) },
+                    onOpenSummary = { navController.navigate(SummaryRoute) },
                     onOpenNeedsReview = {
                         navController.navigate(CatalogRoute(needsReviewOnly = true)) {
                             popUpTo(navController.graph.findStartDestination().id) { saveState = true }
@@ -228,7 +236,11 @@ private fun MercadoNavigation(
             composable<HistoryRoute> {
                 val history: HistoryViewModel = viewModel(factory = HistoryViewModel.Factory)
                 val historyState by history.state.collectAsStateWithLifecycle()
-                HistoryScreen(state = historyState, onOpenTrip = { navController.navigate(TripDetailRoute(it)) })
+                HistoryScreen(
+                    state = historyState,
+                    onOpenTrip = { navController.navigate(TripDetailRoute(it)) },
+                    onOpenSummary = { navController.navigate(SummaryRoute) },
+                )
             }
             composable<TripDetailRoute> {
                 val detail: TripDetailViewModel = viewModel(factory = TripDetailViewModel.Factory)
@@ -238,12 +250,27 @@ private fun MercadoNavigation(
             composable<SettingsRoute> {
                 val settings: SettingsViewModel = viewModel(factory = SettingsViewModel.Factory)
                 val settingsState by settings.state.collectAsStateWithLifecycle()
-                SettingsScreen(state = settingsState, onEvent = settings::onEvent, effects = settings.effects)
+                SettingsScreen(
+                    state = settingsState,
+                    onEvent = settings::onEvent,
+                    effects = settings.effects,
+                    onOpenCategoryCaps = { navController.navigate(CategoryCapsRoute) },
+                )
             }
             composable<ShoppingListRoute> {
                 val list: ShoppingListViewModel = viewModel(factory = ShoppingListViewModel.Factory)
                 val listState by list.state.collectAsStateWithLifecycle()
                 ShoppingListScreen(state = listState, onEvent = list::onEvent, onBack = { navController.popBackStack() })
+            }
+            composable<SummaryRoute> {
+                val summary: SummaryViewModel = viewModel(factory = SummaryViewModel.Factory)
+                val summaryState by summary.state.collectAsStateWithLifecycle()
+                SummaryScreen(state = summaryState, onEvent = summary::onEvent, onBack = { navController.popBackStack() })
+            }
+            composable<CategoryCapsRoute> {
+                val caps: CategoryCapsViewModel = viewModel(factory = CategoryCapsViewModel.Factory)
+                val capsState by caps.state.collectAsStateWithLifecycle()
+                CategoryCapsScreen(state = capsState, onEvent = caps::onEvent, onBack = { navController.popBackStack() })
             }
             composable<TripRoute> {
                 val trip: TripViewModel = viewModel(factory = TripViewModel.Factory)
@@ -271,7 +298,17 @@ private fun MercadoNavigation(
             if (BuildConfig.DEBUG) {
                 composable<DiagnosticsRoute> {
                     val source = remember { SharedBarcodeSource() }
+                    val scope = rememberCoroutineScope()
+                    var sampleMessage by remember { mutableStateOf<String?>(null) }
+                    val loadedFormat = stringResource(R.string.diag_sample_loaded)
                     ScanDiagnosticsScreen(
+                        onLoadSample = {
+                            scope.launch {
+                                val n = loadSampleMonths(container.data(), container.clock.nowMillis())
+                                sampleMessage = String.format(loadedFormat, n)
+                            }
+                        },
+                        sampleMessage = sampleMessage,
                         source = source,
                         decoderFactory = container::newBarcodeDecoder,
                         feedback = container.scanFeedback,

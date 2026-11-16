@@ -58,6 +58,7 @@ fun HomeScreen(
     onOpenNeedsReview: () -> Unit,
     modifier: Modifier = Modifier,
     onOpenList: () -> Unit = {},
+    onOpenSummary: () -> Unit = {},
     onOpenDiagnostics: (() -> Unit)? = null,
 ) {
     Surface(modifier = modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
@@ -70,6 +71,7 @@ fun HomeScreen(
                 if (state.showBudgetHint) BudgetHintCard(onEvent)
                 state.lastTrip?.let { LastTripCard(it, onClick = { onOpenTrip(it.trip.id) }) }
                 if (!state.loading) ListCard(state.listPending, onOpenList)
+                if (state.lastTrip != null) SummaryCard(onOpenSummary)
                 if (state.needsReviewCount > 0) NeedsReviewCard(state.needsReviewCount, onOpenNeedsReview)
                 if (onOpenDiagnostics != null) {
                     TextButton(onClick = onOpenDiagnostics, modifier = Modifier.heightIn(min = 48.dp)) {
@@ -214,6 +216,16 @@ private fun ListCard(pending: Int, onClick: () -> Unit) {
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
+        }
+    }
+}
+
+@Composable
+private fun SummaryCard(onClick: () -> Unit) {
+    Card(onClick = onClick, modifier = Modifier.fillMaxWidth()) {
+        Column(Modifier.padding(16.dp)) {
+            Text(stringResource(R.string.home_summary), style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.home_summary_hint), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }
