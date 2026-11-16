@@ -11,7 +11,7 @@ Lo mantiene el agente. Una sesión nueva empieza leyendo este archivo.
 | Loop | Estado | Puerta de salida |
 | --- | --- | --- |
 | L0 Base del proyecto | cerrado | verde 2026-11-16 (humano no bloqueante pendiente) |
-| L1 Dominio | pendiente | — |
+| L1 Dominio | en curso | — |
 | L2 Datos cifrados | pendiente | — |
 | L3 Escáner | pendiente | — |
 | L4 Compra en curso | pendiente | — |
@@ -55,3 +55,5 @@ Formato por loop (copiar el bloque al empezar cada uno):
   `"$LOCALAPPDATA/Android/Sdk/platform-tools/adb.exe" install -r app/build/outputs/apk/debug/app-debug.apk`
   y confirmar que el ícono "Mercado" abre y muestra la palabra "Mercado" centrada. (Al momento del cierre `adb devices` no mostró ningún teléfono.)
 
+### L1 · Dominio
+- [x] T1 — Modelo: `Pesos` (aritmética exacta), `UnitType`, `Category`, `Product`, `PricePoint`/`PriceSource`, `Trip`, `TripItem` (con `unitType` y `lineTotal`), `TripWithItems`, `ActiveTrip`, `Budget`, `MonthStatus`, `TrafficLight`, `ScanOutcome`; mes con `java.time.YearMonth`. `LineMath` adelantado porque `TripItem.lineTotal` lo usa.
