@@ -2,7 +2,7 @@
 
 Lo mantiene el agente. Una sesión nueva empieza leyendo este archivo.
 
-**Loop actual:** L6 (esperando humano)
+**Loop actual:** L7
 **Última actualización:** 2026-11-16
 **Pasos `[HUMANO]` pendientes:** L2 revisar la semilla; L5 recorrer las pantallas en claro y oscuro (ambos no bloqueantes)
 
@@ -16,7 +16,7 @@ Lo mantiene el agente. Una sesión nueva empieza leyendo este archivo.
 | L3 Escáner | cerrado | verde 2026-11-16; prueba en modo avión 10/10 |
 | L4 Compra en curso | cerrado | verde 2026-11-16; simulacro en casa OK |
 | L5 Resto de pantallas | cerrado | verde 2026-11-16 (humano no bloqueante pendiente) |
-| L6 Seguridad y respaldo | esperando humano | automática verde 2026-11-16; falta prueba en el teléfono |
+| L6 Seguridad y respaldo | cerrado | verde 2026-11-16; prueba en el teléfono OK |
 | L7 Lista, resúmenes, recordatorios | pendiente | — |
 | L8 Release | pendiente | — |
 | L9 Prueba de campo | pendiente | — |
@@ -201,3 +201,4 @@ Formato por loop (copiar el bloque al empezar cada uno):
 - Medido: respaldo con 600.000 iteraciones de PBKDF2 en el teléfono: cifrar 1,74 s (200 KB). APK debug 53,7 MB.
 - Desviaciones de la especificación: ninguna de fondo. En DECISIONES: autenticadores en Android 9–10, la navegación se rearma al desbloquear, detección de bloqueo del teléfono con `KeyguardManager`, vista previa del respaldo antes de confirmar, tope de 64 MB descomprimido, respaldo sin ajustes, S-15 sin portal de plugins. S-12 (firma) queda para L8, como dice el plan.
 - Pendiente para Daniel: `[HUMANO, BLOQUEANTE]` prueba en el teléfono (APK debug instalado 2026-11-16 17:42). Instrucciones en el mensaje de cierre de la sesión.
+- **Resultado de la prueba humana (2026-11-16, Poco X8 Pro):** Daniel: "todo funcionó bien" en los 4 puntos (bloqueo al abrir, gracia, recientes en blanco, exportar → borrar datos → restaurar). L6 cerrado: fin del MVP.
