@@ -70,3 +70,4 @@ Formato por loop (copiar el bloque al empezar cada uno):
 
 ### L2 · Datos cifrados
 - [x] T1 — Entidades de las 8 tablas de `03-datos.md` (incluida `shopping_list_item` ya en v1), `Converters` (`Pesos`↔INTEGER, `YearMonth`↔TEXT), DAOs (`CategoryDao`, `ProductDao`, `TripDao`, `BudgetDao`) con las consultas pedidas, compra abierta con líneas y producto en una sola consulta `@Transaction`, `MercadoDatabase` v1 con `exportSchema` a `app/schemas/`, callback que siembra las 10 categorías y activa `foreign_keys`.
+- [x] T2 — `DatabaseFactory`: `SqlCipherDatabaseFactory` (SQLCipher con `SupportOpenHelperFactory`, WAL, clave cruda `x'…'`) e `InMemoryDatabaseFactory` (Room en memoria sin cifrar para Robolectric). `System.loadLibrary("sqlcipher")` en `MercadoApp.onCreate`. Robolectric usa `android.app.Application` (no carga la librería nativa).
