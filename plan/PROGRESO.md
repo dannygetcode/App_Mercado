@@ -2,7 +2,7 @@
 
 Lo mantiene el agente. Una sesión nueva empieza leyendo este archivo.
 
-**Loop actual:** L6
+**Loop actual:** L6 (esperando humano)
 **Última actualización:** 2026-11-16
 **Pasos `[HUMANO]` pendientes:** L2 revisar la semilla; L5 recorrer las pantallas en claro y oscuro (ambos no bloqueantes)
 
@@ -16,7 +16,7 @@ Lo mantiene el agente. Una sesión nueva empieza leyendo este archivo.
 | L3 Escáner | cerrado | verde 2026-11-16; prueba en modo avión 10/10 |
 | L4 Compra en curso | cerrado | verde 2026-11-16; simulacro en casa OK |
 | L5 Resto de pantallas | cerrado | verde 2026-11-16 (humano no bloqueante pendiente) |
-| L6 Seguridad y respaldo | en curso | — |
+| L6 Seguridad y respaldo | esperando humano | automática verde 2026-11-16; falta prueba en el teléfono |
 | L7 Lista, resúmenes, recordatorios | pendiente | — |
 | L8 Release | pendiente | — |
 | L9 Prueba de campo | pendiente | — |
@@ -196,3 +196,8 @@ Formato por loop (copiar el bloque al empezar cada uno):
 | S-13 | SQL parametrizado | `grep SimpleSQLiteQuery/rawQuery/RawQuery` sin usos; los dos `execSQL` (semilla de categorías con `?` y `PRAGMA foreign_keys`) no llevan texto del usuario; búsqueda con `LIKE :pattern ESCAPE` | Hecho |
 | S-14 | Permisos mínimos | `verificar.sh` lista blanca OK; manifiesto fusionado de release: CAMERA, VIBRATE, USE_BIOMETRIC, USE_FINGERPRINT y el interno DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION | Hecho |
 | S-15 | Dependencias | `verificar.sh` nuevo chequeo S-15 OK: repositorios `google()` y `mavenCentral()` (plugins y dependencias), `FAIL_ON_PROJECT_REPOS`, catálogo sin versiones dinámicas | Hecho |
+**Informe de cierre**
+- Verificación: `./scripts/verificar.sh completo` → VERDE, 11/11 (nuevo: S-15). Lint: "No issues found". Pruebas: 83 de dominio + 152 JVM de la app, 0 fallas, estables en 3 corridas seguidas (`--rerun-tasks`). Instrumentadas en el Poco X8 Pro: `EncryptedDbTest` 1/1, `DbKeyManagerTest` 3/3, `BackupCryptoDeviceTest` 1/1; `ScannerSmokeTest` no corrió porque el teléfono estaba con la pantalla apagada y bloqueada (necesita la pantalla encendida; se hizo tolerante a la espera).
+- Medido: respaldo con 600.000 iteraciones de PBKDF2 en el teléfono: cifrar 1,74 s (200 KB). APK debug 53,7 MB.
+- Desviaciones de la especificación: ninguna de fondo. En DECISIONES: autenticadores en Android 9–10, la navegación se rearma al desbloquear, detección de bloqueo del teléfono con `KeyguardManager`, vista previa del respaldo antes de confirmar, tope de 64 MB descomprimido, respaldo sin ajustes, S-15 sin portal de plugins. S-12 (firma) queda para L8, como dice el plan.
+- Pendiente para Daniel: `[HUMANO, BLOQUEANTE]` prueba en el teléfono (APK debug instalado 2026-11-16 17:42). Instrucciones en el mensaje de cierre de la sesión.
