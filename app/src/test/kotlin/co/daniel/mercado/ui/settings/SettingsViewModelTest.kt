@@ -6,7 +6,9 @@ import co.daniel.mercado.data.settings.InMemoryPreferencesDataStore
 import co.daniel.mercado.data.settings.SettingsStore
 import co.daniel.mercado.domain.model.CatalogFilter
 import co.daniel.mercado.domain.model.Pesos
+import co.daniel.mercado.security.BackupError
 import co.daniel.mercado.ui.catalog.await
+import co.daniel.mercado.ui.catalog.next
 import co.daniel.mercado.ui.trip.TripGraph
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -19,14 +21,18 @@ import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.ConscryptMode
 import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricTestRunner::class)
+@ConscryptMode(ConscryptMode.Mode.OFF)
 class SettingsViewModelTest {
 
     private val t = TripGraph()
@@ -36,7 +42,7 @@ class SettingsViewModelTest {
     @Before
     fun setUp() {
         Dispatchers.setMain(Dispatchers.Unconfined)
-        vm = SettingsViewModel({ t.graph }, store, io = Dispatchers.Unconfined)
+        vm = SettingsViewModel({ t.graph }, store, t.clock, io = Dispatchers.Unconfined)
         vm.state.await { it.month != null }
     }
 
@@ -106,5 +112,81 @@ class SettingsViewModelTest {
         assertNull(vm.state.value.importMessage)
         import(null)
         assertEquals(ImportMessage.Unreadable, vm.state.await { it.importMessage != null }.importMessage)
+    }
+
+    @Test
+    fun `seguridad se guarda en ajustes`() {
+        vm.onEvent(SettingsEvent.LockEnabled(false))
+        vm.onEvent(SettingsEvent.GraceMinutes(15))
+        vm.onEvent(SettingsEvent.SecureScreen(true))
+
+        val s = vm.state.await { it.settings.lockGraceMinutes == 15 && it.settings.secureScreen }.settings
+        assertFalse(s.lockEnabled)
+    }
+
+    @Test
+    fun `exportar pide contrasena dos veces de al menos 8 y luego el archivo`() {
+        vm.onEvent(SettingsEvent.ExportBackup)
+        assertEquals(BackupDialog.ExportPassword, vm.state.value.backupDialog)
+
+        vm.onEvent(SettingsEvent.ExportPassword("corta", "corta"))
+        assertEquals(BackupMessage.PasswordTooShort, vm.state.value.backupMessage)
+        vm.onEvent(SettingsEvent.ExportPassword("contraseña1", "contraseña2"))
+        assertEquals(BackupMessage.PasswordMismatch, vm.state.value.backupMessage)
+
+        vm.onEvent(SettingsEvent.ExportPassword("contraseña1", "contraseña1"))
+        val effect = vm.effects.next() as SettingsEffect.PickExportFile
+        assertTrue(effect.suggestedName.startsWith("mercado-") && effect.suggestedName.endsWith(".mercado"))
+        assertNull(vm.state.value.backupDialog)
+    }
+
+    @Test
+    fun `exportar y restaurar con confirmacion devuelve los datos`() {
+        runBlocking {
+            t.product("Arroz Diana", 5_900)
+            t.graph.setMonthlyBudget(Pesos(900_000))
+        }
+        val out = ByteArrayOutputStream()
+        vm.onEvent(SettingsEvent.ExportBackup)
+        vm.onEvent(SettingsEvent.ExportPassword("contraseña1", "contraseña1"))
+        vm.effects.next()
+        vm.onEvent(SettingsEvent.ExportTo { out })
+        assertEquals(BackupMessage.Exported, vm.state.await { it.backupMessage != null }.backupMessage)
+        assertTrue(vm.state.value.settings.lastBackupAt > 0 || runBlocking { store.current().lastBackupAt } > 0)
+
+        runBlocking { t.product("Leche", 4_300) }
+        assertEquals(listOf("Arroz Diana", "Leche"), catalogNames())
+
+        vm.onEvent(SettingsEvent.RestoreBackup)
+        assertEquals(SettingsEffect.PickRestoreFile, vm.effects.next())
+        vm.onEvent(SettingsEvent.RestoreFrom { ByteArrayInputStream(out.toByteArray()) })
+        assertEquals(BackupDialog.RestorePassword, vm.state.await { it.backupDialog != null }.backupDialog)
+
+        vm.onEvent(SettingsEvent.RestorePassword("otra-contraseña"))
+        val wrong = vm.state.await { it.backupMessage != null }
+        assertEquals(BackupMessage.Failed(BackupError.WRONG_PASSWORD_OR_TAMPERED), wrong.backupMessage)
+        assertEquals(BackupDialog.RestorePassword, wrong.backupDialog)
+
+        vm.onEvent(SettingsEvent.RestorePassword("contraseña1"))
+        val confirm = vm.state.await { it.backupDialog is BackupDialog.ConfirmRestore }.backupDialog as BackupDialog.ConfirmRestore
+        assertEquals(1, confirm.products)
+        assertEquals(listOf("Arroz Diana", "Leche"), catalogNames())
+
+        vm.onEvent(SettingsEvent.ConfirmRestore)
+        assertEquals(BackupMessage.Restored, vm.state.await { it.backupMessage != null }.backupMessage)
+        assertEquals(listOf("Arroz Diana"), catalogNames())
+    }
+
+    @Test
+    fun `un archivo que no es respaldo se informa sin tocar nada`() {
+        runBlocking { t.product("Arroz Diana", 5_900) }
+        vm.onEvent(SettingsEvent.RestoreFrom { ByteArrayInputStream("hola".toByteArray()) })
+        vm.state.await { it.backupDialog == BackupDialog.RestorePassword }
+        vm.onEvent(SettingsEvent.RestorePassword("contraseña1"))
+
+        val s = vm.state.await { it.backupMessage != null }
+        assertEquals(BackupMessage.Failed(BackupError.NOT_A_BACKUP), s.backupMessage)
+        assertNull(s.backupDialog)
+        assertEquals(listOf("Arroz Diana"), catalogNames())
     }
 }

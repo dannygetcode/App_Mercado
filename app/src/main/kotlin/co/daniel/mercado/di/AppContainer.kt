@@ -63,6 +63,7 @@ import co.daniel.mercado.domain.usecase.StartTrip
 import co.daniel.mercado.domain.usecase.TripSession
 import co.daniel.mercado.domain.usecase.UndoLastAction
 import co.daniel.mercado.security.AppLock
+import co.daniel.mercado.security.BackupManager
 import co.daniel.mercado.security.DbKeyManager
 import co.daniel.mercado.security.KeystoreKeyWrapper
 import co.daniel.mercado.util.AppLog
@@ -148,6 +149,7 @@ class DataGraph(
     val transactions = RoomTransactionRunner(db)
     val tripSession = TripSession(transactions)
     val seedImporter = SeedImporter(db, clock)
+    val backupManager = BackupManager(db, clock)
 
     val getMonthStatus = GetMonthStatus(budgets, trips, clock)
     val observeMonthStatus = ObserveMonthStatus(budgets, trips, getMonthStatus)

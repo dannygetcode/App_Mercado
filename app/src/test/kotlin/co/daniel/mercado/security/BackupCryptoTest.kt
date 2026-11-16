@@ -5,9 +5,17 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertThrows
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.ConscryptMode
 import java.nio.ByteBuffer
 
-/** S-08. Con 100.000 iteraciones (el mínimo aceptado) para que corran rápido. */
+/**
+ * S-08. Con 100.000 iteraciones (el mínimo aceptado) para que corran rápido. Corre en Robolectric
+ * con Conscrypt apagado: si otra prueba lo dejó instalado en la JVM, el JDK 17 lo rechaza.
+ */
+@RunWith(RobolectricTestRunner::class)
+@ConscryptMode(ConscryptMode.Mode.OFF)
 class BackupCryptoTest {
 
     private val password = "clave-del-mercado".toCharArray()

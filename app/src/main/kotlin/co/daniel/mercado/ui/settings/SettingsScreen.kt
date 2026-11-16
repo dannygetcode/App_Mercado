@@ -15,6 +15,21 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.lifecycle.compose.LifecycleResumeEffect
+import co.daniel.mercado.security.BackupError
+import co.daniel.mercado.security.isDeviceSecure
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
@@ -55,10 +70,39 @@ import java.time.YearMonth
 
 /** Ajustes (04-ux): Presupuesto, Mercado, Escáner, Seguridad, Datos y Acerca de. */
 @Composable
-fun SettingsScreen(state: SettingsUiState, onEvent: (SettingsEvent) -> Unit, modifier: Modifier = Modifier) {
+fun SettingsScreen(
+    state: SettingsUiState,
+    onEvent: (SettingsEvent) -> Unit,
+    modifier: Modifier = Modifier,
+    effects: Flow<SettingsEffect> = emptyFlow(),
+) {
     val context = LocalContext.current
     val pickCatalog = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) onEvent(SettingsEvent.ImportCatalog { context.contentResolver.openInputStream(uri) })
+    }
+    // El selector de documentos del sistema: la app no pide permisos de almacenamiento (03-datos).
+    val pickExport = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument(BACKUP_MIME)) { uri ->
+        if (uri != null) {
+            onEvent(SettingsEvent.ExportTo { context.contentResolver.openOutputStream(uri, "wt") })
+        } else {
+            onEvent(SettingsEvent.DismissBackupDialog)
+        }
+    }
+    val pickRestore = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri != null) onEvent(SettingsEvent.RestoreFrom { context.contentResolver.openInputStream(uri) })
+    }
+    LaunchedEffect(effects) {
+        effects.collect { effect ->
+            when (effect) {
+                is SettingsEffect.PickExportFile -> pickExport.launch(effect.suggestedName)
+                SettingsEffect.PickRestoreFile -> pickRestore.launch(arrayOf("*/*"))
+            }
+        }
+    }
+    var deviceSecure by remember { mutableStateOf(context.isDeviceSecure()) }
+    LifecycleResumeEffect(Unit) {
+        deviceSecure = context.isDeviceSecure()
+        onPauseOrDispose { }
     }
     val s = state.settings
     Surface(modifier = modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
@@ -96,7 +140,16 @@ fun SettingsScreen(state: SettingsUiState, onEvent: (SettingsEvent) -> Unit, mod
             SwitchRow(R.string.settings_scan_vibration, null, s.scanVibration) { onEvent(SettingsEvent.ScanVibration(it)) }
 
             Section(R.string.settings_security)
-            SwitchRow(R.string.settings_lock, R.string.settings_coming_l6, s.lockEnabled, enabled = false) {}
+            if (!deviceSecure) {
+                Text(
+                    text = stringResource(R.string.settings_no_device_lock),
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                )
+            }
+            SwitchRow(R.string.settings_lock, R.string.settings_lock_hint, s.lockEnabled && deviceSecure, enabled = deviceSecure) {
+                onEvent(SettingsEvent.LockEnabled(it))
+            }
             ListItem(
                 headlineContent = { Text(stringResource(R.string.settings_grace)) },
                 supportingContent = {
@@ -104,19 +157,37 @@ fun SettingsScreen(state: SettingsUiState, onEvent: (SettingsEvent) -> Unit, mod
                         SettingsStore.GRACE_OPTIONS.sorted().forEach { minutes ->
                             FilterChip(
                                 selected = s.lockGraceMinutes == minutes,
-                                onClick = {},
-                                enabled = false,
+                                onClick = { onEvent(SettingsEvent.GraceMinutes(minutes)) },
+                                enabled = s.lockEnabled && deviceSecure,
                                 label = { Text(stringResource(R.string.settings_grace_minutes, minutes)) },
                             )
                         }
                     }
                 },
             )
-            SwitchRow(R.string.settings_secure_screen, R.string.settings_coming_l6, s.secureScreen, enabled = false) {}
+            SwitchRow(R.string.settings_secure_screen, R.string.settings_secure_screen_hint, s.secureScreen) {
+                onEvent(SettingsEvent.SecureScreen(it))
+            }
 
             Section(R.string.settings_data)
-            DisabledRow(R.string.settings_export_backup, R.string.settings_coming_l6)
-            DisabledRow(R.string.settings_restore_backup, R.string.settings_coming_l6)
+            ListItem(
+                modifier = Modifier.clickable(enabled = !state.backupBusy) { onEvent(SettingsEvent.ExportBackup) },
+                headlineContent = { Text(stringResource(R.string.settings_export_backup)) },
+                supportingContent = { Text(stringResource(R.string.settings_export_backup_hint)) },
+                trailingContent = if (state.backupBusy) {
+                    { CircularProgressIndicator(Modifier.size(24.dp)) }
+                } else {
+                    null
+                },
+            )
+            ListItem(
+                modifier = Modifier.clickable(enabled = !state.backupBusy) { onEvent(SettingsEvent.RestoreBackup) },
+                headlineContent = { Text(stringResource(R.string.settings_restore_backup)) },
+                supportingContent = { Text(stringResource(R.string.settings_restore_backup_hint)) },
+            )
+            if (state.backupDialog == null) {
+                state.backupMessage?.let { BackupResult(it, onDismiss = { onEvent(SettingsEvent.DismissBackupMessage) }) }
+            }
             ListItem(
                 headlineContent = { Text(stringResource(R.string.settings_last_backup)) },
                 supportingContent = {
@@ -145,6 +216,7 @@ fun SettingsScreen(state: SettingsUiState, onEvent: (SettingsEvent) -> Unit, mod
             ListItem(headlineContent = { Text(stringResource(R.string.no_internet_note)) })
         }
     }
+    state.backupDialog?.let { BackupDialogs(it, state.backupMessage, state.backupBusy, onEvent) }
     if (state.budgetSheet) {
         KeypadBottomSheet(
             title = stringResource(R.string.budget_title, state.month?.let { Dates.monthName(it.yearMonth) }.orEmpty()),
@@ -247,6 +319,123 @@ private fun ImportResult(message: ImportMessage, onDismiss: () -> Unit) {
         TextButton(onClick = onDismiss) { Text(stringResource(R.string.keypad_ok)) }
     }
 }
+
+@Composable
+private fun backupMessageText(message: BackupMessage): String = when (message) {
+    BackupMessage.Exported -> stringResource(R.string.backup_exported)
+    BackupMessage.Restored -> stringResource(R.string.backup_restored)
+    BackupMessage.PasswordTooShort -> stringResource(R.string.backup_password_short)
+    BackupMessage.PasswordMismatch -> stringResource(R.string.backup_password_mismatch)
+    BackupMessage.WriteFailed -> stringResource(R.string.backup_write_failed)
+    BackupMessage.ReadFailed -> stringResource(R.string.import_unreadable)
+    is BackupMessage.Failed -> when (message.error) {
+        BackupError.TOO_LARGE -> stringResource(R.string.backup_too_large)
+        BackupError.NOT_A_BACKUP -> stringResource(R.string.backup_not_a_backup)
+        BackupError.WRONG_PASSWORD_OR_TAMPERED -> stringResource(R.string.backup_wrong_password)
+        BackupError.NEWER_VERSION -> stringResource(R.string.backup_newer)
+        BackupError.INVALID_CONTENT -> stringResource(R.string.backup_invalid)
+    } + " " + stringResource(R.string.backup_nothing_changed)
+}
+
+@Composable
+private fun BackupResult(message: BackupMessage, onDismiss: () -> Unit) {
+    val ok = message == BackupMessage.Exported || message == BackupMessage.Restored
+    Row(
+        Modifier.fillMaxWidth().padding(horizontal = 16.dp).semantics { liveRegion = LiveRegionMode.Polite },
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = backupMessageText(message),
+            modifier = Modifier.weight(1f),
+            color = if (ok) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+        )
+        TextButton(onClick = onDismiss) { Text(stringResource(R.string.keypad_ok)) }
+    }
+}
+
+@Composable
+private fun BackupDialogs(dialog: BackupDialog, message: BackupMessage?, busy: Boolean, onEvent: (SettingsEvent) -> Unit) {
+    val dismiss = { onEvent(SettingsEvent.DismissBackupDialog) }
+    when (dialog) {
+        BackupDialog.ExportPassword -> {
+            var password by remember { mutableStateOf("") }
+            var repeat by remember { mutableStateOf("") }
+            AlertDialog(
+                onDismissRequest = dismiss,
+                title = { Text(stringResource(R.string.backup_password_title)) },
+                text = {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text(stringResource(R.string.backup_password_hint))
+                        PasswordField(password, { password = it }, R.string.backup_password)
+                        PasswordField(repeat, { repeat = it }, R.string.backup_password_repeat)
+                        message?.let { Text(backupMessageText(it), color = MaterialTheme.colorScheme.error) }
+                    }
+                },
+                confirmButton = {
+                    TextButton(onClick = { onEvent(SettingsEvent.ExportPassword(password, repeat)) }) {
+                        Text(stringResource(R.string.backup_continue))
+                    }
+                },
+                dismissButton = { TextButton(onClick = dismiss) { Text(stringResource(R.string.cancel)) } },
+            )
+        }
+        BackupDialog.RestorePassword -> {
+            var password by remember { mutableStateOf("") }
+            AlertDialog(
+                onDismissRequest = dismiss,
+                title = { Text(stringResource(R.string.backup_open_title)) },
+                text = {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        PasswordField(password, { password = it }, R.string.backup_password)
+                        if (busy) CircularProgressIndicator(Modifier.size(24.dp))
+                        message?.let { Text(backupMessageText(it), color = MaterialTheme.colorScheme.error) }
+                    }
+                },
+                confirmButton = {
+                    TextButton(onClick = { onEvent(SettingsEvent.RestorePassword(password)) }, enabled = !busy) {
+                        Text(stringResource(R.string.backup_open))
+                    }
+                },
+                dismissButton = { TextButton(onClick = dismiss) { Text(stringResource(R.string.cancel)) } },
+            )
+        }
+        is BackupDialog.ConfirmRestore -> AlertDialog(
+            onDismissRequest = dismiss,
+            title = { Text(stringResource(R.string.backup_confirm_title)) },
+            text = {
+                Text(
+                    stringResource(
+                        R.string.backup_confirm_text,
+                        Dates.dayMonthYear(dialog.exportedAt),
+                        pluralStringResource(R.plurals.backup_products, dialog.products, dialog.products),
+                        pluralStringResource(R.plurals.backup_trips, dialog.trips, dialog.trips),
+                    ),
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = { onEvent(SettingsEvent.ConfirmRestore) }) {
+                    Text(stringResource(R.string.backup_confirm_yes), color = MaterialTheme.colorScheme.error)
+                }
+            },
+            dismissButton = { TextButton(onClick = dismiss) { Text(stringResource(R.string.cancel)) } },
+        )
+    }
+}
+
+@Composable
+private fun PasswordField(value: String, onChange: (String) -> Unit, label: Int) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onChange,
+        label = { Text(stringResource(label)) },
+        singleLine = true,
+        visualTransformation = PasswordVisualTransformation(),
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, autoCorrectEnabled = false),
+        modifier = Modifier.fillMaxWidth(),
+    )
+}
+
+private const val BACKUP_MIME = "application/octet-stream"
 
 @Preview(heightDp = 1600)
 @Composable

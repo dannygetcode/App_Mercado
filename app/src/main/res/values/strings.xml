@@ -172,7 +172,6 @@
     <string name="settings_budget_inherited">%s · del mes anterior</string>
     <string name="settings_category_caps">Topes por categoría</string>
     <string name="settings_coming_l7">Llega con la lista sugerida y los resúmenes</string>
-    <string name="settings_coming_l6">Llega en la siguiente versión</string>
     <string name="settings_market">Mercado</string>
     <string name="settings_frequency">Frecuencia del mercado</string>
     <plurals name="settings_frequency_days">
@@ -220,4 +219,38 @@
     <string name="data_error_text">La base cifrada de este teléfono no abrió. No desinstales la app ni borres sus datos: así se perderían. Cierra Mercado y ábrelo de nuevo. Si sigue igual, no borres nada: los datos siguen guardados en el teléfono.</string>
     <string name="lock_prompt_title">Desbloquear Mercado</string>
     <string name="lock_unlock">Desbloquear</string>
+    <string name="settings_no_device_lock">Tu teléfono no tiene bloqueo de pantalla. Configúralo en los ajustes del teléfono para poder bloquear Mercado.</string>
+    <string name="settings_lock_hint">Pide huella o PIN al abrir la app</string>
+    <string name="settings_secure_screen_hint">En recientes se ve en blanco</string>
+    <string name="settings_export_backup_hint">Archivo cifrado con tu contraseña</string>
+    <string name="settings_restore_backup_hint">Reemplaza todos los datos de la app</string>
+    <string name="backup_password_title">Contraseña del respaldo</string>
+    <string name="backup_password_hint">Mínimo 8 caracteres. No se guarda: si la olvidas, el respaldo no se puede abrir.</string>
+    <string name="backup_password">Contraseña</string>
+    <string name="backup_password_repeat">Repite la contraseña</string>
+    <string name="backup_continue">Elegir dónde guardar</string>
+    <string name="backup_open_title">Abrir respaldo</string>
+    <string name="backup_open">Abrir</string>
+    <string name="backup_confirm_title">¿Reemplazar todos los datos?</string>
+    <string name="backup_confirm_text">El respaldo del %1$s tiene %2$s y %3$s. Todo lo que hay ahora en la app se borra y se cambia por eso. No se puede deshacer.</string>
+    <string name="backup_confirm_yes">Reemplazar</string>
+    <plurals name="backup_products">
+        <item quantity="one">%d producto</item>
+        <item quantity="other">%d productos</item>
+    </plurals>
+    <plurals name="backup_trips">
+        <item quantity="one">%d compra</item>
+        <item quantity="other">%d compras</item>
+    </plurals>
+    <string name="backup_exported">Respaldo guardado.</string>
+    <string name="backup_restored">Respaldo restaurado.</string>
+    <string name="backup_password_short">La contraseña debe tener al menos 8 caracteres.</string>
+    <string name="backup_password_mismatch">Las dos contraseñas no coinciden.</string>
+    <string name="backup_write_failed">No se pudo guardar el archivo.</string>
+    <string name="backup_too_large">El archivo pasa de 20 MB.</string>
+    <string name="backup_not_a_backup">Ese archivo no es un respaldo de Mercado.</string>
+    <string name="backup_wrong_password">Contraseña incorrecta o archivo dañado.</string>
+    <string name="backup_newer">El respaldo es de una versión más nueva de la app.</string>
+    <string name="backup_invalid">El respaldo está dañado.</string>
+    <string name="backup_nothing_changed">Tus datos no cambiaron.</string>
 </resources>

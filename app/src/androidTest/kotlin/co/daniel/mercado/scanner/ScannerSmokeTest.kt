@@ -68,8 +68,13 @@ class ScannerSmokeTest {
     }
 
     private fun runSmoke() {
-        compose.waitUntil(CAMERA_WARMUP_MS) {
-            compose.onAllNodesWithText("Pausar cámara").fetchSemanticsNodes().isNotEmpty()
+        // Hace falta la pantalla encendida y desbloqueada; mientras la actividad no compone, se espera.
+        compose.waitUntil(STARTUP_TIMEOUT_MS) {
+            try {
+                compose.onAllNodesWithText("Pausar cámara").fetchSemanticsNodes().isNotEmpty()
+            } catch (_: IllegalStateException) {
+                false
+            }
         }
         Thread.sleep(CAMERA_WARMUP_MS)
         compose.waitForIdle()
@@ -86,5 +91,6 @@ class ScannerSmokeTest {
 
     private companion object {
         const val CAMERA_WARMUP_MS = 3_000L
+        const val STARTUP_TIMEOUT_MS = 10_000L
     }
 }

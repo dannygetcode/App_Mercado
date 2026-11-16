@@ -235,7 +235,7 @@ private fun MercadoNavigation(
             composable<SettingsRoute> {
                 val settings: SettingsViewModel = viewModel(factory = SettingsViewModel.Factory)
                 val settingsState by settings.state.collectAsStateWithLifecycle()
-                SettingsScreen(state = settingsState, onEvent = settings::onEvent)
+                SettingsScreen(state = settingsState, onEvent = settings::onEvent, effects = settings.effects)
             }
             composable<TripRoute> {
                 val trip: TripViewModel = viewModel(factory = TripViewModel.Factory)

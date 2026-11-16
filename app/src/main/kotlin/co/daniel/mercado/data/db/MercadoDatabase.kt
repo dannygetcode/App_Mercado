@@ -4,6 +4,7 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.sqlite.db.SupportSQLiteDatabase
+import co.daniel.mercado.data.db.dao.BackupDao
 import co.daniel.mercado.data.db.dao.BudgetDao
 import co.daniel.mercado.data.db.dao.CategoryDao
 import co.daniel.mercado.data.db.dao.ProductDao
@@ -28,7 +29,7 @@ import co.daniel.mercado.data.db.entity.TripItemEntity
         BudgetEntity::class,
         ShoppingListItemEntity::class,
     ],
-    version = 1,
+    version = MercadoDatabase.VERSION,
     exportSchema = true,
 )
 @TypeConverters(Converters::class)
@@ -37,9 +38,11 @@ abstract class MercadoDatabase : RoomDatabase() {
     abstract fun productDao(): ProductDao
     abstract fun tripDao(): TripDao
     abstract fun budgetDao(): BudgetDao
+    abstract fun backupDao(): BackupDao
 
     companion object {
         const val FILE_NAME = "mercado.db"
+        const val VERSION = 1
 
         /** Categorías sembradas al crear la base (03-datos.md), en su orden. */
         val SEED_CATEGORIES = listOf(
