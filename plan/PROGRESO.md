@@ -2,9 +2,9 @@
 
 Lo mantiene el agente. Una sesión nueva empieza leyendo este archivo.
 
-**Loop actual:** L5
+**Loop actual:** L6
 **Última actualización:** 2026-11-16
-**Pasos `[HUMANO]` pendientes:** L2 revisar la semilla (no bloqueante)
+**Pasos `[HUMANO]` pendientes:** L2 revisar la semilla; L5 recorrer las pantallas en claro y oscuro (ambos no bloqueantes)
 
 ## Tablero
 
@@ -15,7 +15,7 @@ Lo mantiene el agente. Una sesión nueva empieza leyendo este archivo.
 | L2 Datos cifrados | cerrado | verde 2026-11-16 (2 humanos no bloqueantes pendientes) |
 | L3 Escáner | cerrado | verde 2026-11-16; prueba en modo avión 10/10 |
 | L4 Compra en curso | cerrado | verde 2026-11-16; simulacro en casa OK |
-| L5 Resto de pantallas | en curso | — |
+| L5 Resto de pantallas | cerrado | verde 2026-11-16 (humano no bloqueante pendiente) |
 | L6 Seguridad y respaldo | pendiente | — |
 | L7 Lista, resúmenes, recordatorios | pendiente | — |
 | L8 Release | pendiente | — |
@@ -163,3 +163,9 @@ Formato por loop (copiar el bloque al empezar cada uno):
 - [x] T5 — Historial (`HistoryScreen` + `HistoryViewModel`): compras cerradas agrupadas por mes de cierre ("Noviembre 2026 · $X"), cada una con fecha, tienda, total (el pagado si existe) y artículos; estado vacío. Detalle (`TripDetailScreen` + `TripDetailViewModel`): fecha y hora, tienda, artículos, total estimado, límite, líneas (nombre o "Artículo sin nombre", "2 × $5.900" o "por peso", total de línea) y "Total pagado según el recibo" editable con el teclado (0 lo quita). Solo compras cerradas. 4 pruebas de ViewModel.
 - [x] T6 — Ajustes (`SettingsScreen` + `SettingsViewModel`), todas las secciones de 04-ux. Funcionan: presupuesto del mes (mismo teclado; dice si es heredado), frecuencia del mercado (−/+ en 1–90 días), recordatorios (se guarda; el aviso llega en L7), sonido y vibración del escáner, importar catálogo JSON (selector del sistema `OpenDocument`, importa en segundo plano con el `SeedImporter` todo-o-nada y muestra el resultado: "N nuevos, M actualizados" o el error concreto con el número de producto y "No se importó nada"), versión y "Esta app no tiene acceso a internet". Visibles y desactivadas hasta L6: bloqueo, gracia (1/5/15 min), pantalla segura, exportar/restaurar respaldo; "Último respaldo: Nunca". "Topes por categoría" visible y desactivado hasta L7 (RF-13 es S). 5 pruebas de ViewModel.
 - [x] T7 — Estados vacíos (catálogo sin productos / sin resultados, historial vacío, compra vacía ya existía), errores (la base cifrada que no abre muestra "No se pudieron abrir tus datos" en vez de cerrarse la app; la navegación espera a la base con el fondo vacío; importación con mensaje concreto), tema oscuro (todas las pantallas nuevas con colores del tema y `@Preview` en oscuro) y accesibilidad (RNF-03, RNF-11): los ganchos de prueba que estaban como `contentDescription` ("keypad_value", "trip_total", "increment", "decrement") pasan a `testTag`; los botones −/+ de la línea y de "Editar línea" dicen "Quitar uno de X" / "Agregar uno de X"; íconos con descripción; ↑/↓ de favoritos de 48 dp; títulos marcados como encabezado; avisos con `liveRegion`. `AccessibilityUiTest` (6) en oscuro y letra a 1,3×.
+- Fallo encontrado en el teléfono tras T7 (no lo cubrían las pruebas JVM): con una compra abierta, al arrancar la app navegaba a la compra antes de que el `NavHost` (dentro del `Scaffold`, subcompuesto) fijara su grafo → `IllegalStateException: You must call setGraph() before calling getGraph()` y cierre. Corregido: los efectos de arranque (compra abierta, acceso directo, diagnóstico) esperan la primera entrada de la pila (`awaitGraph`). Verificado en el Poco X8 Pro: abre directo en la compra, sin entradas en el búfer de fallos.
+**Informe de cierre**
+- Verificación: `./scripts/verificar.sh completo` → VERDE, 10/10. Lint: "No issues found" (sin `HardcodedText`; todos los textos en `strings.xml`). Pruebas: 83 de dominio + 122 JVM de la app, 0 fallas. Pruebas de ViewModel de la puerta: Inicio 6, Catálogo/editor 6, Historial/detalle 4 (más Ajustes 5 y `AccessibilityUiTest` 6). `compileDebugAndroidTestKotlin` OK.
+- Medido: APK debug 53,8 MB (debug sin R8, todas las ABI). Arranque en frío en el teléfono (`am start -W`): 230 ms hasta la primera ventana.
+- Desviaciones de la especificación: ninguna de fondo. Detalles en DECISIONES (acceso directo con límite por defecto, íconos vectoriales propios, clave `budget_hint_dismissed`, desactivar sin confirmación con "Reactivar", orden de favoritos con ↑/↓, topes por categoría en L7). La tarjeta "Lista de mercado" del Inicio llega con L7.
+- Pendiente para Daniel: `[HUMANO, no bloqueante]` recorrer todas las pantallas en el teléfono, en tema claro y en oscuro (el APK debug ya está instalado). Ver el mensaje de cierre de la sesión.

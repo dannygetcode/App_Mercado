@@ -64,6 +64,7 @@ import co.daniel.mercado.ui.settings.SettingsViewModel
 import co.daniel.mercado.ui.trip.TripScreen
 import co.daniel.mercado.ui.trip.TripViewModel
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.first
 import kotlin.reflect.KClass
 
 /** Lo que pide el arranque: nada, abrir la compra (acceso directo) o el diagnóstico (solo debug). */
@@ -119,6 +120,7 @@ private fun MercadoNavigation(
     LaunchedEffect(Unit) {
         if (checkedOpenTrip) return@LaunchedEffect
         checkedOpenTrip = true
+        navController.awaitGraph()
         if (launchAction == LaunchAction.NONE && container.data().trips.getActive() != null) {
             navController.navigate(TripRoute)
         }
@@ -126,6 +128,10 @@ private fun MercadoNavigation(
     LaunchedEffect(launchAction) {
         when (launchAction) {
             LaunchAction.NONE -> return@LaunchedEffect
+            else -> navController.awaitGraph()
+        }
+        when (launchAction) {
+            LaunchAction.NONE -> Unit
             LaunchAction.NEW_TRIP -> {
                 // Abierta o no, termina en la compra; si no había, empieza con el límite por defecto.
                 container.data().startTrip(TripLimit.Default)
@@ -267,6 +273,14 @@ private fun MercadoNavigation(
             }
         }
     }
+}
+
+/**
+ * El `NavHost` vive dentro del contenido del `Scaffold` (subcomposición) y fija su grafo después de
+ * los efectos de este nivel: navegar antes lo hace fallar. Espera a la primera entrada de la pila.
+ */
+private suspend fun NavHostController.awaitGraph() {
+    currentBackStackEntryFlow.first()
 }
 
 /** Vuelve al Inicio quitando de la pila la compra y el cierre. */
