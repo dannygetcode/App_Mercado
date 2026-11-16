@@ -199,3 +199,5 @@ Formato binario del archivo:
 | `last_reminder_cycle` | Long | 0 |
 | `last_backup_at` | Long | 0 |
 | `seed_imported` | Boolean | false |
+| `budget_hint_dismissed` | Boolean | false (L5: tarjeta "Define tu presupuesto" omitida) |
+| `last_backup_reminder_at` | Long | 0 (L7: último aviso mensual de respaldo) |

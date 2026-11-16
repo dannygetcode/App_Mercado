@@ -2,7 +2,20 @@
 
 Formato: una entrada por versión (`versionName` semántico). Las fechas están en hora de Colombia.
 
-## [Sin publicar]
+## [1.0.0] — 2026-11-16
+
+Primera versión completa (MVP + segunda iteración). Resumen por loop abajo.
+
+- Compra en curso con escáner continuo (ML Kit sin red), total con semáforo, teclado de precio
+  propio, producto nuevo con precio primero, favoritos, búsqueda, deshacer y cierre de compra.
+- Modo "Etiqueta": lee el precio de la etiqueta del estante y prellena el teclado (RF-18).
+- Inicio con el estado del mes, presupuesto mensual con herencia, catálogo, historial y ajustes.
+- Lista de mercado sugerida, resumen del mes con topes por categoría y variaciones de precio,
+  recordatorios de mercado y de respaldo.
+- Seguridad: base cifrada (SQLCipher + Keystore), bloqueo con huella/PIN, pantalla segura, sin
+  permisos de red, respaldo cifrado `.mercado`, release optimizado con R8.
+
+## Historial de desarrollo
 
 ### L0 · Base del proyecto (2026-11-16)
 - Proyecto Gradle con dos módulos: `:domain` (Kotlin/JVM puro) y `:app` (Android, Compose).
@@ -45,3 +58,29 @@ Formato: una entrada por versión (`versionName` semántico). Las fechas están 
 - Vibración distinta al cruzar el 80 % y el 100 % del límite; pausa automática de la cámara.
 - Cierre de compra: total pagado, tienda, productos por nombrar, guardar o descartar.
 - Inicio provisional con "Ir a mercar" / "Continuar compra" y límite prellenado.
+
+### L5 · Resto de pantallas (2026-11-16)
+- Navegación con rutas tipadas y barra inferior; acceso directo del lanzador "Nueva compra".
+- Inicio real: estado del mes, tarjetas, primer uso y presupuesto mensual con herencia.
+- Catálogo con búsqueda, filtros y orden de favoritos; editor de producto con códigos escaneados,
+  historial de precios y desactivar/reactivar.
+- Historial por mes y detalle con total pagado editable; Ajustes con todas las secciones e
+  importación de catálogo JSON.
+- Estados vacíos, error si la base no abre, tema oscuro y accesibilidad (letra a 1,3×).
+
+### L6 · Seguridad y respaldo (2026-11-16)
+- Bloqueo con `BiometricPrompt` (huella o PIN) y gracia de 1, 5 o 15 minutos; pantalla segura.
+- Respaldo cifrado `MRC1` (PBKDF2 600.000 + AES-256-GCM), restauración validada y transaccional.
+- Auditoría S-01..S-15 con evidencia; solo repositorios Google Maven y Maven Central.
+
+### L7 · Lista, resúmenes y recordatorios (2026-11-16)
+- Lectura del precio de la etiqueta del estante (ML Kit texto, sin red).
+- Lista de mercado sugerida con motivo, pestaña Lista en la compra.
+- Resumen del mes con barras, topes por categoría, top 10, subidas y bajadas, 6 meses.
+- Recordatorios con WorkManager (mercado y respaldo mensual).
+
+### L8 · Release (2026-11-16)
+- Reglas de R8 (incluida la de ML Kit por reflexión), build `qa`, arranque ~200 ms, APK 35,2 MB.
+- Lint a cero; la fábrica de base sin cifrar sale del código de la app.
+- README, CHANGELOG y documentos actualizados; versión 1.0.0.
+

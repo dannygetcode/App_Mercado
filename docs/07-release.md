@@ -44,6 +44,12 @@ variantes debug y release usan firmas distintas: debug lleva el sufijo `.debug` 
 
 ## HyperOS (Poco X8 Pro)
 
+- `adb install` falla con `INSTALL_FAILED_USER_RESTRICTED`. Lo que funciona (Git Bash):
+  `export MSYS_NO_PATHCONV=1`, `adb push <apk> /data/local/tmp/mercado.apk` y
+  `adb shell pm install -r -t /data/local/tmp/mercado.apk`. El shell no puede conceder permisos
+  ni tocar la pantalla.
+- Para probar la variante optimizada sin la llave: `./gradlew :app:assembleQa` (paquete
+  `co.daniel.mercado.qa`, firmada con la llave de debug).
 - Activar opciones de desarrollador, "Depuración USB" e "Instalar vía USB" (puede pedir iniciar
   sesión con cuenta Xiaomi y tener SIM).
 - Al instalar, el escáner de seguridad de Xiaomi puede advertir que la app es desconocida: es lo

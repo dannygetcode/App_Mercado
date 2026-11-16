@@ -68,6 +68,7 @@ anota las elegidas en `plan/DECISIONES.md`. Nunca uses alfa, beta ni RC.
 | SQLCipher | `net.zetetic:sqlcipher-android` ≥ 4.6.1 + `androidx.sqlite:sqlite-ktx` | ≥ 4.6.1 soporta páginas de 16 KB |
 | CameraX | 1.4+ estable | |
 | ML Kit | `com.google.mlkit:barcode-scanning` 17.3.0 o posterior | Bundled, no la variante `play-services-` |
+| ML Kit texto | `com.google.mlkit:text-recognition` 16.0.1 | Bundled; solo para RF-18 (etiqueta del estante). Agregado en L7-T0 |
 | Biometric | `androidx.biometric:biometric` estable | |
 | WorkManager | `androidx.work:work-runtime-ktx` estable | |
 | DataStore | `androidx.datastore:datastore-preferences` estable | |
@@ -201,6 +202,11 @@ interface BarcodeDecoder {
 - Ningún cuadro se escribe a disco. No se usa `ImageCapture`.
 - Linterna con un botón. Botón de pausa de cámara. La cámara se libera al salir de la pantalla.
 - En pruebas se inyecta un `FakeBarcodeSource` que emite códigos.
+- Modo etiqueta (RF-18): `LabelReader` (`MlKitLabelReader`) lee texto y código del mismo cuadro y
+  entrega `LabelRead(code, price)`; el precio sale de la regla pura `ShelfPrice` y se estabiliza con
+  `LabelStabilizer` (dos lecturas iguales). Abre el teclado prellenado; nunca suma solo.
+- R8: ML Kit busca sus `ComponentRegistrar` por reflexión; `proguard-rules.pro` conserva sus
+  constructores (sin eso el escáner falla solo en release).
 
 ## Arranque y rendimiento
 
@@ -211,6 +217,10 @@ interface BarcodeDecoder {
 - SQLCipher: cargar la librería nativa una vez en `MercadoApp.onCreate`.
 - R8 con `isMinifyEnabled = true` e `isShrinkResources = true` en release.
 - ABI: incluir solo `arm64-v8a` y `armeabi-v7a` en release (reduce tamaño).
+- Tipos de build: `debug` (`.debug`, depurable, diagnóstico del escáner), `qa` (igual a release
+  pero `.qa` y firmado con la llave de debug, para probar R8 en el teléfono) y `release`.
+- Recordatorios: `ReminderWorker` diario (WorkManager) que delega en `ReminderCheck`. El
+  `SystemJobService` de WorkManager va con `exported="false"` (S-11).
 
 ## Convenciones de código
 

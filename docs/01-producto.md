@@ -127,6 +127,14 @@ barras, favorito, activo, pendiente de revisar.
 ### RF-13 · Presupuesto por categoría (S)
 - Tope mensual opcional por categoría; en el resumen del mes se muestra el avance de cada una.
 
+### RF-18 · Precio de la etiqueta del estante (M, pedido por Daniel el 2026-11-16)
+- En la compra, el visor tiene un selector "Código | Etiqueta". En "Etiqueta" la cámara lee el
+  texto de la etiqueta del estante y, si trae, su código de barras, en el teléfono y sin red.
+- El precio de venta (el número más grande; no cantidades, porcentajes ni precio por unidad de
+  medida) prellena el teclado: producto conocido → "Precio de la etiqueta" con su nombre; código
+  desconocido → "Producto nuevo"; sin código → precio suelto.
+- Nunca suma solo: se confirma con "Sumar" (1 toque) o se corrigen los dígitos.
+
 ### Pendientes (C) — no implementar sin instrucción
 - RF-14 Etiquetas de balanza con precio embebido (códigos que empiezan por 2): requiere fotos de
   etiquetas reales de los supermercados de Daniel.

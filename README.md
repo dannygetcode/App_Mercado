@@ -1,27 +1,66 @@
-# App Mercado
+# Mercado
 
-App Android personal para llevar la cuenta del mercado contra el presupuesto: escanear, sumar, listo.
+App Android personal para llevar la cuenta del mercado contra el presupuesto: escanear, sumar,
+listo. Todo corre en el teléfono: sin internet, sin cuenta, sin servidor. La base de datos va
+cifrada y la app se protege con la huella o el PIN del teléfono.
 
-Esta carpeta contiene el **paquete de trabajo** para implementar la app completa con un agente
-(Claude Code con Opus 5.5).
+**Qué hace (v1.0.0):** compra en curso con escáner continuo y total con semáforo; precio suelto
+con teclado propio; lectura del precio de la etiqueta del estante; catálogo con favoritos y
+códigos; historial y resumen del mes por categoría, productos y variaciones de precio; lista de
+mercado sugerida a partir de las compras; recordatorios; respaldo cifrado con contraseña.
 
-## Cómo ponerlo a trabajar
+## Compilar
 
-1. Deja el recibo del último mes en `seed/` (foto o PDF, nombre `recibo.*`). Ver `seed/README.md`.
-2. Abre una terminal en esta carpeta e inicia Claude Code con el modelo Opus 5.5.
-3. Pega el prompt de arranque de `plan/PROMPTS.md`.
-4. El agente avanza loop por loop y se detiene cuando necesita algo de ti (pasos `[HUMANO]`).
-5. Para retomar en otra sesión, pega el prompt de continuación. El estado vive en `plan/PROGRESO.md`.
+Requisitos: JDK 17 y el Android SDK (plataforma 37). En Windows usar Git Bash.
 
-## Mapa
+```bash
+./scripts/verificar.sh rapido      # pruebas de :domain + compilación debug
+./scripts/verificar.sh completo    # todo: pruebas, lint, APK debug y chequeos de seguridad
+./gradlew :app:assembleDebug       # app-debug.apk  (paquete co.daniel.mercado.debug)
+./gradlew :app:assembleQa          # app-qa.apk     (optimizada, firmada con la llave de debug)
+./gradlew :app:assembleRelease     # app-release.apk (necesita keystore.properties)
+```
+
+La versión release se firma con la llave de Daniel. Cómo crearla y el formato de
+`keystore.properties` (nunca va a git) están en `docs/07-release.md`.
+
+## Instalar
+
+Con el teléfono por USB y la depuración USB activa:
+
+```bash
+adb install -r app/build/outputs/apk/release/app-release.apk
+```
+
+En HyperOS (Poco) `adb install` está bloqueado; usar:
+
+```bash
+export MSYS_NO_PATHCONV=1
+adb push app/build/outputs/apk/release/app-release.apk /data/local/tmp/mercado.apk
+adb shell pm install -r /data/local/tmp/mercado.apk
+```
+
+Sin cable: copiar el APK al teléfono y abrirlo desde el gestor de archivos. **Actualizar siempre
+encima, con la misma llave y sin desinstalar**: desinstalar borra los datos.
+
+## Respaldar
+
+Ajustes → Datos → **Exportar respaldo**: un archivo `mercado-AAAA-MM-DD.mercado` cifrado con una
+contraseña que eliges (mínimo 8 caracteres; no se guarda en ningún lado). Para volver:
+**Restaurar respaldo**, elegir el archivo, escribir la contraseña y confirmar; reemplaza todos
+los datos. La app recuerda hacer un respaldo cada mes. Haz uno antes de cambiar de teléfono o
+de instalar una versión nueva.
+
+Para pasar los datos de la app de prueba (debug) a la final: exportar en la de prueba y restaurar
+en la final.
+
+## Documentación
 
 | Ruta | Contenido |
 | --- | --- |
-| `CLAUDE.md` | Reglas y protocolo del agente (se carga solo) |
 | `docs/` | Especificación: producto, arquitectura, datos, UX, seguridad, pruebas, release |
-| `plan/PLAN.md` | Los 10 loops con tareas y puertas de salida |
-| `plan/PROGRESO.md` | Tablero de avance (lo actualiza el agente) |
-| `plan/BLOQUEOS.md` | Lo que el agente no pudo resolver solo |
+| `plan/PLAN.md`, `plan/PROGRESO.md` | Loops de trabajo, avance, evidencia de seguridad S-01..S-15 |
 | `plan/DECISIONES.md` | Decisiones tomadas durante la implementación |
-| `plan/PROMPTS.md` | Prompts listos para copiar |
+| `CHANGELOG.md` | Cambios por versión |
+| `CLAUDE.md`, `plan/PROMPTS.md` | Reglas y prompts para el agente que implementa la app |
 | `seed/` | Recibo y catálogo inicial |
