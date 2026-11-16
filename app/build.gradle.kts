@@ -71,6 +71,8 @@ android {
         warningsAsErrors = false
         checkReleaseBuilds = true
         error += listOf("HardcodedText")
+        // D-20/arquitectura: solo teléfono en retrato y ABIs ARM; ChromeOS no es objetivo.
+        disable += listOf("ChromeOsAbiSupport")
     }
 }
 
