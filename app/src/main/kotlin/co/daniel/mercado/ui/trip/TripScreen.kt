@@ -1,5 +1,14 @@
 package co.daniel.mercado.ui.trip
 
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.heading
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.ui.res.painterResource
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import co.daniel.mercado.scanner.LabelReader
 import co.daniel.mercado.scanner.LabelRead
 import androidx.compose.ui.semantics.Role
@@ -144,17 +153,25 @@ fun TripScreen(
 @Composable
 private fun TopBar(torchOn: Boolean, paused: Boolean, onBack: () -> Unit, onTorch: () -> Unit, onPause: () -> Unit) {
     Row(Modifier.fillMaxWidth().padding(horizontal = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-        TextButton(onClick = onBack, modifier = Modifier.heightIn(min = 48.dp)) {
-            Text("← " + stringResource(R.string.trip_back))
-        }
-        Spacer(Modifier.weight(1f))
+        IconButton(onClick = onBack) { Icon(painterResource(R.drawable.ic_back), stringResource(R.string.trip_back)) }
+        Text(
+            stringResource(R.string.trip_title),
+            style = MaterialTheme.typography.titleLarge,
+            modifier = Modifier.weight(1f).semantics { heading() },
+        )
         if (!paused) {
-            TextButton(onClick = onTorch, modifier = Modifier.heightIn(min = 48.dp)) {
-                Text(stringResource(if (torchOn) R.string.torch_off else R.string.torch_on))
+            IconButton(onClick = onTorch) {
+                Icon(
+                    painterResource(if (torchOn) R.drawable.ic_flashlight_off else R.drawable.ic_flashlight_on),
+                    stringResource(if (torchOn) R.string.torch_off else R.string.torch_on),
+                )
             }
         }
-        TextButton(onClick = onPause, modifier = Modifier.heightIn(min = 48.dp)) {
-            Text(stringResource(if (paused) R.string.camera_resume else R.string.camera_pause))
+        IconButton(onClick = onPause) {
+            Icon(
+                painterResource(if (paused) R.drawable.ic_play else R.drawable.ic_pause),
+                stringResource(if (paused) R.string.camera_resume else R.string.camera_pause),
+            )
         }
     }
 }
@@ -327,20 +344,38 @@ private fun BottomBar(
     closeEnabled: Boolean,
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(8.dp),
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 6.dp),
         horizontalArrangement = Arrangement.spacedBy(6.dp),
     ) {
-        Button(onClick = onKeypad, modifier = Modifier.weight(1.3f).height(56.dp)) {
-            Text(stringResource(R.string.trip_bar_keypad), maxLines = 1)
-        }
-        FilledTonalButton(onClick = onFavorites, modifier = Modifier.weight(1.3f).height(56.dp)) {
-            Text(stringResource(R.string.trip_bar_favorites), maxLines = 1)
-        }
-        FilledTonalButton(onClick = onSearch, modifier = Modifier.weight(1f).height(56.dp)) {
-            Text(stringResource(R.string.trip_bar_search), maxLines = 1)
-        }
-        FilledTonalButton(onClick = onClose, enabled = closeEnabled, modifier = Modifier.weight(1f).height(56.dp)) {
-            Text("✓ " + stringResource(R.string.close_trip), maxLines = 1)
+        BarButton(R.drawable.ic_dialpad, R.string.trip_bar_keypad, onKeypad, primary = true)
+        BarButton(R.drawable.ic_star, R.string.trip_bar_favorites, onFavorites)
+        BarButton(R.drawable.ic_search, R.string.trip_bar_search, onSearch)
+        BarButton(R.drawable.ic_check, R.string.close_trip, onClose, enabled = closeEnabled)
+    }
+}
+
+/** Botón de la barra de la compra: ícono arriba y nombre completo abajo, 64 dp de alto. */
+@Composable
+private fun RowScope.BarButton(icon: Int, label: Int, onClick: () -> Unit, primary: Boolean = false, enabled: Boolean = true) {
+    val colors = if (primary) {
+        ButtonDefaults.buttonColors()
+    } else {
+        ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+        )
+    }
+    Button(
+        onClick = onClick,
+        enabled = enabled,
+        modifier = Modifier.weight(1f).height(64.dp),
+        shape = MaterialTheme.shapes.large,
+        colors = colors,
+        contentPadding = PaddingValues(horizontal = 4.dp, vertical = 6.dp),
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Icon(painterResource(icon), contentDescription = null, modifier = Modifier.size(22.dp))
+            Text(stringResource(label), style = MaterialTheme.typography.labelMedium, maxLines = 1)
         }
     }
 }

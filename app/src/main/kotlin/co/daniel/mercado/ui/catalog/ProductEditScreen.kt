@@ -1,5 +1,6 @@
 package co.daniel.mercado.ui.catalog
 
+import co.daniel.mercado.ui.components.MercadoTextField
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,8 +31,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedCard
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -166,12 +165,12 @@ private fun ProductFields(state: ProductEditUiState, onEvent: (ProductEditEvent)
         ProductError.DUPLICATE -> stringResource(R.string.close_review_duplicate)
         else -> null
     }
-    OutlinedTextField(
+    MercadoTextField(
         value = state.name,
         onValueChange = { onEvent(ProductEditEvent.Name(it)) },
-        label = { Text(stringResource(R.string.edit_line_name)) },
+        label = stringResource(R.string.edit_line_name),
         isError = nameError != null,
-        supportingText = nameError?.let { { Text(it) } },
+        supportingText = nameError,
         singleLine = true,
         keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
         modifier = Modifier.fillMaxWidth().testTag("product_name"),
@@ -208,7 +207,12 @@ private fun ProductFields(state: ProductEditUiState, onEvent: (ProductEditEvent)
         Text(stringResource(R.string.product_unit_kg_hint), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 
-    OutlinedCard(onClick = { onEvent(ProductEditEvent.OpenPrice) }, modifier = Modifier.fillMaxWidth()) {
+    Card(
+        onClick = { onEvent(ProductEditEvent.OpenPrice) },
+        modifier = Modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.medium,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+    ) {
         Column(Modifier.padding(16.dp)) {
             Text(
                 stringResource(if (state.unitType == UnitType.KG) R.string.product_price_kg else R.string.product_price),

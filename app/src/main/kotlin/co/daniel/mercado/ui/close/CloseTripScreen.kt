@@ -1,5 +1,6 @@
 package co.daniel.mercado.ui.close
 
+import co.daniel.mercado.ui.components.MercadoTextField
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -25,7 +26,6 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -166,11 +166,11 @@ private fun PaidRow(totalPaid: Pesos?, onClick: () -> Unit) {
 @Composable
 private fun StoreField(state: CloseTripUiState, viewModel: CloseTripViewModel) {
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        OutlinedTextField(
+        MercadoTextField(
             value = state.store,
             onValueChange = viewModel::setStore,
             modifier = Modifier.fillMaxWidth(),
-            label = { Text(stringResource(R.string.close_store_label)) },
+            label = stringResource(R.string.close_store_label),
             singleLine = true,
             keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words),
         )
@@ -204,18 +204,14 @@ private fun ReviewSection(state: CloseTripUiState, viewModel: CloseTripViewModel
                 text = stringResource(R.string.close_review_item, item.product.name, MoneyFormat.format(item.product.refPrice)),
                 style = MaterialTheme.typography.bodyMedium.merge(MoneyTextStyle),
             )
-            OutlinedTextField(
+            MercadoTextField(
                 value = item.name,
                 onValueChange = { viewModel.setReviewName(item.product.id, it) },
                 modifier = Modifier.fillMaxWidth(),
-                label = { Text(stringResource(R.string.edit_line_name)) },
+                label = stringResource(R.string.edit_line_name),
                 singleLine = true,
                 isError = item.duplicate,
-                supportingText = if (item.duplicate) {
-                    { Text(stringResource(R.string.close_review_duplicate)) }
-                } else {
-                    null
-                },
+                supportingText = if (item.duplicate) stringResource(R.string.close_review_duplicate) else null,
                 keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
             )
             FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {

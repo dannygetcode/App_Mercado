@@ -85,7 +85,7 @@ class TripScreenTest {
     @Test
     fun `teclado, sumar, aparece la linea y el total`() {
         show()
-        compose.onNodeWithText("$ Teclado").performClick()
+        compose.onNodeWithText("Teclado").performClick()
         compose.onNodeWithText("1").performClick()
         compose.onNodeWithText("2").performClick()
         compose.onNodeWithText("000").performClick()
@@ -148,7 +148,7 @@ class TripScreenTest {
     @Test
     fun `pasar el limite muestra te pasaste en rojo`() {
         show(TripLimit.Custom(Pesos(10_000)))
-        compose.onNodeWithText("$ Teclado").performClick()
+        compose.onNodeWithText("Teclado").performClick()
         compose.onNodeWithText("1").performClick()
         compose.onNodeWithText("2").performClick()
         compose.onNodeWithText("000").performClick()

@@ -1,5 +1,10 @@
 package co.daniel.mercado.ui.settings
 
+import androidx.compose.ui.graphics.Color
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Card
+import androidx.compose.foundation.layout.ColumnScope
+import co.daniel.mercado.ui.components.MercadoTextField
 import android.Manifest
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -19,7 +24,6 @@ import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,7 +40,8 @@ import kotlinx.coroutines.flow.emptyFlow
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.ListItem as M3ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
@@ -118,133 +123,134 @@ fun SettingsScreen(
         Column(Modifier.statusBarsPadding().verticalScroll(rememberScrollState()).padding(bottom = 24.dp)) {
             ScreenTitle(stringResource(R.string.nav_settings))
 
-            Section(R.string.settings_budget)
-            val month = state.month
-            ListItem(
-                modifier = Modifier.clickable(onClick = { onEvent(SettingsEvent.EditBudget) }),
-                headlineContent = {
-                    Text(stringResource(R.string.settings_budget_month, month?.let { Dates.monthName(it.yearMonth) }.orEmpty()))
-                },
-                supportingContent = {
-                    val budget = month?.budget
-                    Text(
-                        when {
-                            budget == null -> stringResource(R.string.settings_budget_none)
-                            month.inherited -> stringResource(R.string.settings_budget_inherited, MoneyFormat.format(budget))
-                            else -> MoneyFormat.format(budget)
-                        },
-                    )
-                },
-            )
-            ListItem(
-                modifier = Modifier.clickable(onClick = onOpenCategoryCaps),
-                headlineContent = { Text(stringResource(R.string.settings_category_caps)) },
-                supportingContent = { Text(stringResource(R.string.caps_hint)) },
-            )
-
-            Section(R.string.settings_market)
-            FrequencyRow(s.shoppingFrequencyDays, onChange = { onEvent(SettingsEvent.FrequencyDays(it)) })
-            SwitchRow(R.string.settings_reminders, R.string.settings_reminders_hint, s.remindersEnabled) { on ->
-                onEvent(SettingsEvent.Reminders(on))
-                // Permiso en contexto: al activar los recordatorios (Android 13+).
-                if (on && !canNotify && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    askNotifications.launch(Manifest.permission.POST_NOTIFICATIONS)
-                }
-            }
-            if (s.remindersEnabled && !canNotify) {
-                Row(Modifier.padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        stringResource(R.string.settings_notifications_off),
-                        color = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.weight(1f),
-                    )
-                    TextButton(onClick = {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                            askNotifications.launch(Manifest.permission.POST_NOTIFICATIONS)
-                        }
-                    }) { Text(stringResource(R.string.settings_notifications_allow)) }
-                }
-            }
-
-            Section(R.string.settings_scanner)
-            SwitchRow(R.string.settings_scan_sound, null, s.scanSound) { onEvent(SettingsEvent.ScanSound(it)) }
-            SwitchRow(R.string.settings_scan_vibration, null, s.scanVibration) { onEvent(SettingsEvent.ScanVibration(it)) }
-
-            Section(R.string.settings_security)
-            if (!deviceSecure) {
-                Text(
-                    text = stringResource(R.string.settings_no_device_lock),
-                    color = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+            Group(R.string.settings_budget) {
+                val month = state.month
+                ListItem(
+                    modifier = Modifier.clickable(onClick = { onEvent(SettingsEvent.EditBudget) }),
+                    headlineContent = {
+                        Text(stringResource(R.string.settings_budget_month, month?.let { Dates.monthName(it.yearMonth) }.orEmpty()))
+                    },
+                    supportingContent = {
+                        val budget = month?.budget
+                        Text(
+                            when {
+                                budget == null -> stringResource(R.string.settings_budget_none)
+                                month.inherited -> stringResource(R.string.settings_budget_inherited, MoneyFormat.format(budget))
+                                else -> MoneyFormat.format(budget)
+                            },
+                        )
+                    },
+                )
+                ListItem(
+                    modifier = Modifier.clickable(onClick = onOpenCategoryCaps),
+                    headlineContent = { Text(stringResource(R.string.settings_category_caps)) },
+                    supportingContent = { Text(stringResource(R.string.caps_hint)) },
                 )
             }
-            SwitchRow(R.string.settings_lock, R.string.settings_lock_hint, s.lockEnabled && deviceSecure, enabled = deviceSecure) {
-                onEvent(SettingsEvent.LockEnabled(it))
-            }
-            ListItem(
-                headlineContent = { Text(stringResource(R.string.settings_grace)) },
-                supportingContent = {
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        SettingsStore.GRACE_OPTIONS.sorted().forEach { minutes ->
-                            FilterChip(
-                                selected = s.lockGraceMinutes == minutes,
-                                onClick = { onEvent(SettingsEvent.GraceMinutes(minutes)) },
-                                enabled = s.lockEnabled && deviceSecure,
-                                label = { Text(stringResource(R.string.settings_grace_minutes, minutes)) },
-                            )
-                        }
+            Group(R.string.settings_market) {
+                FrequencyRow(s.shoppingFrequencyDays, onChange = { onEvent(SettingsEvent.FrequencyDays(it)) })
+                SwitchRow(R.string.settings_reminders, R.string.settings_reminders_hint, s.remindersEnabled) { on ->
+                    onEvent(SettingsEvent.Reminders(on))
+                    // Permiso en contexto: al activar los recordatorios (Android 13+).
+                    if (on && !canNotify && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        askNotifications.launch(Manifest.permission.POST_NOTIFICATIONS)
                     }
-                },
-            )
-            SwitchRow(R.string.settings_secure_screen, R.string.settings_secure_screen_hint, s.secureScreen) {
-                onEvent(SettingsEvent.SecureScreen(it))
+                }
+                if (s.remindersEnabled && !canNotify) {
+                    Row(Modifier.padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            stringResource(R.string.settings_notifications_off),
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.weight(1f),
+                        )
+                        TextButton(onClick = {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                askNotifications.launch(Manifest.permission.POST_NOTIFICATIONS)
+                            }
+                        }) { Text(stringResource(R.string.settings_notifications_allow)) }
+                    }
+                }
             }
-
-            Section(R.string.settings_data)
-            ListItem(
-                modifier = Modifier.clickable(enabled = !state.backupBusy) { onEvent(SettingsEvent.ExportBackup) },
-                headlineContent = { Text(stringResource(R.string.settings_export_backup)) },
-                supportingContent = { Text(stringResource(R.string.settings_export_backup_hint)) },
-                trailingContent = if (state.backupBusy) {
-                    { CircularProgressIndicator(Modifier.size(24.dp)) }
-                } else {
-                    null
-                },
-            )
-            ListItem(
-                modifier = Modifier.clickable(enabled = !state.backupBusy) { onEvent(SettingsEvent.RestoreBackup) },
-                headlineContent = { Text(stringResource(R.string.settings_restore_backup)) },
-                supportingContent = { Text(stringResource(R.string.settings_restore_backup_hint)) },
-            )
-            if (state.backupDialog == null) {
-                state.backupMessage?.let { BackupResult(it, onDismiss = { onEvent(SettingsEvent.DismissBackupMessage) }) }
+            Group(R.string.settings_scanner) {
+                SwitchRow(R.string.settings_scan_sound, null, s.scanSound) { onEvent(SettingsEvent.ScanSound(it)) }
+                SwitchRow(R.string.settings_scan_vibration, null, s.scanVibration) { onEvent(SettingsEvent.ScanVibration(it)) }
             }
-            ListItem(
-                headlineContent = { Text(stringResource(R.string.settings_last_backup)) },
-                supportingContent = {
-                    Text(if (s.lastBackupAt > 0) Dates.dayMonthYear(s.lastBackupAt) else stringResource(R.string.settings_never))
-                },
-            )
-            ListItem(
-                modifier = Modifier.clickable(enabled = !state.importing) {
-                    pickCatalog.launch(arrayOf("application/json", "text/plain", "application/octet-stream"))
-                },
-                headlineContent = { Text(stringResource(R.string.settings_import_catalog)) },
-                supportingContent = { Text(stringResource(R.string.settings_import_catalog_hint)) },
-                trailingContent = if (state.importing) {
-                    { CircularProgressIndicator(Modifier.size(24.dp)) }
-                } else {
-                    null
-                },
-            )
-            state.importMessage?.let { ImportResult(it, onDismiss = { onEvent(SettingsEvent.DismissImportMessage) }) }
-
-            Section(R.string.settings_about)
-            ListItem(
-                headlineContent = { Text(stringResource(R.string.app_name)) },
-                supportingContent = { Text(stringResource(R.string.settings_version, BuildConfig.VERSION_NAME)) },
-            )
-            ListItem(headlineContent = { Text(stringResource(R.string.no_internet_note)) })
+            Group(R.string.settings_security) {
+                if (!deviceSecure) {
+                    Text(
+                        text = stringResource(R.string.settings_no_device_lock),
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                    )
+                }
+                SwitchRow(R.string.settings_lock, R.string.settings_lock_hint, s.lockEnabled && deviceSecure, enabled = deviceSecure) {
+                    onEvent(SettingsEvent.LockEnabled(it))
+                }
+                ListItem(
+                    headlineContent = { Text(stringResource(R.string.settings_grace)) },
+                    supportingContent = {
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            SettingsStore.GRACE_OPTIONS.sorted().forEach { minutes ->
+                                FilterChip(
+                                    selected = s.lockGraceMinutes == minutes,
+                                    onClick = { onEvent(SettingsEvent.GraceMinutes(minutes)) },
+                                    enabled = s.lockEnabled && deviceSecure,
+                                    label = { Text(stringResource(R.string.settings_grace_minutes, minutes)) },
+                                )
+                            }
+                        }
+                    },
+                )
+                SwitchRow(R.string.settings_secure_screen, R.string.settings_secure_screen_hint, s.secureScreen) {
+                    onEvent(SettingsEvent.SecureScreen(it))
+                }
+            }
+            Group(R.string.settings_data) {
+                ListItem(
+                    modifier = Modifier.clickable(enabled = !state.backupBusy) { onEvent(SettingsEvent.ExportBackup) },
+                    headlineContent = { Text(stringResource(R.string.settings_export_backup)) },
+                    supportingContent = { Text(stringResource(R.string.settings_export_backup_hint)) },
+                    trailingContent = if (state.backupBusy) {
+                        { CircularProgressIndicator(Modifier.size(24.dp)) }
+                    } else {
+                        null
+                    },
+                )
+                ListItem(
+                    modifier = Modifier.clickable(enabled = !state.backupBusy) { onEvent(SettingsEvent.RestoreBackup) },
+                    headlineContent = { Text(stringResource(R.string.settings_restore_backup)) },
+                    supportingContent = { Text(stringResource(R.string.settings_restore_backup_hint)) },
+                )
+                if (state.backupDialog == null) {
+                    state.backupMessage?.let { BackupResult(it, onDismiss = { onEvent(SettingsEvent.DismissBackupMessage) }) }
+                }
+                ListItem(
+                    headlineContent = { Text(stringResource(R.string.settings_last_backup)) },
+                    supportingContent = {
+                        Text(if (s.lastBackupAt > 0) Dates.dayMonthYear(s.lastBackupAt) else stringResource(R.string.settings_never))
+                    },
+                )
+                ListItem(
+                    modifier = Modifier.clickable(enabled = !state.importing) {
+                        pickCatalog.launch(arrayOf("application/json", "text/plain", "application/octet-stream"))
+                    },
+                    headlineContent = { Text(stringResource(R.string.settings_import_catalog)) },
+                    supportingContent = { Text(stringResource(R.string.settings_import_catalog_hint)) },
+                    trailingContent = if (state.importing) {
+                        { CircularProgressIndicator(Modifier.size(24.dp)) }
+                    } else {
+                        null
+                    },
+                )
+                state.importMessage?.let { ImportResult(it, onDismiss = { onEvent(SettingsEvent.DismissImportMessage) }) }
+            }
+            Group(R.string.settings_about) {
+                ListItem(
+                    headlineContent = { Text(stringResource(R.string.app_name)) },
+                    supportingContent = { Text(stringResource(R.string.settings_version, BuildConfig.VERSION_NAME)) },
+                )
+                ListItem(headlineContent = { Text(stringResource(R.string.no_internet_note)) })
+            }
         }
     }
     state.backupDialog?.let { BackupDialogs(it, state.backupMessage, state.backupBusy, onEvent) }
@@ -261,14 +267,20 @@ fun SettingsScreen(
 }
 
 @Composable
-private fun Section(title: Int) {
-    HorizontalDivider(Modifier.padding(top = 8.dp))
+private fun Group(title: Int, content: @Composable ColumnScope.() -> Unit) {
     Text(
         text = stringResource(title),
         style = MaterialTheme.typography.titleSmall,
         color = MaterialTheme.colorScheme.primary,
-        modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 4.dp).semantics { heading() },
+        modifier = Modifier.padding(start = 28.dp, end = 16.dp, top = 20.dp, bottom = 8.dp).semantics { heading() },
     )
+    Card(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+        shape = MaterialTheme.shapes.large,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
+    ) {
+        Column(Modifier.padding(vertical = 4.dp), content = content)
+    }
 }
 
 @Composable
@@ -447,10 +459,10 @@ private fun BackupDialogs(dialog: BackupDialog, message: BackupMessage?, busy: B
 
 @Composable
 private fun PasswordField(value: String, onChange: (String) -> Unit, label: Int) {
-    OutlinedTextField(
+    MercadoTextField(
         value = value,
         onValueChange = onChange,
-        label = { Text(stringResource(label)) },
+        label = stringResource(label),
         singleLine = true,
         visualTransformation = PasswordVisualTransformation(),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, autoCorrectEnabled = false),
@@ -473,3 +485,21 @@ private fun SettingsPreview() {
         )
     }
 }
+
+/** Fila de ajustes: transparente para que la tarjeta del grupo sea el fondo. */
+@Composable
+private fun ListItem(
+    headlineContent: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
+    supportingContent: (@Composable () -> Unit)? = null,
+    trailingContent: (@Composable () -> Unit)? = null,
+) {
+    M3ListItem(
+        headlineContent = headlineContent,
+        modifier = modifier,
+        supportingContent = supportingContent,
+        trailingContent = trailingContent,
+        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+    )
+}
+

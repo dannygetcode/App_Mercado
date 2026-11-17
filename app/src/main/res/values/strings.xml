@@ -20,7 +20,7 @@
     <string name="diag_empty">Apunta la cámara a un código de barras</string>
     <string name="undo">Deshacer</string>
     <string name="keypad_add">Sumar</string>
-    <string name="keypad_backspace">⌫</string>
+    <string name="keypad_backspace_desc">Borrar</string>
     <string name="loose_item_name">Artículo sin nombre</string>
     <string name="trip_remaining">Quedan %1$s de %2$s</string>
     <string name="trip_over">Te pasaste por %s</string>
@@ -34,8 +34,8 @@
     <string name="line_by_weight">por peso</string>
     <string name="line_weight_grams">%d g</string>
     <string name="trip_empty">Apunta la cámara a un código de barras o usa el teclado</string>
-    <string name="trip_bar_keypad">$ Teclado</string>
-    <string name="trip_bar_favorites">★ Favoritos</string>
+    <string name="trip_bar_keypad">Teclado</string>
+    <string name="trip_bar_favorites">Favoritos</string>
     <string name="trip_bar_search">Buscar</string>
     <string name="close_trip">Cerrar</string>
     <string name="trip_back">Volver a Inicio</string>
@@ -69,8 +69,6 @@
     <string name="edit_line_quantity">Cantidad</string>
     <string name="home_start_trip">Ir a mercar</string>
     <string name="home_continue_trip">Continuar compra · %s</string>
-    <string name="home_month_spent_of">%1$s · Gastado %2$s de %3$s</string>
-    <string name="home_month_spent">%1$s · Gastado %2$s</string>
     <string name="home_month_remaining">Quedan %s</string>
     <string name="home_budget_edit">Toca para cambiar el presupuesto</string>
     <string name="home_budget_inherited">Presupuesto del mes anterior · toca para cambiarlo</string>
@@ -312,4 +310,8 @@
     <string name="reminder_backup_text">Pasó un mes desde el último. Ajustes → Exportar respaldo.</string>
     <string name="settings_notifications_off">Las notificaciones están apagadas para Mercado.</string>
     <string name="settings_notifications_allow">Permitir notificaciones</string>
+    <string name="trip_title">Compra</string>
+    <string name="home_month_label">Gastado en %s</string>
+    <string name="home_month_of">de %s de presupuesto</string>
+    <string name="home_month_spent_label">Sin presupuesto definido · toca para definirlo</string>
 </resources>

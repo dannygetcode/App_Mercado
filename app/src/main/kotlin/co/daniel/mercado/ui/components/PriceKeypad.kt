@@ -1,5 +1,10 @@
 package co.daniel.mercado.ui.components
 
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.painterResource
+import androidx.compose.material3.Icon
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.foundation.background
 import androidx.compose.ui.platform.testTag
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,7 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.Button
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -77,41 +81,63 @@ fun PriceKeypad(
     allowZero: Boolean = false,
 ) {
     Column(modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        if (title != null) Text(title, style = MaterialTheme.typography.titleMedium)
-        BasicText(
-            text = MoneyFormat.format(state.value),
-            modifier = Modifier.fillMaxWidth().testTag("keypad_value"),
-            style = TotalTextStyle.copy(
-                color = if (state.replaceOnType) {
-                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                } else {
-                    MaterialTheme.colorScheme.onSurface
-                },
-                textAlign = TextAlign.End,
-            ),
-            maxLines = 1,
-            autoSize = TextAutoSize.StepBased(minFontSize = 24.sp, maxFontSize = 46.sp),
+        // Monto en un recuadro: tenue mientras es el valor prellenado (la primera tecla lo reemplaza).
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.45f), MaterialTheme.shapes.large)
+                .padding(horizontal = 16.dp, vertical = 10.dp),
+        ) {
+            if (title != null) {
+                Text(title, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onPrimaryContainer)
+            }
+            BasicText(
+                text = MoneyFormat.format(state.value),
+                modifier = Modifier.fillMaxWidth().testTag("keypad_value"),
+                style = TotalTextStyle.copy(
+                    color = if (state.replaceOnType) {
+                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.45f)
+                    } else {
+                        MaterialTheme.colorScheme.onSurface
+                    },
+                    textAlign = TextAlign.End,
+                ),
+                maxLines = 1,
+                autoSize = TextAutoSize.StepBased(minFontSize = 24.sp, maxFontSize = 46.sp),
+            )
+        }
+        val keyColors = ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+            contentColor = MaterialTheme.colorScheme.onSurface,
         )
         KEY_ROWS.forEach { row ->
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 row.forEach { key ->
-                    FilledTonalButton(
+                    Button(
                         onClick = { onStateChange(state.press(key)) },
                         modifier = Modifier.weight(1f).height(KEY_HEIGHT),
-                    ) { Text(key, fontSize = 24.sp) }
+                        shape = MaterialTheme.shapes.large,
+                        colors = keyColors,
+                    ) { Text(key, fontSize = 26.sp, fontWeight = FontWeight.Medium) }
                 }
             }
         }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            FilledTonalButton(
+            Button(
                 onClick = { onStateChange(state.backspace()) },
                 modifier = Modifier.weight(1f).height(KEY_HEIGHT),
-            ) { Text(stringResource(R.string.keypad_backspace), fontSize = 24.sp) }
+                shape = MaterialTheme.shapes.large,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                ),
+            ) { Icon(painterResource(R.drawable.ic_backspace), stringResource(R.string.keypad_backspace_desc)) }
             Button(
                 onClick = { onSubmit(state.value) },
                 enabled = allowZero || !state.isZero,
                 modifier = Modifier.weight(2f).height(KEY_HEIGHT),
-            ) { Text(actionLabel, fontSize = 20.sp) }
+                shape = MaterialTheme.shapes.large,
+            ) { Text(actionLabel, fontSize = 20.sp, fontWeight = FontWeight.SemiBold) }
         }
     }
 }

@@ -35,7 +35,9 @@ class HomeScreenTest {
     fun `muestra el mes con gastado, presupuesto y saldo, e Ir a mercar`() {
         show(HomeUiState(loading = false, month = MonthStatus(nov, Pesos(900_000), Pesos(612_000), Pesos(288_000), TrafficLight.GREEN)))
 
-        compose.onNodeWithText("Noviembre · Gastado $612.000 de $900.000").assertIsDisplayed()
+        compose.onNodeWithText("Gastado en Noviembre").assertIsDisplayed()
+        compose.onNodeWithText("$612.000").assertIsDisplayed()
+        compose.onNodeWithText("de $900.000 de presupuesto").assertIsDisplayed()
         compose.onNodeWithText("Quedan $288.000").assertIsDisplayed()
         compose.onNodeWithText("Ir a mercar").performClick()
         assertEquals(listOf<HomeEvent>(HomeEvent.StartOrContinue), events)

@@ -1,5 +1,7 @@
 package co.daniel.mercado.ui.catalog
 
+import co.daniel.mercado.ui.components.ScreenTitle
+import co.daniel.mercado.ui.components.SearchField
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,7 +25,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -58,22 +59,13 @@ fun CatalogScreen(
     Surface(modifier = modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
         Box(Modifier.statusBarsPadding()) {
             Column {
-                OutlinedTextField(
+                ScreenTitle(stringResource(R.string.nav_catalog))
+                SearchField(
                     value = state.filter.query,
                     onValueChange = { onEvent(CatalogEvent.Query(it)) },
-                    modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = 12.dp),
-                    placeholder = { Text(stringResource(R.string.catalog_search_hint)) },
-                    singleLine = true,
+                    placeholder = stringResource(R.string.catalog_search_hint),
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                    trailingIcon = if (state.filter.query.isNotEmpty()) {
-                        {
-                            IconButton(onClick = { onEvent(CatalogEvent.Query("")) }) {
-                                Icon(painterResource(R.drawable.ic_close), stringResource(R.string.clear_search))
-                            }
-                        }
-                    } else {
-                        null
-                    },
                 )
                 FilterRow(state, onEvent)
                 HorizontalDivider()

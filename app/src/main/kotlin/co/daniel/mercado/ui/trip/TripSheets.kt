@@ -1,5 +1,7 @@
 package co.daniel.mercado.ui.trip
 
+import co.daniel.mercado.ui.components.SearchField
+import co.daniel.mercado.ui.components.MercadoTextField
 import co.daniel.mercado.domain.model.ShoppingListEntry
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.contentDescription
@@ -31,7 +33,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
@@ -138,11 +139,11 @@ private fun NewProductSheet(sheet: TripSheet.NewProduct, state: TripUiState, vie
         Text(stringResource(R.string.new_product_title), style = MaterialTheme.typography.titleLarge)
         Text(sheet.code, style = MaterialTheme.typography.bodySmall.merge(MoneyTextStyle), color = MaterialTheme.colorScheme.onSurfaceVariant)
         // No toma el foco al abrir: el teclado del sistema no salta; el de precio ya está activo.
-        OutlinedTextField(
+        MercadoTextField(
             value = state.query,
             onValueChange = viewModel::setQuery,
             modifier = Modifier.fillMaxWidth().testTag("new_product_name"),
-            label = { Text(stringResource(R.string.new_product_name_hint)) },
+            label = stringResource(R.string.new_product_name_hint),
             singleLine = true,
             keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences, imeAction = ImeAction.Done),
         )
@@ -284,12 +285,11 @@ private fun FavoritesGrid(favorites: List<Product>, onPick: (Long) -> Unit) {
 private fun SearchTab(state: TripUiState, viewModel: TripViewModel) {
     val focus = remember { FocusRequester() }
     LaunchedEffect(Unit) { focus.requestFocus() }
-    OutlinedTextField(
+    SearchField(
         value = state.query,
         onValueChange = viewModel::setQuery,
         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).focusRequester(focus).testTag("search_field"),
-        label = { Text(stringResource(R.string.picker_search_hint)) },
-        singleLine = true,
+        placeholder = stringResource(R.string.picker_search_hint),
         keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences, imeAction = ImeAction.Search),
         keyboardActions = KeyboardActions(onSearch = {
             state.results.firstOrNull()?.let { viewModel.pickProduct(it.id) } ?: viewModel.createFromSearch()
@@ -319,12 +319,12 @@ private fun EditLineSheet(line: TripItem, viewModel: TripViewModel) {
     Column(Modifier.padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text(stringResource(R.string.edit_line_title), style = MaterialTheme.typography.titleLarge)
         if (line.isLoose) {
-            OutlinedTextField(
+            MercadoTextField(
                 value = name,
                 onValueChange = { name = it.take(MAX_NAME) },
                 modifier = Modifier.fillMaxWidth().testTag("line_name"),
-                label = { Text(stringResource(R.string.edit_line_name)) },
-                placeholder = { Text(stringResource(R.string.loose_item_name)) },
+                label = stringResource(R.string.edit_line_name),
+                placeholder = stringResource(R.string.loose_item_name),
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences, imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(onDone = { viewModel.renameLooseLine(line.id, name); viewModel.dismissSheet() }),

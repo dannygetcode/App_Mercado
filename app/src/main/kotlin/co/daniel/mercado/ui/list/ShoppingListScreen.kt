@@ -1,5 +1,6 @@
 package co.daniel.mercado.ui.list
 
+import co.daniel.mercado.ui.components.SearchField
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,7 +24,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -159,11 +159,10 @@ private fun AddSheet(state: ShoppingListUiState, onEvent: (ShoppingListEvent) ->
     ) {
         Column(Modifier.fillMaxHeight(0.7f).navigationBarsPadding()) {
             LaunchedEffect(Unit) { focus.requestFocus() }
-            OutlinedTextField(
+            SearchField(
                 value = state.query,
                 onValueChange = { onEvent(ShoppingListEvent.Query(it)) },
-                label = { Text(stringResource(R.string.picker_search_hint)) },
-                singleLine = true,
+                placeholder = stringResource(R.string.picker_search_hint),
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).focusRequester(focus),
             )
             LazyColumn(Modifier.padding(horizontal = 16.dp)) {
