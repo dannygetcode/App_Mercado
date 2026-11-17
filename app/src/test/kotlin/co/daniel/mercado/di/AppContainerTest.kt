@@ -37,4 +37,33 @@ class AppContainerTest {
         assertEquals("Detergente líquido AK-1 1800 ml", (outcome as ScanOutcome.Added).productName)
         data.db.close()
     }
+
+    @Test
+    fun `borrar todo deja la app como nueva con el catalogo inicial`() = runTest {
+        val container = AppContainer(
+            appContext = ApplicationProvider.getApplicationContext(),
+            databaseFactory = InMemoryDatabaseFactory(),
+            dataStore = InMemoryPreferencesDataStore(),
+            clock = Clock { 1_800_000_000_000L },
+            scope = backgroundScope,
+            ioDispatcher = Dispatchers.IO,
+        )
+        val data = container.data()
+        data.startTrip()
+        data.handleScan("7702310048088")
+        data.closeTrip()
+        data.setMonthlyBudget(co.daniel.mercado.domain.model.Pesos(900_000))
+        container.settings.setScanSound(false)
+
+        container.resetAllData()
+
+        assertEquals(48, data.db.productDao().count())
+        assertEquals(10, data.products.categories().size)
+        assertEquals(0, data.db.backupDao().trips().size)
+        assertEquals(0, data.db.backupDao().budgets().size)
+        assertTrue(container.settings.current().seedImported)
+        assertEquals(false, container.settings.current().scanSound)
+        data.db.close()
+    }
 }
+

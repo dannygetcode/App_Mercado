@@ -33,6 +33,10 @@ class TripFixture {
     val budgets = InMemoryBudgetRepository()
     val tx = ImmediateTransactionRunner()
     val shoppingList = InMemoryShoppingListRepository()
+
+    init {
+        products.tripItemsDetach = trips::detachProducts
+    }
     val session = TripSession(tx)
 
     val monthStatus = GetMonthStatus(budgets, trips, clock)

@@ -133,4 +133,28 @@ class LabelModeTest {
         assertEquals(KeypadPurpose.LoosePrice, (vm.state.value.sheet as TripSheet.Keypad).purpose)
         assertNull((vm.state.value.sheet as TripSheet.Keypad).initial)
     }
+
+    @Test
+    fun `el codigo leido en un cuadro y el precio en otros se juntan`() {
+        runBlocking { t.product("Arroz Diana", 5_900, ARROZ) }
+        vm.toggleLabelMode()
+        vm.onLabel(LabelRead(ARROZ, null))
+        t.clock.advance(300)
+        vm.onLabel(LabelRead(null, Pesos(6_200)))
+        t.clock.advance(300)
+        vm.onLabel(LabelRead(null, Pesos(6_200)))
+
+        val sheet = await { it.sheet as? TripSheet.Keypad }
+        assertEquals("Arroz Diana", (sheet.purpose as KeypadPurpose.ShelfPrice).productName)
+        assertEquals(Pesos(6_200), sheet.initial)
+    }
+
+    @Test
+    fun `el precio que se esta leyendo se muestra en vivo`() {
+        vm.toggleLabelMode()
+        vm.onLabel(LabelRead(null, Pesos(4_590)))
+        assertEquals(Pesos(4_590), vm.state.value.labelPreview)
+        vm.toggleLabelMode()
+        assertNull(vm.state.value.labelPreview)
+    }
 }

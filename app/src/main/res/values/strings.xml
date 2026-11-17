@@ -314,4 +314,46 @@
     <string name="home_month_label">Gastado en %s</string>
     <string name="home_month_of">de %s de presupuesto</string>
     <string name="home_month_spent_label">Sin presupuesto definido · toca para definirlo</string>
+    <string name="label_mode_detected">Precio detectado: %s · mantén la cámara quieta</string>
+    <string name="cleanup_title">Borrar datos</string>
+    <string name="cleanup_open">Borrar datos</string>
+    <string name="cleanup_open_hint">Compras por fechas, productos o todo</string>
+    <string name="cleanup_backup_hint">Antes de borrar, exporta un respaldo en Ajustes. Lo que borres solo se recupera restaurándolo.</string>
+    <string name="cleanup_trips_title">Compras por fechas</string>
+    <string name="cleanup_trips_text">Borra las compras cerradas del período, con todos sus productos. La compra abierta no se toca.</string>
+    <string name="cleanup_this_month">Este mes</string>
+    <string name="cleanup_last_month">Mes anterior</string>
+    <string name="cleanup_pick_dates">Elegir fechas</string>
+    <string name="cleanup_range">Del %1$s al %2$s</string>
+    <string name="cleanup_counting">Contando…</string>
+    <string name="cleanup_no_trips">No hay compras cerradas en esas fechas.</string>
+    <plurals name="cleanup_trips_count">
+        <item quantity="one">%1$d compra por %2$s.</item>
+        <item quantity="other">%1$d compras por %2$s.</item>
+    </plurals>
+    <string name="cleanup_trips_button">Borrar compras</string>
+    <string name="cleanup_products_title">Productos</string>
+    <string name="cleanup_products_text">Las compras pasadas conservan esos renglones con su nombre y precio.</string>
+    <string name="cleanup_products_pick">Elegir productos</string>
+    <plurals name="cleanup_products_button">
+        <item quantity="one">Borrar %d producto</item>
+        <item quantity="other">Borrar %d productos</item>
+    </plurals>
+    <string name="cleanup_inactive">desactivado</string>
+    <string name="cleanup_all_title">Borrar todo</string>
+    <string name="cleanup_all_text">Borra compras, catálogo, presupuestos y lista; la app queda como recién instalada, con el catálogo inicial. Tus ajustes se conservan.</string>
+    <string name="cleanup_all_button">Borrar todo</string>
+    <string name="cleanup_confirm_trips_title">¿Borrar esas compras?</string>
+    <string name="cleanup_confirm_products_title">¿Borrar los productos?</string>
+    <string name="cleanup_confirm_all_title">¿Borrar todos los datos?</string>
+    <string name="cleanup_no_undo">No se puede deshacer.</string>
+    <plurals name="cleanup_trips_deleted">
+        <item quantity="one">Se borró %d compra.</item>
+        <item quantity="other">Se borraron %d compras.</item>
+    </plurals>
+    <plurals name="cleanup_products_deleted">
+        <item quantity="one">Se borró %d producto.</item>
+        <item quantity="other">Se borraron %d productos.</item>
+    </plurals>
+    <string name="cleanup_all_deleted">Listo: la app quedó como nueva.</string>
 </resources>

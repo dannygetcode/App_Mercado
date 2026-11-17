@@ -46,6 +46,20 @@ class InMemoryTripRepository : TripRepository {
                 itemsOf(trip.id).map { ClosedLine(trip.id, trip.closedAt!!, it.productId, it.quantity, it.unitPrice, it.unitType) }
             }
 
+    override suspend fun deleteClosedBetween(fromMillis: Long, toMillis: Long): Int {
+        val ids = state.value.trips.values.filter { t -> t.closedAt?.let { it in fromMillis until toMillis } == true }.map { it.id }.toSet()
+        state.value = State(
+            trips = state.value.trips - ids,
+            items = state.value.items.filterValues { it.tripId !in ids },
+        )
+        return ids.size
+    }
+
+    /** Lo que hace la base al borrar productos: sus líneas quedan sin producto. */
+    fun detachProducts(ids: Set<Long>) {
+        state.value = state.value.copy(items = state.value.items.mapValues { (_, i) -> if (i.productId in ids) i.copy(productId = null) else i })
+    }
+
     override suspend fun lastClosedAt(): Long? = state.value.trips.values.mapNotNull { it.closedAt }.maxOrNull()
 
     override suspend fun getWithItems(id: Long): TripWithItems? =

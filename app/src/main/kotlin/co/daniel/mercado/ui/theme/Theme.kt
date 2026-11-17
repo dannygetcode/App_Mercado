@@ -29,6 +29,7 @@ private val LightColors = with(Light) {
         surfaceContainerHighest = containerHighest,
         surfaceBright = containerLowest, surfaceDim = containerHighest,
         error = error, errorContainer = errorContainer, onErrorContainer = onErrorContainer,
+        inverseSurface = inverseSurface, inverseOnSurface = inverseOnSurface, inversePrimary = inversePrimary,
     )
 }
 
@@ -50,6 +51,7 @@ private val DarkColors = with(Dark) {
         surfaceContainerHighest = containerHighest,
         surfaceBright = containerHighest, surfaceDim = containerLowest,
         error = error, errorContainer = errorContainer, onErrorContainer = onErrorContainer,
+        inverseSurface = inverseSurface, inverseOnSurface = inverseOnSurface, inversePrimary = inversePrimary,
     )
 }
 

@@ -47,6 +47,7 @@ class TripViewModel(
         val noticeMs: Long = 4_000,
         val autoPauseMs: Long = 120_000,
         val stalePriceMs: Long = 60L * 24 * 60 * 60 * 1_000,
+        val labelPreviewMs: Long = 1_500,
     )
 
     private val _state = MutableStateFlow(TripUiState())
@@ -119,10 +120,23 @@ class TripViewModel(
         }
     }
 
+    private var previewJob: Job? = null
+
+    /** "Precio detectado: $X" sobre el visor; se apaga si deja de verse. */
+    private fun showLabelPreview(price: Pesos) {
+        _state.update { it.copy(labelPreview = price) }
+        previewJob?.cancel()
+        previewJob = viewModelScope.launch {
+            delay(timing.labelPreviewMs)
+            _state.update { it.copy(labelPreview = null) }
+        }
+    }
+
     /** Cambia entre leer códigos y leer la etiqueta del estante. */
     fun toggleLabelMode() {
         labelStabilizer.reset()
-        _state.update { it.copy(labelMode = !it.labelMode) }
+        previewJob?.cancel()
+        _state.update { it.copy(labelMode = !it.labelMode, labelPreview = null) }
         restartAutoPause()
     }
 
@@ -131,13 +145,14 @@ class TripViewModel(
      * leído para confirmar con "Sumar" (la lectura de texto puede equivocarse).
      */
     fun onLabel(read: LabelRead) {
-        val price = read.price ?: return
         val current = _state.value
         if (current.trip == null || !current.labelMode || current.sheet != null) return
-        if (!labelStabilizer.offer(read.code, price)) return
+        read.price?.let { showLabelPreview(it) }
+        val accepted = labelStabilizer.offer(read.code, read.price) ?: return
+        val price = accepted.price
         restartAutoPause()
         viewModelScope.launch {
-            val code = read.code
+            val code = accepted.code
             val product = code?.let { guarded { graph().products.findByBarcode(it) } }
             if (_state.value.sheet != null) return@launch
             feedback.accepted()

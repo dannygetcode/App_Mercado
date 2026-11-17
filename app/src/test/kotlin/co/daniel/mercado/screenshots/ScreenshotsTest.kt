@@ -290,6 +290,29 @@ class ScreenshotsTest {
     }
 
     @Test
+    fun `12 borrar datos`() {
+        val vm = co.daniel.mercado.ui.cleanup.DataCleanupViewModel({ g }, t.clock) {}.also { vms += it }
+        vm.onEvent(co.daniel.mercado.ui.cleanup.DataCleanupEvent.LastMonth)
+        vm.state.await { it.preview != null }
+        show {
+            val s by vm.state.collectAsStateWithLifecycle()
+            co.daniel.mercado.ui.cleanup.DataCleanupScreen(s, {}, {})
+        }
+        shot("12-borrar-datos")
+    }
+
+    @Test
+    fun `13 aviso deshacer`() {
+        openTrip()
+        val vm = TripViewModel({ g }, FakeBarcodeSource(), RecordingFeedback(), t.clock).also { vms += it }
+        vm.state.await { it.trip != null }
+        vm.pickProduct(products.getValue("Arroz Diana 1 kg"))
+        vm.state.await { it.notice != null }
+        show { TripScreen(vm, FakeBarcodeSource(), { error("sin cámara") }, {}, {}, {}, showCamera = false) }
+        shot("13-aviso-deshacer")
+    }
+
+    @Test
     fun `11 bloqueo`() {
         show(dark = true) { LockScreen(onUnlock = {}, autoPrompt = false) }
         shot("11-bloqueo")

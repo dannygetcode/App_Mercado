@@ -1,5 +1,7 @@
 package co.daniel.mercado.di
 
+import co.daniel.mercado.data.db.entity.CategoryEntity
+import androidx.room.withTransaction
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -51,6 +53,8 @@ import co.daniel.mercado.domain.usecase.ChangeLinePrice
 import co.daniel.mercado.domain.usecase.ChangeQuantity
 import co.daniel.mercado.domain.usecase.CloseTrip
 import co.daniel.mercado.domain.usecase.DeactivateProduct
+import co.daniel.mercado.domain.usecase.DeleteProducts
+import co.daniel.mercado.domain.usecase.DeleteTripsInRange
 import co.daniel.mercado.domain.usecase.DiscardTrip
 import co.daniel.mercado.domain.usecase.GetMonthStatus
 import co.daniel.mercado.domain.usecase.GetProductDetail
@@ -130,6 +134,34 @@ class AppContainer(
 
     /** Espera a que la base esté abierta. Falla con `DbKeyException` si la clave no se recupera. */
     suspend fun data(): DataGraph = dataGraph.await()
+
+    /**
+     * "Borrar todo": deja los datos como recién instalada (categorías y catálogo inicial), en una
+     * transacción. Conserva los ajustes de seguridad, escáner y mercado; la llave de la base no cambia.
+     */
+    suspend fun resetAllData() {
+        val graph = data()
+        graph.db.withTransaction {
+            val dao = graph.db.backupDao()
+            dao.deleteTripItems()
+            dao.deleteShoppingList()
+            dao.deletePriceHistory()
+            dao.deleteBarcodes()
+            dao.deleteTrips()
+            dao.deleteProducts()
+            dao.deleteBudgets()
+            dao.deleteCategories()
+            MercadoDatabase.SEED_CATEGORIES.forEachIndexed { index, name ->
+                graph.db.categoryDao().insert(CategoryEntity(name = name, sortOrder = index))
+            }
+        }
+        graph.tripSession.undo.clear()
+        settings.setSeedImported(false)
+        settings.setBudgetHintDismissed(false)
+        settings.setLastReminderCycle(0)
+        settings.setLastBackupReminderAt(0)
+        importInitialCatalog(graph)
+    }
 
     private suspend fun importInitialCatalog(graph: DataGraph) {
         if (settings.current().seedImported) return
@@ -211,4 +243,7 @@ class DataGraph(
     val getMonthSummary = GetMonthSummary(trips, products, getMonthStatus, getPriceChanges)
     val getMonthsComparison = GetMonthsComparison(getMonthStatus)
     val shouldRemindShopping = ShouldRemindShopping(trips, buildSuggestedList, clock)
+
+    val deleteTripsInRange = DeleteTripsInRange(trips, transactions)
+    val deleteProducts = DeleteProducts(products, transactions)
 }

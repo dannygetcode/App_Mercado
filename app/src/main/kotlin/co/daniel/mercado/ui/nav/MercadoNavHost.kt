@@ -50,6 +50,8 @@ import co.daniel.mercado.ui.catalog.CatalogScreen
 import co.daniel.mercado.ui.catalog.CatalogViewModel
 import co.daniel.mercado.ui.catalog.ProductEditScreen
 import co.daniel.mercado.ui.catalog.ProductEditViewModel
+import co.daniel.mercado.ui.cleanup.DataCleanupScreen
+import co.daniel.mercado.ui.cleanup.DataCleanupViewModel
 import co.daniel.mercado.ui.close.CloseTripScreen
 import co.daniel.mercado.ui.close.CloseTripViewModel
 import co.daniel.mercado.ui.diagnostics.ScanDiagnosticsScreen
@@ -255,6 +257,7 @@ private fun MercadoNavigation(
                     onEvent = settings::onEvent,
                     effects = settings.effects,
                     onOpenCategoryCaps = { navController.navigate(CategoryCapsRoute) },
+                    onOpenCleanup = { navController.navigate(DataCleanupRoute) },
                 )
             }
             composable<ShoppingListRoute> {
@@ -271,6 +274,11 @@ private fun MercadoNavigation(
                 val caps: CategoryCapsViewModel = viewModel(factory = CategoryCapsViewModel.Factory)
                 val capsState by caps.state.collectAsStateWithLifecycle()
                 CategoryCapsScreen(state = capsState, onEvent = caps::onEvent, onBack = { navController.popBackStack() })
+            }
+            composable<DataCleanupRoute> {
+                val cleanup: DataCleanupViewModel = viewModel(factory = DataCleanupViewModel.Factory)
+                val cleanupState by cleanup.state.collectAsStateWithLifecycle()
+                DataCleanupScreen(state = cleanupState, onEvent = cleanup::onEvent, onBack = { navController.popBackStack() })
             }
             composable<TripRoute> {
                 val trip: TripViewModel = viewModel(factory = TripViewModel.Factory)

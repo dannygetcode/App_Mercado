@@ -6,11 +6,13 @@ import androidx.camera.core.ImageProxy
 import co.daniel.mercado.domain.model.Pesos
 import co.daniel.mercado.domain.rules.ShelfPrice
 import co.daniel.mercado.domain.rules.TextLine
+import co.daniel.mercado.util.AppLog
 import com.google.android.gms.tasks.Tasks
 import com.google.mlkit.vision.barcode.BarcodeScanner
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.text.Text
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.TextRecognizer
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
@@ -53,15 +55,11 @@ class MlKitLabelReader : LabelReader {
         Tasks.whenAllComplete(textTask, codeTask).addOnCompleteListener {
             try {
                 if (closed.get()) return@addOnCompleteListener
-                val lines = if (textTask.isSuccessful) {
-                    textTask.result.textBlocks.flatMap { block ->
-                        block.lines.map { TextLine(it.text, it.boundingBox?.height() ?: 0) }
-                    }
-                } else {
-                    emptyList()
-                }
+                val lines = if (textTask.isSuccessful) linesOf(textTask.result) else emptyList()
                 val code = if (codeTask.isSuccessful) ScanFilter.firstValid(codeTask.result.mapNotNull { it.rawValue }) else null
                 val price = ShelfPrice.find(lines)
+                // Solo en debug (AppLog no escribe en release): qué vio la cámara y qué precio salió.
+                AppLog.d("Etiqueta: ${lines.joinToString(" | ") { "${it.text}[${it.height}]" }} -> $price / $code")
                 if (code != null || price != null) onResult(LabelRead(code, price))
             } finally {
                 image.close()
@@ -76,3 +74,8 @@ class MlKitLabelReader : LabelReader {
         }
     }
 }
+
+/** Líneas del resultado de ML Kit con su alto (el tamaño de letra decide cuál es el precio). */
+fun linesOf(text: Text): List<TextLine> =
+    text.textBlocks.flatMap { block -> block.lines.map { TextLine(it.text, it.boundingBox?.height() ?: 0) } }
+

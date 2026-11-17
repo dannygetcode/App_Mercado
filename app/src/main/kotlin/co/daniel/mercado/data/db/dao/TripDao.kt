@@ -45,6 +45,9 @@ interface TripDao {
     )
     suspend fun closedLines(fromMillis: Long, toMillis: Long): List<ClosedLineRow>
 
+    @Query("DELETE FROM trip WHERE closed_at IS NOT NULL AND closed_at >= :fromMillis AND closed_at < :toMillis")
+    suspend fun deleteClosedBetween(fromMillis: Long, toMillis: Long): Int
+
     @Query("SELECT MAX(closed_at) FROM trip WHERE closed_at IS NOT NULL")
     suspend fun lastClosedAt(): Long?
 

@@ -88,6 +88,19 @@ class InMemoryProductRepository : ProductRepository {
         if (i >= 0) categories[i] = categories[i].copy(monthlyBudget = amount)
     }
 
+    override suspend fun all(): List<Product> = products.value.values.sortedBy { it.name }
+
+    var tripItemsDetach: (Set<Long>) -> Unit = {}
+
+    override suspend fun deleteProducts(ids: Collection<Long>): Int {
+        val existing = ids.filter { products.value.containsKey(it) }.toSet()
+        tripItemsDetach(existing)
+        products.value = products.value - existing
+        barcodes.entries.removeAll { it.value in existing }
+        priceHistory.removeAll { it.productId in existing }
+        return existing.size
+    }
+
     override suspend fun getByIds(ids: Collection<Long>): List<Product> = ids.mapNotNull { products.value[it] }
 
     override suspend fun lastPricePoint(productId: Long): PricePoint? =

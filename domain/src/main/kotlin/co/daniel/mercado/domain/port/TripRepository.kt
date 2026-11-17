@@ -49,6 +49,9 @@ interface TripRepository {
     /** Líneas de compras cerradas en `[fromMillis, toMillis)`, para sugerencias y resúmenes. */
     suspend fun closedLines(fromMillis: Long, toMillis: Long): List<ClosedLine>
 
+    /** Borra las compras cerradas en `[fromMillis, toMillis)` con sus líneas. Devuelve cuántas. */
+    suspend fun deleteClosedBetween(fromMillis: Long, toMillis: Long): Int
+
     /** Cierre de la compra cerrada más reciente, o nulo. */
     suspend fun lastClosedAt(): Long?
 

@@ -36,6 +36,10 @@ internal object Light {
     val error = Color(0xFFB3261E)
     val errorContainer = Color(0xFFF9DEDC)
     val onErrorContainer = Color(0xFF410E0B)
+    // Avisos con "Deshacer": fondo oscuro con la acción en verde claro (sin el lila por defecto).
+    val inverseSurface = Color(0xFF2F312D)
+    val inverseOnSurface = Color(0xFFF0F1EB)
+    val inversePrimary = Green200
 }
 
 internal object Dark {
@@ -67,6 +71,9 @@ internal object Dark {
     val error = Color(0xFFF2B8B5)
     val errorContainer = Color(0xFF8C1D18)
     val onErrorContainer = Color(0xFFF9DEDC)
+    val inverseSurface = Color(0xFFE2E3DE)
+    val inverseOnSurface = Color(0xFF2F312D)
+    val inversePrimary = Green900
 }
 
 /** Colores del semáforo (04-ux.md). No se usan para nada más. */

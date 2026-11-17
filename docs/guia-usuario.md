@@ -50,9 +50,14 @@ etiqueta de la balanza.
 ### Leer la etiqueta del estante
 
 Sobre el visor hay un selector "Código | Etiqueta". En "Etiqueta" la cámara lee el precio grande
-de la etiqueta del estante y, si la etiqueta trae código de barras, también el producto. Se abre
-el teclado con ese precio ya escrito: revisa y toca "Sumar". La app nunca suma sola en este modo,
+de la etiqueta del estante y, si la etiqueta trae código de barras, también el producto. Mientras
+lee, el visor muestra "Precio detectado: $X"; mantén la cámara quieta un instante y se abre el
+teclado con ese precio ya escrito. Revisa y toca "Sumar". La app nunca suma sola en este modo,
 porque leer texto puede confundir un dígito. Cada compra empieza en "Código".
+
+Lo que mejor funciona es llenar el visor con la etiqueta, de frente y con buena luz (la linterna
+ayuda). El precio que cuenta es el número más grande; el precio por gramo o por kilo, que suele
+ir en letra pequeña, se ignora.
 
 ### Corregir
 
@@ -121,7 +126,26 @@ el archivo `mercado-AAAA-MM-DD.mercado`. La contraseña no se guarda en ningún 
 archivo no se puede abrir. Para restaurar, elige el archivo, escribe la contraseña, revisa la
 fecha y el contenido que muestra la app y confirma. Restaurar reemplaza todos los datos actuales.
 
+## Borrar datos
+
+<img src="img/12-borrar-datos.png" width="280" alt="Pantalla Borrar datos">
+
+En Ajustes → Datos → "Borrar datos" hay tres opciones, y cada una pide confirmación:
+
+- Compras por fechas: "Este mes", "Mes anterior" o un rango con el calendario. Antes de borrar
+  muestra cuántas compras hay y cuánto suman. La compra abierta no se toca.
+- Productos: se eligen de una lista con buscador. Las compras pasadas conservan esos renglones con
+  su nombre y precio, así el historial no cambia de total.
+- Borrar todo: la app queda como recién instalada, con el catálogo inicial. Los ajustes se
+  conservan.
+
+Exporta un respaldo antes: lo borrado solo se recupera restaurándolo.
+
 ## Problemas frecuentes
+
+La etiqueta no se lee: acerca el teléfono hasta que la etiqueta ocupe el visor y espera a ver
+"Precio detectado". Si el número que aparece no es el correcto, corrígelo en el teclado antes de
+sumar; si no aparece nada, usa el botón Teclado.
 
 La cámara no abre: la app pide el permiso al entrar a la compra. Si lo negaste, toca "Permitir" en
 el visor o dalo en los ajustes del teléfono. Sin cámara la compra sigue funcionando con el

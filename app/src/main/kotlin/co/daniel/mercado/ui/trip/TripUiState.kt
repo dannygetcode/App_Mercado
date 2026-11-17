@@ -23,6 +23,8 @@ data class TripUiState(
     val torchOn: Boolean = false,
     /** La cámara lee la etiqueta del estante (texto + código) en vez de solo códigos. */
     val labelMode: Boolean = false,
+    /** Último precio que la cámara ve en la etiqueta (aún sin confirmar). */
+    val labelPreview: Pesos? = null,
     val favorites: List<Product> = emptyList(),
     /** Pestaña Lista: lo de la lista de mercado que aún no está en el carrito (RF-09). */
     val listPending: List<ShoppingListEntry> = emptyList(),

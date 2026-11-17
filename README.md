@@ -29,6 +29,7 @@ guarda los datos en una base cifrada.
 - Lista de mercado que se arma sola con la frecuencia de tus compras.
 - Recordatorios de mercado y de respaldo.
 - Bloqueo con huella o PIN, base cifrada y respaldo cifrado con contraseña.
+- Borrado de datos por fechas, por productos o completo, siempre con confirmación.
 
 La guía paso a paso está en [`docs/guia-usuario.md`](docs/guia-usuario.md).
 

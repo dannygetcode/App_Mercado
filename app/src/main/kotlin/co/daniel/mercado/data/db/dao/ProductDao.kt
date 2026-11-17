@@ -39,6 +39,24 @@ interface ProductDao {
     @Query("SELECT * FROM product WHERE active = 1 ORDER BY name COLLATE NOCASE, id")
     fun observeActive(): Flow<List<ProductEntity>>
 
+    @Query("SELECT * FROM product ORDER BY name COLLATE NOCASE, id")
+    suspend fun all(): List<ProductEntity>
+
+    @Query("UPDATE trip_item SET product_id = NULL WHERE product_id IN (:ids)")
+    suspend fun detachTripItems(ids: List<Long>)
+
+    @Query("DELETE FROM barcode WHERE product_id IN (:ids)")
+    suspend fun deleteBarcodesOfAll(ids: List<Long>)
+
+    @Query("DELETE FROM price_history WHERE product_id IN (:ids)")
+    suspend fun deletePriceHistoryOfAll(ids: List<Long>)
+
+    @Query("DELETE FROM shopping_list_item WHERE product_id IN (:ids)")
+    suspend fun deleteListItemsOfAll(ids: List<Long>)
+
+    @Query("DELETE FROM product WHERE id IN (:ids)")
+    suspend fun deleteAll(ids: List<Long>): Int
+
     @Query("SELECT COUNT(*) FROM product")
     suspend fun count(): Int
 

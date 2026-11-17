@@ -225,8 +225,13 @@ private fun CameraArea(
                 onLabel = onLabel,
             )
             if (state.labelMode) {
+                val preview = state.labelPreview
                 Text(
-                    text = stringResource(R.string.label_mode_hint),
+                    text = if (preview != null) {
+                        stringResource(R.string.label_mode_detected, MoneyFormat.format(preview))
+                    } else {
+                        stringResource(R.string.label_mode_hint)
+                    },
                     color = Color.White,
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier

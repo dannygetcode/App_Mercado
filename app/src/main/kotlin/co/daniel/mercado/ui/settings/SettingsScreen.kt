@@ -84,6 +84,7 @@ fun SettingsScreen(
     modifier: Modifier = Modifier,
     effects: Flow<SettingsEffect> = emptyFlow(),
     onOpenCategoryCaps: () -> Unit = {},
+    onOpenCleanup: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val pickCatalog = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
@@ -243,6 +244,11 @@ fun SettingsScreen(
                     },
                 )
                 state.importMessage?.let { ImportResult(it, onDismiss = { onEvent(SettingsEvent.DismissImportMessage) }) }
+                ListItem(
+                    modifier = Modifier.clickable(onClick = onOpenCleanup),
+                    headlineContent = { Text(stringResource(R.string.cleanup_open), color = MaterialTheme.colorScheme.error) },
+                    supportingContent = { Text(stringResource(R.string.cleanup_open_hint)) },
+                )
             }
             Group(R.string.settings_about) {
                 ListItem(

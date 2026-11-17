@@ -79,6 +79,18 @@ class RoomProductRepository(private val db: MercadoDatabase) : ProductRepository
 
     override suspend fun setCategoryBudget(categoryId: Long, amount: Pesos?) = categoryDao.setMonthlyBudget(categoryId, amount)
 
+    override suspend fun all(): List<Product> = dao.all().map { it.toModel() }
+
+    override suspend fun deleteProducts(ids: Collection<Long>): Int = db.withTransaction {
+        ids.distinct().chunked(MAX_SQL_ARGS).sumOf { chunk ->
+            dao.detachTripItems(chunk)
+            dao.deleteBarcodesOfAll(chunk)
+            dao.deletePriceHistoryOfAll(chunk)
+            dao.deleteListItemsOfAll(chunk)
+            dao.deleteAll(chunk)
+        }
+    }
+
     override suspend fun getByIds(ids: Collection<Long>): List<Product> =
         ids.distinct().chunked(MAX_SQL_ARGS).flatMap { chunk -> dao.getByIds(chunk).map { it.toModel() } }
 
@@ -138,6 +150,8 @@ class RoomTripRepository(private val db: MercadoDatabase) : TripRepository {
         dao.closedLines(fromMillis, toMillis).map { ClosedLine(it.tripId, it.closedAt, it.productId, it.quantity, it.unitPrice, it.unitType) }
 
     override suspend fun lastClosedAt(): Long? = dao.lastClosedAt()
+
+    override suspend fun deleteClosedBetween(fromMillis: Long, toMillis: Long): Int = dao.deleteClosedBetween(fromMillis, toMillis)
 }
 
 class RoomShoppingListRepository(db: MercadoDatabase) : ShoppingListRepository {

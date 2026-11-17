@@ -33,6 +33,9 @@ data object SummaryRoute
 data object CategoryCapsRoute
 
 @Serializable
+data object DataCleanupRoute
+
+@Serializable
 data object TripRoute
 
 @Serializable

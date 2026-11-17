@@ -56,33 +56,56 @@ class ShelfPriceTest {
     }
 
     @Test
-    fun `la etiqueta cuenta con dos lecturas iguales y no se repite mientras sigue en cuadro`() {
+    fun `precio seguido de Und o c-u si cuenta`() {
+        assertEquals(Pesos(4_590), price("$4.590 Und" to 80, "x 500 g" to 20))
+        assertEquals(Pesos(4_590), price("4.590 UN" to 80))
+        assertEquals(Pesos(2_750), price("$2.750 c/u" to 60))
+    }
+
+    @Test
+    fun `confusiones tipicas de la lectura de texto`() {
+        assertEquals(Pesos(4_590), price("S4.590" to 80))
+        assertEquals(Pesos(4_590), price("$ 4 590" to 80))
+        assertEquals(Pesos(10_900), price("$1O.9OO" to 80))
+        assertEquals(Pesos(11_900), price("$1l.900" to 80))
+    }
+
+    @Test
+    fun `numero grande solo en su linea cuenta y uno suelto en una frase no`() {
+        assertEquals(Pesos(4590), price("ARROZ DIANA" to 30, "4590" to 120, "Und" to 30))
+        assertNull(price("Pasillo 12 estante 3400" to 60))
+    }
+
+    @Test
+    fun `la etiqueta se confirma por el precio aunque el codigo aparezca solo en algunos cuadros`() {
         val clock = FakeClock()
         val s = LabelStabilizer(clock)
-        assertFalse(s.offer("7702004003508", Pesos(5_900)))
+        assertNull(s.offer("7702004003508", null))
         clock.advance(300)
-        assertTrue(s.offer("7702004003508", Pesos(5_900)))
+        assertNull(s.offer(null, Pesos(5_900)))
         clock.advance(300)
-        assertFalse(s.offer("7702004003508", Pesos(5_900)))
+        assertEquals(LabelStabilizer.Accepted("7702004003508", Pesos(5_900)), s.offer(null, Pesos(5_900)))
+        clock.advance(300)
+        assertNull(s.offer("7702004003508", Pesos(5_900)))
         clock.advance(2_900)
-        assertFalse(s.offer("7702004003508", Pesos(5_900)))
+        assertNull(s.offer(null, Pesos(5_900)))
 
         clock.advance(3_100)
-        assertFalse(s.offer("7702004003508", Pesos(5_900)))
+        assertNull(s.offer(null, Pesos(5_900)))
         clock.advance(200)
-        assertTrue(s.offer("7702004003508", Pesos(5_900)))
+        assertEquals(LabelStabilizer.Accepted(null, Pesos(5_900)), s.offer(null, Pesos(5_900)))
     }
 
     @Test
     fun `lecturas distintas o muy separadas no cuentan`() {
         val clock = FakeClock()
         val s = LabelStabilizer(clock)
-        assertFalse(s.offer(null, Pesos(5_900)))
+        assertNull(s.offer(null, Pesos(5_900)))
         clock.advance(200)
-        assertFalse(s.offer(null, Pesos(5_000)))
-        clock.advance(2_500)
-        assertFalse(s.offer(null, Pesos(5_000)))
+        assertNull(s.offer(null, Pesos(5_000)))
+        clock.advance(2_600)
+        assertNull(s.offer(null, Pesos(5_000)))
         clock.advance(100)
-        assertTrue(s.offer(null, Pesos(5_000)))
+        assertEquals(Pesos(5_000), s.offer(null, Pesos(5_000))?.price)
     }
 }

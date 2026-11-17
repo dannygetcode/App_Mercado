@@ -52,6 +52,15 @@ interface ProductRepository {
     /** RF-13: tope mensual de la categoría; nulo lo quita. */
     suspend fun setCategoryBudget(categoryId: Long, amount: Pesos?)
 
+    /** Todos los productos, activos o no, por nombre. */
+    suspend fun all(): List<Product>
+
+    /**
+     * Borra productos con sus códigos, historial de precios e ítems de lista. Las líneas de compras
+     * que los usaban se conservan como renglones sueltos (nombre y precio copiados). Devuelve cuántos.
+     */
+    suspend fun deleteProducts(ids: Collection<Long>): Int
+
     /** Productos por id (activos o no), para nombres y categorías de resúmenes y lista. */
     suspend fun getByIds(ids: Collection<Long>): List<Product>
 
