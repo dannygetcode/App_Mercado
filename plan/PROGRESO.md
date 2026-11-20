@@ -241,3 +241,5 @@ Formato por loop (copiar el bloque al empezar cada uno):
 - Verificación: `./scripts/verificar.sh completo` VERDE 11/11 (antes hubo que correr `./gradlew clean`: la caché de dex apuntaba a la ruta vieja del proyecto).
 - Instalado en el Poco X8 Pro (2026-11-20 09:25): APK release firmado (35,4 MB, certificado `8c07a44c…d4177df`, el mismo de antes, así que los datos se conservan); arranque en 227 ms, sin errores de la app.
 - [x] Botones visibles "Quitar presupuesto del mes" y "Quitar presupuesto de esta compra" bajo el teclado (Inicio y compra); antes solo se podía escribiendo $0. `HomeScreenTest` +2. `verificar.sh completo` VERDE.
+- [x] Importar catálogo: si el archivo elegido es un respaldo `.mercado` (magia `MRC1`), avisa "Ábrelo desde Ajustes → Restaurar respaldo" en vez de "JSON no válido". `SeedImporterTest` +1. `verificar.sh completo` VERDE.
+- Teléfono (2026-11-20): había cuatro paquetes (`.debug`, `.qa`, `.debug.test` y release); Daniel abría la debug vieja. Quedó solo `co.daniel.mercado` (release) y Daniel restauró su respaldo en ella. En adelante se instala solo el release.
