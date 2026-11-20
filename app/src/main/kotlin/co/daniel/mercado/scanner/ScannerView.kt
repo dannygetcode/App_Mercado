@@ -38,6 +38,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import co.daniel.mercado.R
+import co.daniel.mercado.domain.rules.ReceiptScan
 import co.daniel.mercado.util.AppLog
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.awaitCancellation
@@ -64,11 +65,14 @@ fun ScannerView(
     labelMode: Boolean = false,
     labelReaderFactory: (() -> LabelReader)? = null,
     onLabel: (LabelRead) -> Unit = {},
+    receiptReaderFactory: (() -> ReceiptReader)? = null,
+    onReceipt: (ReceiptScan) -> Unit = {},
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val currentOnCode by rememberUpdatedState(onCode)
     val currentOnLabel by rememberUpdatedState(onLabel)
+    val currentOnReceipt by rememberUpdatedState(onReceipt)
     val currentOnStarted by rememberUpdatedState(onCameraStarted)
     val currentOnTorch by rememberUpdatedState(onTorchAvailable)
     var camera by remember { mutableStateOf<Camera?>(null) }
@@ -99,6 +103,7 @@ fun ScannerView(
         var provider: ProcessCameraProvider? = null
         var decoder: BarcodeDecoder? = null
         var labelReader: LabelReader? = null
+        var receiptReader: ReceiptReader? = null
         val preview = Preview.Builder()
             .setResolutionSelector(RESOLUTION)
             .build()
@@ -110,7 +115,12 @@ fun ScannerView(
         try {
             provider = ProcessCameraProvider.awaitInstance(context)
             val readerFactory = labelReaderFactory
-            if (labelMode && readerFactory != null) {
+            val receiptFactory = receiptReaderFactory
+            if (receiptFactory != null) {
+                // Recibo al cerrar la compra: solo texto, renglón por renglón.
+                val activeReader = receiptFactory().also { receiptReader = it }
+                analysis.setAnalyzer(analysisExecutor) { image -> activeReader.analyze(image) { currentOnReceipt(it) } }
+            } else if (labelMode && readerFactory != null) {
                 // Etiqueta del estante: texto y código en el mismo cuadro.
                 val activeReader = readerFactory().also { labelReader = it }
                 analysis.setAnalyzer(analysisExecutor) { image -> activeReader.analyze(image) { currentOnLabel(it) } }
@@ -141,6 +151,7 @@ fun ScannerView(
             provider?.unbind(preview, analysis)
             decoder?.close()
             labelReader?.close()
+            receiptReader?.close()
             analysisExecutor.shutdown()
             camera = null
         }

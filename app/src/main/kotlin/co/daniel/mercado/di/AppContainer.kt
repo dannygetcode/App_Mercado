@@ -76,6 +76,9 @@ import co.daniel.mercado.domain.usecase.SaveProduct
 import co.daniel.mercado.domain.usecase.SearchProducts
 import co.daniel.mercado.domain.usecase.SetMonthlyBudget
 import co.daniel.mercado.domain.usecase.SetTripLimit
+import co.daniel.mercado.domain.usecase.ApplyReceipt
+import co.daniel.mercado.scanner.MlKitReceiptReader
+import co.daniel.mercado.scanner.ReceiptReader
 import co.daniel.mercado.domain.usecase.SetPaidTotal
 import co.daniel.mercado.domain.usecase.StartTrip
 import co.daniel.mercado.domain.usecase.TripSession
@@ -119,6 +122,8 @@ class AppContainer(
     fun newBarcodeDecoder(): BarcodeDecoder = MlKitBarcodeDecoder()
 
     fun newLabelReader(): LabelReader = MlKitLabelReader()
+
+    fun newReceiptReader(): ReceiptReader = MlKitReceiptReader()
 
     /** Compuerta de bloqueo, una por proceso (S-05). */
     val appLock = AppLock(clock)
@@ -219,6 +224,7 @@ class DataGraph(
     val discardTrip = DiscardTrip(trips, tripSession)
     val setPaidTotal = SetPaidTotal(trips)
     val setTripLimit = SetTripLimit(trips, tripSession)
+    val applyReceipt = ApplyReceipt(trips, products, tripSession, clock)
 
     val searchProducts = SearchProducts(products)
     val observeFavorites = ObserveFavorites(products)

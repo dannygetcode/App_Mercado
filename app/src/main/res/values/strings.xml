@@ -86,6 +86,25 @@
     <string name="home_trip_budget_of">Esta compra: %1$s de %2$s · cambiar</string>
     <string name="home_trip_budget_none">Esta compra: %s · ponerle presupuesto</string>
     <string name="trip_budget_title">Presupuesto de esta compra</string>
+    <string name="receipt_scan">Escanear recibo</string>
+    <string name="receipt_scan_hint">Corrige precios, agrega lo que faltó y llena el total pagado</string>
+    <string name="receipt_result">Recibo aplicado · corregidas: %1$d · agregadas: %2$d · sin recibo: %3$d. Toca para escanear otra vez</string>
+    <string name="receipt_title">Escanear recibo</string>
+    <string name="receipt_hint">Pasa la cámara por el recibo de arriba abajo, despacio. No se guarda ninguna foto.</string>
+    <plurals name="receipt_read">
+        <item quantity="one">%d producto leído</item>
+        <item quantity="other">%d productos leídos</item>
+    </plurals>
+    <string name="receipt_total">Total %s</string>
+    <string name="receipt_done">Listo · revisar</string>
+    <string name="receipt_review_title">Revisa el recibo</string>
+    <string name="receipt_review_hint">Desmarca lo que se haya leído mal. Lo marcado corrige tu compra o se agrega.</string>
+    <string name="receipt_no_lines">No se leyeron productos. Puedes seguir escaneando o aplicar solo el total.</string>
+    <string name="receipt_selected_sum">Suma de lo marcado</string>
+    <string name="receipt_total_label">Total del recibo</string>
+    <string name="receipt_apply">Aplicar a la compra</string>
+    <string name="receipt_continue">Seguir escaneando</string>
+    <string name="receipt_qty">%1$d × %2$s</string>
     <string name="trip_no_limit_hint">Sin presupuesto para esta compra · toca para ponerle uno</string>
     <string name="trip_budget_hint">Solo para esta salida (ej. $100.000). Lo que gastes igual suma al mes. $0 = sin tope.</string>
     <string name="save">Guardar</string>

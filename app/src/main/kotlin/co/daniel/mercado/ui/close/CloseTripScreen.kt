@@ -21,6 +21,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
@@ -40,6 +42,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -47,6 +50,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.daniel.mercado.R
 import co.daniel.mercado.domain.model.Pesos
+import co.daniel.mercado.domain.usecase.ApplyReceiptResult
+import co.daniel.mercado.scanner.BarcodeDecoder
+import co.daniel.mercado.scanner.ReceiptReader
 import co.daniel.mercado.domain.rules.MoneyFormat
 import co.daniel.mercado.ui.components.KeypadState
 import co.daniel.mercado.ui.components.PriceKeypad
@@ -63,10 +69,18 @@ fun CloseTripScreen(
     onBackToTrip: () -> Unit,
     onDone: () -> Unit,
     modifier: Modifier = Modifier,
+    receiptReaderFactory: (() -> ReceiptReader)? = null,
+    decoderFactory: (() -> BarcodeDecoder)? = null,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     LaunchedEffect(state.done) { if (state.done) onDone() }
     BackHandler(onBack = onBackToTrip)
+
+    val receipt = state.receipt
+    if (receipt != null && receiptReaderFactory != null && decoderFactory != null) {
+        ReceiptScanContent(receipt, viewModel, receiptReaderFactory, decoderFactory, modifier)
+        return
+    }
 
     Surface(modifier = modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
         Column(Modifier.safeDrawingPadding()) {
@@ -79,6 +93,7 @@ fun CloseTripScreen(
                 }
                 Text(stringResource(R.string.close_title), style = MaterialTheme.typography.headlineSmall)
                 Summary(state)
+                if (receiptReaderFactory != null) ReceiptCard(state.receiptResult, viewModel::openReceipt)
                 PaidRow(state.totalPaid, viewModel::openPaidSheet)
                 StoreField(state, viewModel)
                 if (state.review.isNotEmpty()) ReviewSection(state, viewModel)
@@ -134,6 +149,32 @@ private fun Summary(state: CloseTripUiState) {
                     color = trafficLightColor(trip.trafficLight),
                 )
             }
+        }
+    }
+}
+
+/** "Escanear recibo": corrige precios y agrega lo que faltó con lo que dice el recibo. */
+@Composable
+private fun ReceiptCard(result: ApplyReceiptResult?, onClick: () -> Unit) {
+    Card(
+        onClick = onClick,
+        modifier = Modifier.fillMaxWidth().testTag("receipt_card"),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
+    ) {
+        Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+            Icon(painterResource(R.drawable.ic_receipt), contentDescription = null)
+            Column(Modifier.weight(1f).padding(horizontal = 14.dp)) {
+                Text(stringResource(R.string.receipt_scan), style = MaterialTheme.typography.titleMedium)
+                Text(
+                    text = if (result == null) {
+                        stringResource(R.string.receipt_scan_hint)
+                    } else {
+                        stringResource(R.string.receipt_result, result.corrected, result.added, result.notOnReceipt)
+                    },
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            }
+            Icon(painterResource(R.drawable.ic_chevron_right), contentDescription = null)
         }
     }
 }

@@ -11,6 +11,10 @@ import co.daniel.mercado.domain.model.ActiveTrip
 import co.daniel.mercado.domain.model.Category
 import co.daniel.mercado.domain.model.Pesos
 import co.daniel.mercado.domain.model.Product
+import co.daniel.mercado.domain.rules.ReceiptAccumulator
+import co.daniel.mercado.domain.rules.ReceiptLine
+import co.daniel.mercado.domain.rules.ReceiptScan
+import co.daniel.mercado.domain.usecase.ApplyReceiptResult
 import co.daniel.mercado.domain.usecase.CloseTripResult
 import co.daniel.mercado.domain.usecase.ProductDraft
 import co.daniel.mercado.domain.usecase.SaveProductResult
@@ -30,6 +34,18 @@ data class ReviewItem(
     val duplicate: Boolean = false,
 )
 
+/** Lector del recibo al cerrar: primero la cámara lo recorre, luego se revisa lo leído. */
+data class ReceiptUi(
+    val reviewing: Boolean = false,
+    val lines: List<ReceiptLine> = emptyList(),
+    val total: Pesos? = null,
+    /** Índices de [lines] que se aplicarán (por defecto todos). */
+    val selected: Set<Int> = emptySet(),
+    val applying: Boolean = false,
+) {
+    val selectedSum: Pesos get() = Pesos(lines.filterIndexed { i, _ -> i in selected }.sumOf { it.amount.value })
+}
+
 data class CloseTripUiState(
     val loading: Boolean = true,
     val trip: ActiveTrip? = null,
@@ -40,6 +56,10 @@ data class CloseTripUiState(
     val categories: List<Category> = emptyList(),
     val review: List<ReviewItem> = emptyList(),
     val confirmDiscard: Boolean = false,
+    /** Abierto mientras se escanea o revisa el recibo. */
+    val receipt: ReceiptUi? = null,
+    /** Lo que hizo el último recibo aplicado (aviso en el cierre). */
+    val receiptResult: ApplyReceiptResult? = null,
     val saving: Boolean = false,
     /** La compra se guardó o descartó: volver a Inicio. */
     val done: Boolean = false,
@@ -51,27 +71,101 @@ class CloseTripViewModel(private val graph: suspend () -> DataGraph) : ViewModel
     private val _state = MutableStateFlow(CloseTripUiState())
     val state: StateFlow<CloseTripUiState> = _state.asStateFlow()
 
+    private val accumulator = ReceiptAccumulator()
+
     init {
         viewModelScope.launch {
             val g = graph()
-            val trip = g.observeActiveTrip().first()
-            val review = trip?.items
-                ?.mapNotNull { it.productId }
-                ?.distinct()
-                ?.mapNotNull { g.products.getById(it) }
-                ?.filter { it.needsReview }
-                ?.map { ReviewItem(it) }
-                .orEmpty()
+            _state.update {
+                it.copy(recentStores = g.trips.recentStores(RECENT_STORES), categories = g.products.categories())
+            }
+            reload()
+        }
+    }
+
+    /** Lee la compra abierta y los productos por nombrar (al entrar y después de aplicar un recibo). */
+    private suspend fun reload() {
+        val g = graph()
+        val trip = g.observeActiveTrip().first()
+        val typed = _state.value.review.associateBy { it.product.id }
+        val review = trip?.items
+            ?.mapNotNull { it.productId }
+            ?.distinct()
+            ?.mapNotNull { g.products.getById(it) }
+            ?.filter { it.needsReview }
+            ?.map { typed[it.id] ?: ReviewItem(it) }
+            .orEmpty()
+        _state.update {
+            it.copy(
+                loading = false,
+                trip = trip,
+                done = trip == null,
+                categories = it.categories.ifEmpty { g.products.categories() },
+                review = review,
+            )
+        }
+    }
+
+    // ---- Recibo ----
+
+    fun openReceipt() {
+        accumulator.reset()
+        _state.update { it.copy(receipt = ReceiptUi(), receiptResult = null) }
+    }
+
+    /** Un cuadro leído por la cámara. Llega del hilo de ML Kit. */
+    fun onReceiptScan(scan: ReceiptScan) {
+        if (_state.value.receipt?.reviewing != false) return
+        accumulator.add(scan)
+        val lines = accumulator.lines()
+        val total = accumulator.total()
+        _state.update { s ->
+            val r = s.receipt ?: return@update s
+            if (r.reviewing) s else s.copy(receipt = r.copy(lines = lines, total = total))
+        }
+    }
+
+    /** "Listo": pasa a revisar lo leído, todo marcado. */
+    fun reviewReceipt() = _state.update { s ->
+        val r = s.receipt ?: return@update s
+        s.copy(receipt = r.copy(reviewing = true, selected = r.lines.indices.toSet()))
+    }
+
+    fun toggleReceiptLine(index: Int) = _state.update { s ->
+        val r = s.receipt ?: return@update s
+        s.copy(receipt = r.copy(selected = if (index in r.selected) r.selected - index else r.selected + index))
+    }
+
+    /** "Seguir escaneando": vuelve a la cámara sin perder lo leído. */
+    fun continueReceiptScan() = _state.update { s ->
+        val r = s.receipt ?: return@update s
+        s.copy(receipt = r.copy(reviewing = false))
+    }
+
+    fun closeReceipt() {
+        accumulator.reset()
+        _state.update { it.copy(receipt = null) }
+    }
+
+    /** Aplica lo marcado a la compra; el total leído pasa a "Total pagado". */
+    fun applyReceipt() {
+        val r = _state.value.receipt ?: return
+        if (r.applying) return
+        _state.update { it.copy(receipt = r.copy(applying = true)) }
+        viewModelScope.launch {
+            val chosen = r.lines.filterIndexed { i, _ -> i in r.selected }
+            val result = runCatching { graph().applyReceipt(chosen) }
+                .onFailure { AppLog.w("CloseTripViewModel: no se pudo aplicar el recibo", it) }
+                .getOrNull()
+            accumulator.reset()
             _state.update {
                 it.copy(
-                    loading = false,
-                    trip = trip,
-                    done = trip == null,
-                    recentStores = g.trips.recentStores(RECENT_STORES),
-                    categories = g.products.categories(),
-                    review = review,
+                    receipt = null,
+                    receiptResult = result,
+                    totalPaid = r.total?.takeIf { t -> t.isPositive && t <= Pesos.KEYPAD_MAX } ?: it.totalPaid,
                 )
             }
+            reload()
         }
     }
 

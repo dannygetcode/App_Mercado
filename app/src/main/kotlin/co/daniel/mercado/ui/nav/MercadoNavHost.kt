@@ -301,6 +301,8 @@ private fun MercadoNavigation(
                     viewModel = close,
                     onBackToTrip = { navController.popBackStack() },
                     onDone = { navController.backToHome() },
+                    receiptReaderFactory = container::newReceiptReader,
+                    decoderFactory = container::newBarcodeDecoder,
                 )
             }
             if (BuildConfig.DEBUG) {

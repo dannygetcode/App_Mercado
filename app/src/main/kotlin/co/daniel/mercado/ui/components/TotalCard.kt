@@ -7,6 +7,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,14 +16,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.pluralStringResource
@@ -56,63 +55,69 @@ data class TotalCardModel(
 @Composable
 fun TotalCard(model: TotalCardModel, modifier: Modifier = Modifier, onClick: (() -> Unit)? = null) {
     val color = trafficLightColor(model.trafficLight)
-    val clickable = if (onClick != null) Modifier.clickable(onClickLabel = stringResource(R.string.trip_budget_title), onClick = onClick) else Modifier
-    Card(modifier = modifier.fillMaxWidth().clip(CardDefaults.shape).then(clickable)) {
-        Column(Modifier.padding(horizontal = 16.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                AnimatedContent(
-                    targetState = model.total,
-                    transitionSpec = { fadeIn(tween(FADE_MS)) togetherWith fadeOut(tween(FADE_MS)) },
-                    modifier = Modifier.weight(1f),
-                    label = "total",
-                ) { total ->
-                    BasicText(
-                        text = MoneyFormat.format(total),
-                        modifier = Modifier.testTag("trip_total"),
-                        style = TotalTextStyle.copy(color = MaterialTheme.colorScheme.onSurface),
-                        maxLines = 1,
-                        autoSize = TextAutoSize.StepBased(minFontSize = 28.sp, maxFontSize = 46.sp),
-                    )
-                }
-                Text(
-                    text = pluralStringResource(R.plurals.trip_items, model.articleCount, model.articleCount),
-                    style = MaterialTheme.typography.titleMedium,
-                )
-            }
-            val limit = model.limit
-            val remaining = model.remaining
-            if (limit != null && remaining != null) {
+    Card(modifier = modifier.fillMaxWidth()) {
+        Box {
+            Column(Modifier.padding(horizontal = 16.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    LinearProgressIndicator(
-                        progress = { ((model.percentOfLimit ?: 0).coerceIn(0, 100)) / 100f },
-                        modifier = Modifier.weight(1f).height(10.dp),
-                        color = color,
-                        drawStopIndicator = {},
-                    )
-                    model.percentOfLimit?.let {
-                        Text(
-                            text = stringResource(R.string.trip_percent, it),
-                            modifier = Modifier.padding(start = 12.dp),
-                            style = MoneyTextStyle,
+                    AnimatedContent(
+                        targetState = model.total,
+                        transitionSpec = { fadeIn(tween(FADE_MS)) togetherWith fadeOut(tween(FADE_MS)) },
+                        modifier = Modifier.weight(1f),
+                        label = "total",
+                    ) { total ->
+                        BasicText(
+                            text = MoneyFormat.format(total),
+                            modifier = Modifier.testTag("trip_total"),
+                            style = TotalTextStyle.copy(color = MaterialTheme.colorScheme.onSurface),
+                            maxLines = 1,
+                            autoSize = TextAutoSize.StepBased(minFontSize = 28.sp, maxFontSize = 46.sp),
                         )
                     }
+                    Text(
+                        text = pluralStringResource(R.plurals.trip_items, model.articleCount, model.articleCount),
+                        style = MaterialTheme.typography.titleMedium,
+                    )
                 }
-                Text(
-                    text = if (remaining.value < 0) {
-                        stringResource(R.string.trip_over, MoneyFormat.format(Pesos(-remaining.value)))
-                    } else {
-                        stringResource(R.string.trip_remaining, MoneyFormat.format(remaining), MoneyFormat.format(limit))
-                    },
-                    modifier = Modifier.testTag("traffic_" + model.trafficLight.name),
-                    color = color,
-                    style = MaterialTheme.typography.titleMedium.merge(MoneyTextStyle),
-                )
-            } else if (onClick != null) {
-                Text(
-                    text = stringResource(R.string.trip_no_limit_hint),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
+                val limit = model.limit
+                val remaining = model.remaining
+                if (limit != null && remaining != null) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        LinearProgressIndicator(
+                            progress = { ((model.percentOfLimit ?: 0).coerceIn(0, 100)) / 100f },
+                            modifier = Modifier.weight(1f).height(10.dp),
+                            color = color,
+                            drawStopIndicator = {},
+                        )
+                        model.percentOfLimit?.let {
+                            Text(
+                                text = stringResource(R.string.trip_percent, it),
+                                modifier = Modifier.padding(start = 12.dp),
+                                style = MoneyTextStyle,
+                            )
+                        }
+                    }
+                    Text(
+                        text = if (remaining.value < 0) {
+                            stringResource(R.string.trip_over, MoneyFormat.format(Pesos(-remaining.value)))
+                        } else {
+                            stringResource(R.string.trip_remaining, MoneyFormat.format(remaining), MoneyFormat.format(limit))
+                        },
+                        modifier = Modifier.testTag("traffic_" + model.trafficLight.name),
+                        color = color,
+                        style = MaterialTheme.typography.titleMedium.merge(MoneyTextStyle),
+                    )
+                } else if (onClick != null) {
+                    Text(
+                        text = stringResource(R.string.trip_no_limit_hint),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+            if (onClick != null) {
+                // Capa táctil encima: tocar la tarjeta cambia el presupuesto de la compra sin fundir la
+                // accesibilidad del total, el saldo y el semáforo (cada uno se sigue leyendo aparte).
+                Box(Modifier.matchParentSize().clickable(onClickLabel = stringResource(R.string.trip_budget_title), onClick = onClick))
             }
         }
     }

@@ -138,7 +138,8 @@ barras, favorito, activo, pendiente de revisar.
 ### Pendientes (C) — no implementar sin instrucción
 - RF-14 Etiquetas de balanza con precio embebido (códigos que empiezan por 2): requiere fotos de
   etiquetas reales de los supermercados de Daniel.
-- RF-15 Importar recibo por foto con OCR en el dispositivo.
+- RF-15 Importar recibo con OCR en el dispositivo. **Hecho en su versión de cierre (2026-11-20):**
+  se escanea en vivo al cerrar la compra y corrige/agrega líneas y el total pagado (04-ux, Cierre).
 - RF-16 Compartir lista con otro teléfono por archivo o QR.
 
 ## Requerimientos no funcionales

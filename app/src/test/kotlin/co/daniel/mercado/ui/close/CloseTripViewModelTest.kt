@@ -2,6 +2,8 @@ package co.daniel.mercado.ui.close
 
 import androidx.lifecycle.viewModelScope
 import co.daniel.mercado.domain.model.Pesos
+import co.daniel.mercado.domain.rules.ReceiptLine
+import co.daniel.mercado.domain.rules.ReceiptScan
 import co.daniel.mercado.domain.usecase.TripLimit
 import co.daniel.mercado.ui.trip.TripGraph
 import co.daniel.mercado.ui.trip.TripGraph.Companion.ARROZ
@@ -51,6 +53,42 @@ class CloseTripViewModelTest {
         g.startTrip(TripLimit.Custom(Pesos(10_000)))
         g.handleScan(ARROZ)
         g.addUnknownScanned(DESCONOCIDO, Pesos(7_800))
+    }
+
+    @Test
+    fun `recibo leido en varios cuadros se revisa, se desmarca lo malo y se aplica a la compra`() {
+        tripWithNewProduct()
+        vm = CloseTripViewModel({ g })
+        await { !it.loading }
+
+        vm.openReceipt()
+        val frame = ReceiptScan(
+            listOf(
+                ReceiptLine("ARROZ DIANA 1000G", 1, Pesos(6_200)),
+                ReceiptLine("DETERGENTE FAB 1KG", 1, Pesos(12_900)),
+                ReceiptLine("XX LECTURA MALA", 1, Pesos(99_000)),
+            ),
+            Pesos(26_900),
+        )
+        vm.onReceiptScan(frame)
+        assertTrue(vm.state.value.receipt!!.lines.isEmpty())
+        vm.onReceiptScan(frame)
+        assertEquals(3, vm.state.value.receipt!!.lines.size)
+        assertEquals(Pesos(26_900), vm.state.value.receipt!!.total)
+
+        vm.reviewReceipt()
+        vm.toggleReceiptLine(2)
+        assertEquals(Pesos(19_100), vm.state.value.receipt!!.selectedSum)
+        vm.applyReceipt()
+
+        val s = await { it.receipt == null && it.receiptResult != null }
+        assertEquals(1, s.receiptResult!!.corrected)
+        assertEquals(1, s.receiptResult!!.added)
+        assertEquals(Pesos(26_900), s.totalPaid)
+        val after = await { it.trip?.items?.size == 3 }
+        assertEquals(Pesos(6_200), after.trip!!.items.first { it.nameSnapshot == "Arroz Diana 1 kg" }.unitPrice)
+        // El producto creado desde el recibo queda para nombrar junto al provisional.
+        assertEquals(2, after.review.size)
     }
 
     @Test
