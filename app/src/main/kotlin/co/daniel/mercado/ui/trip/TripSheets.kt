@@ -108,6 +108,7 @@ private fun KeypadSheet(sheet: TripSheet.Keypad, viewModel: TripViewModel) {
         )
         is KeypadPurpose.CreateProduct -> Triple(stringResource(R.string.create_price_title, p.name), null, stringResource(R.string.keypad_add))
         is KeypadPurpose.ShelfPrice -> Triple(stringResource(R.string.shelf_price_title), p.productName, stringResource(R.string.keypad_add))
+        KeypadPurpose.TripLimit -> Triple(stringResource(R.string.trip_budget_title), stringResource(R.string.trip_budget_hint), stringResource(R.string.save))
     }
     if (subtitle != null) {
         Text(
@@ -125,6 +126,7 @@ private fun KeypadSheet(sheet: TripSheet.Keypad, viewModel: TripViewModel) {
         onSubmit = viewModel::submitKeypad,
         title = title,
         actionLabel = action,
+        allowZero = sheet.purpose == KeypadPurpose.TripLimit,
     )
 }
 

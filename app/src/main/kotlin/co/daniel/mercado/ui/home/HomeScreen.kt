@@ -21,6 +21,8 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.LinearProgressIndicator
@@ -81,7 +83,15 @@ fun HomeScreen(
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(start = 4.dp, bottom = 4.dp).semantics { heading() },
                 )
-                state.month?.let { MonthHeader(it, onClick = { onEvent(HomeEvent.EditBudget) }) }
+                state.month?.let {
+                    MonthHeader(
+                        month = it,
+                        openTripTotal = state.openTripTotal,
+                        openTripLimit = state.openTripLimit,
+                        onClick = { onEvent(HomeEvent.EditBudget) },
+                        onTripBudget = { onEvent(HomeEvent.EditTripBudget) },
+                    )
+                }
                 if (state.showBudgetHint) BudgetHintCard(onEvent)
                 state.lastTrip?.let { LastTripCard(it, onClick = { onOpenTrip(it.trip.id) }) }
                 if (!state.loading) ListCard(state.listPending, onOpenList)
@@ -121,8 +131,18 @@ fun HomeScreen(
             title = stringResource(R.string.budget_title, state.month?.let { Dates.monthName(it.yearMonth) }.orEmpty()),
             actionLabel = stringResource(R.string.save),
             initial = sheet.current,
-            hint = stringResource(R.string.budget_hint),
+            hint = stringResource(if (sheet.current != null) R.string.budget_hint_remove else R.string.budget_hint),
+            allowZero = sheet.current != null,
             onSubmit = { onEvent(HomeEvent.SaveBudget(it)) },
+            onDismiss = { onEvent(HomeEvent.DismissSheet) },
+        )
+        is HomeSheet.TripBudget -> KeypadBottomSheet(
+            title = stringResource(R.string.trip_budget_title),
+            actionLabel = stringResource(if (sheet.tripOpen) R.string.save else R.string.home_limit_start),
+            initial = sheet.current,
+            hint = stringResource(R.string.trip_budget_hint),
+            allowZero = true,
+            onSubmit = { onEvent(HomeEvent.SaveTripBudget(it)) },
             onDismiss = { onEvent(HomeEvent.DismissSheet) },
         )
         null -> Unit
@@ -130,7 +150,13 @@ fun HomeScreen(
 }
 
 @Composable
-private fun MonthHeader(month: MonthStatus, onClick: () -> Unit) {
+private fun MonthHeader(
+    month: MonthStatus,
+    openTripTotal: Pesos?,
+    openTripLimit: Pesos?,
+    onClick: () -> Unit,
+    onTripBudget: () -> Unit,
+) {
     val budget = month.budget
     val remaining = month.remaining
     Card(
@@ -185,8 +211,41 @@ private fun MonthHeader(month: MonthStatus, onClick: () -> Unit) {
                 )
             } else {
                 Text(stringResource(R.string.home_month_spent_label), style = MaterialTheme.typography.bodyLarge)
+                Text(stringResource(R.string.home_budget_optional), style = MaterialTheme.typography.bodySmall)
             }
+            TripBudgetButton(openTripTotal, openTripLimit, onTripBudget)
         }
+    }
+}
+
+/**
+ * Presupuesto de una salida (ej. $100.000 en el D1) sin tocar el del mes: lo gastado en esa compra
+ * igual suma a la barra del mes.
+ */
+@Composable
+private fun TripBudgetButton(openTripTotal: Pesos?, openTripLimit: Pesos?, onClick: () -> Unit) {
+    val label = when {
+        openTripTotal == null -> stringResource(R.string.home_trip_budget_new)
+        openTripLimit == null -> stringResource(R.string.home_trip_budget_none, MoneyFormat.format(openTripTotal))
+        else -> stringResource(R.string.home_trip_budget_of, MoneyFormat.format(openTripTotal), MoneyFormat.format(openTripLimit))
+    }
+    FilledTonalButton(
+        onClick = onClick,
+        modifier = Modifier.fillMaxWidth().padding(top = 6.dp).heightIn(min = 48.dp).testTag("home_trip_budget"),
+        shape = MaterialTheme.shapes.large,
+        colors = ButtonDefaults.filledTonalButtonColors(
+            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.7f),
+            contentColor = MaterialTheme.colorScheme.onSurface,
+        ),
+    ) {
+        Icon(painterResource(R.drawable.ic_edit), contentDescription = null, modifier = Modifier.size(18.dp))
+        Text(
+            label,
+            modifier = Modifier.padding(start = 8.dp),
+            style = MaterialTheme.typography.labelLarge.merge(MoneyTextStyle),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
     }
 }
 

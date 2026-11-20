@@ -26,6 +26,8 @@ data class HomeUiState(
     val loading: Boolean = true,
     /** Total de la compra abierta, si hay una. */
     val openTripTotal: Pesos? = null,
+    /** Presupuesto de la compra abierta (nulo: sin tope o sin compra abierta). */
+    val openTripLimit: Pesos? = null,
     val month: MonthStatus? = null,
     val lastTrip: TripSummary? = null,
     val needsReviewCount: Int = 0,
@@ -43,8 +45,14 @@ sealed interface HomeSheet {
     /** Límite de esta compra, prellenado con lo que queda del mes. */
     data class Limit(val suggested: Pesos?) : HomeSheet
 
-    /** Presupuesto del mes en curso (el propio o el heredado como punto de partida). */
+    /** Presupuesto del mes en curso (el propio o el heredado como punto de partida). $0 lo quita. */
     data class Budget(val current: Pesos?) : HomeSheet
+
+    /**
+     * "Presupuesto de esta compra" desde la tarjeta del mes: con una compra abierta cambia su tope;
+     * sin compra abierta arranca una con ese tope. Lo gastado siempre suma al mes.
+     */
+    data class TripBudget(val current: Pesos?, val tripOpen: Boolean) : HomeSheet
 }
 
 sealed interface HomeEvent {
@@ -52,6 +60,8 @@ sealed interface HomeEvent {
     data class StartTrip(val limit: Pesos) : HomeEvent
     data object EditBudget : HomeEvent
     data class SaveBudget(val amount: Pesos) : HomeEvent
+    data object EditTripBudget : HomeEvent
+    data class SaveTripBudget(val amount: Pesos) : HomeEvent
     data object DismissSheet : HomeEvent
     data object DismissBudgetHint : HomeEvent
 }
@@ -75,7 +85,7 @@ class HomeViewModel(
     init {
         viewModelScope.launch {
             val g = graph()
-            launch { g.observeActiveTrip().collect { trip -> _state.update { it.copy(loading = false, openTripTotal = trip?.total) } } }
+            launch { g.observeActiveTrip().collect { trip -> _state.update { it.copy(loading = false, openTripTotal = trip?.total, openTripLimit = trip?.limit) } } }
             launch { g.observeMonthStatus().collect { month -> _state.update { it.copy(month = month) } } }
             launch { g.observeClosedTrips().collect { trips -> _state.update { it.copy(lastTrip = trips.firstOrNull()) } } }
             launch { g.observeNeedsReviewCount().collect { n -> _state.update { it.copy(needsReviewCount = n) } } }
@@ -95,6 +105,11 @@ class HomeViewModel(
             is HomeEvent.StartTrip -> startTrip(event.limit)
             HomeEvent.EditBudget -> _state.update { it.copy(sheet = HomeSheet.Budget(it.month?.budget)) }
             is HomeEvent.SaveBudget -> saveBudget(event.amount)
+            HomeEvent.EditTripBudget -> _state.update {
+                val open = it.openTripTotal != null
+                it.copy(sheet = HomeSheet.TripBudget(if (open) it.openTripLimit else null, open))
+            }
+            is HomeEvent.SaveTripBudget -> saveTripBudget(event.amount)
             HomeEvent.DismissSheet -> _state.update { it.copy(sheet = null) }
             HomeEvent.DismissBudgetHint -> viewModelScope.launch { settings.setBudgetHintDismissed(true) }
         }
@@ -120,10 +135,22 @@ class HomeViewModel(
         }
     }
 
+    /** $0 quita el presupuesto del mes (si había uno); el presupuesto mensual es opcional. */
     private fun saveBudget(amount: Pesos) {
+        val hadBudget = _state.value.month?.budget != null
         _state.update { it.copy(sheet = null) }
-        if (!amount.isPositive) return
+        if (!amount.isPositive && !hadBudget) return
         viewModelScope.launch { graph().setMonthlyBudget(amount) }
+    }
+
+    /** Con compra abierta cambia su tope; sin ella, arranca una compra con ese tope ($0 = sin tope). */
+    private fun saveTripBudget(amount: Pesos) {
+        if (_state.value.openTripTotal == null) {
+            startTrip(amount)
+            return
+        }
+        _state.update { it.copy(sheet = null) }
+        viewModelScope.launch { graph().setTripLimit(amount.takeIf { it.isPositive }) }
     }
 
     companion object {

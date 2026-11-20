@@ -122,7 +122,7 @@ fun TripScreen(
                     onLabel = viewModel::onLabel,
                     onToggleLabelMode = viewModel::toggleLabelMode,
                 )
-                state.totalCard?.let { TotalCard(it, Modifier.padding(horizontal = 8.dp, vertical = 6.dp)) }
+                state.totalCard?.let { TotalCard(it, Modifier.padding(horizontal = 8.dp, vertical = 6.dp), onClick = viewModel::openLimitKeypad) }
                 Lines(
                     items = state.trip?.items.orEmpty(),
                     state = state,

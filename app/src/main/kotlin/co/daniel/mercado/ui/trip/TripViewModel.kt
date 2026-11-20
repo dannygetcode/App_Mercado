@@ -197,6 +197,9 @@ class TripViewModel(
 
     fun openLooseKeypad() = openSheet(TripSheet.Keypad(KeypadPurpose.LoosePrice))
 
+    /** Tocar la tarjeta del total: cambiar el presupuesto de esta compra. */
+    fun openLimitKeypad() = openSheet(TripSheet.Keypad(KeypadPurpose.TripLimit, initial = _state.value.trip?.limit))
+
     fun openPicker(tab: PickerTab = PickerTab.FAVORITES) {
         if (tab == PickerTab.SEARCH) _state.update { it.copy(query = "", results = emptyList()) }
         openSheet(TripSheet.Picker(tab))
@@ -221,11 +224,17 @@ class TripViewModel(
     /** "Sumar" del teclado; el uso depende de para qué se abrió. La hoja se cierra sola. */
     fun submitKeypad(price: Pesos) {
         val sheet = _state.value.sheet as? TripSheet.Keypad ?: return
+        if (sheet.purpose == KeypadPurpose.TripLimit) {
+            dismissSheet()
+            viewModelScope.launch { guarded { graph().setTripLimit(price.takeIf { it.isPositive }) } }
+            return
+        }
         if (!validPrice(price)) return
         dismissSheet()
         viewModelScope.launch {
             val g = graph()
             when (val purpose = sheet.purpose) {
+                KeypadPurpose.TripLimit -> Unit
                 KeypadPurpose.LoosePrice -> guarded { g.addLoosePrice(price) }?.let { handleOutcome(it, false) }
                 is KeypadPurpose.LabelPrice ->
                     guarded { g.addWeighedItem(purpose.productId, price) }?.let { handleOutcome(it, false) }

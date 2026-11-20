@@ -57,6 +57,24 @@ class StartTrip(
     }
 }
 
+/**
+ * Presupuesto de esta compra (por ejemplo $100.000 para una salida al D1). Cambia solo el tope de
+ * la compra abierta; lo gastado sigue sumando al mes. Nulo o $0 = sin tope.
+ */
+class SetTripLimit(
+    private val trips: TripRepository,
+    private val session: TripSession,
+) {
+    suspend operator fun invoke(limit: Pesos?): Boolean {
+        limit?.let { require(it.value >= 0 && it <= Pesos.KEYPAD_MAX) { "límite fuera de rango" } }
+        return session.mutate {
+            val active = trips.getActive() ?: return@mutate false
+            trips.updateTrip(active.trip.copy(budgetLimit = limit?.takeIf { it.isPositive }))
+            true
+        }
+    }
+}
+
 /** La compra abierta con total, límite y semáforo, recalculada con cada cambio. */
 class ObserveActiveTrip(private val trips: TripRepository) {
 

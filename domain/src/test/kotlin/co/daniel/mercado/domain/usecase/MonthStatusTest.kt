@@ -61,8 +61,23 @@ class MonthStatusTest {
     }
 
     @Test
-    fun `el presupuesto debe ser positivo`() = runTest {
-        assertFailsWith<IllegalArgumentException> { f.setMonthlyBudget(Pesos.ZERO, nov) }
+    fun `el presupuesto no puede ser negativo`() = runTest {
+        assertFailsWith<IllegalArgumentException> { f.setMonthlyBudget(Pesos(-1), nov) }
+    }
+
+    @Test
+    fun `quitar el presupuesto con 0 deja el mes sin presupuesto y no se hereda`() = runTest {
+        f.budgets.set(Budget(YearMonth.of(2026, 9), Pesos(850_000)))
+        f.setMonthlyBudget(Pesos.ZERO, nov)
+
+        val status = f.monthStatus(nov)
+        assertNull(status.budget)
+        assertNull(status.remaining)
+        assertFalse(status.inherited)
+        assertEquals(TrafficLight.NONE, status.trafficLight)
+        // El mes siguiente tampoco lo hereda hasta que se defina otro.
+        assertNull(f.monthStatus(YearMonth.of(2026, 12)).budget)
+        assertNull(f.startTrip.defaultLimit())
     }
 
     @Test

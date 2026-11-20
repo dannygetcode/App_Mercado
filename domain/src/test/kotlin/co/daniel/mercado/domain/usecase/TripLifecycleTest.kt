@@ -9,12 +9,14 @@ import co.daniel.mercado.domain.model.Pesos
 import co.daniel.mercado.domain.model.PriceSource
 import co.daniel.mercado.domain.model.ScanOutcome
 import co.daniel.mercado.domain.model.UnitType
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import java.time.YearMonth
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertIs
+import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
@@ -52,6 +54,29 @@ class TripLifecycleTest {
         val custom = assertIs<StartTripResult.Started>(f.startTrip(TripLimit.Custom(Pesos(150_000))))
 
         assertEquals(Pesos(150_000), custom.limit)
+    }
+
+    @Test
+    fun `el presupuesto de la compra se cambia en curso sin tocar lo gastado del mes`() = runTest {
+        val nov = YearMonth.of(2026, 11)
+        f.setMonthlyBudget(Pesos(900_000), nov)
+        f.startTrip()
+        f.addLoose(Pesos(30_000))
+        f.closeTrip()
+        f.startTrip(TripLimit.None)
+        f.addLoose(Pesos(40_000))
+
+        assertTrue(f.setTripLimit(Pesos(100_000)))
+        val active = assertNotNull(f.observeActiveTrip().first())
+        assertEquals(Pesos(100_000), active.limit)
+        assertEquals(Pesos(60_000), active.remaining)
+        assertEquals(Pesos(40_000), active.total)
+
+        f.setTripLimit(Pesos.ZERO)
+        assertNull(f.observeActiveTrip().first()?.limit)
+        f.closeTrip()
+        assertEquals(Pesos(70_000), f.monthStatus(nov).spent)
+        assertFalse(f.setTripLimit(Pesos(50_000)))
     }
 
     @Test

@@ -75,6 +75,7 @@ import co.daniel.mercado.domain.usecase.RenameLooseLine
 import co.daniel.mercado.domain.usecase.SaveProduct
 import co.daniel.mercado.domain.usecase.SearchProducts
 import co.daniel.mercado.domain.usecase.SetMonthlyBudget
+import co.daniel.mercado.domain.usecase.SetTripLimit
 import co.daniel.mercado.domain.usecase.SetPaidTotal
 import co.daniel.mercado.domain.usecase.StartTrip
 import co.daniel.mercado.domain.usecase.TripSession
@@ -217,6 +218,7 @@ class DataGraph(
     val closeTrip = CloseTrip(trips, products, tripSession, clock, shoppingList)
     val discardTrip = DiscardTrip(trips, tripSession)
     val setPaidTotal = SetPaidTotal(trips)
+    val setTripLimit = SetTripLimit(trips, tripSession)
 
     val searchProducts = SearchProducts(products)
     val observeFavorites = ObserveFavorites(products)

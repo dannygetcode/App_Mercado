@@ -84,6 +84,9 @@ sealed interface KeypadPurpose {
 
     /** "Crear «texto»" desde la búsqueda. */
     data class CreateProduct(val name: String) : KeypadPurpose
+
+    /** Presupuesto de esta compra (tocar la tarjeta del total). $0 = sin tope. */
+    data object TripLimit : KeypadPurpose
 }
 
 enum class PickerTab { FAVORITES, SEARCH, LIST }

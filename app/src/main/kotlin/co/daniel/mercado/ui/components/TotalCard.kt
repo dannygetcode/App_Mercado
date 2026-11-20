@@ -5,6 +5,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,12 +15,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.pluralStringResource
@@ -51,9 +54,10 @@ data class TotalCardModel(
  * color del semáforo. Sin límite: solo total y artículos. El total se achica antes que cortarse.
  */
 @Composable
-fun TotalCard(model: TotalCardModel, modifier: Modifier = Modifier) {
+fun TotalCard(model: TotalCardModel, modifier: Modifier = Modifier, onClick: (() -> Unit)? = null) {
     val color = trafficLightColor(model.trafficLight)
-    Card(modifier = modifier.fillMaxWidth()) {
+    val clickable = if (onClick != null) Modifier.clickable(onClickLabel = stringResource(R.string.trip_budget_title), onClick = onClick) else Modifier
+    Card(modifier = modifier.fillMaxWidth().clip(CardDefaults.shape).then(clickable)) {
         Column(Modifier.padding(horizontal = 16.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 AnimatedContent(
@@ -102,6 +106,12 @@ fun TotalCard(model: TotalCardModel, modifier: Modifier = Modifier) {
                     modifier = Modifier.testTag("traffic_" + model.trafficLight.name),
                     color = color,
                     style = MaterialTheme.typography.titleMedium.merge(MoneyTextStyle),
+                )
+            } else if (onClick != null) {
+                Text(
+                    text = stringResource(R.string.trip_no_limit_hint),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
         }

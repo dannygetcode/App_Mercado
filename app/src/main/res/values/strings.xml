@@ -79,7 +79,15 @@
     <string name="home_needs_review">Productos por revisar · %d</string>
     <string name="home_needs_review_hint">Productos nuevos que esperan nombre</string>
     <string name="budget_title">Presupuesto de %s</string>
-    <string name="budget_hint">Si un mes no tiene presupuesto, usa el del mes anterior.</string>
+    <string name="budget_hint">Opcional. Si un mes no tiene presupuesto, usa el del mes anterior.</string>
+    <string name="budget_hint_remove">Deja $0 para quitar el presupuesto del mes.</string>
+    <string name="home_budget_optional">Presupuesto del mes opcional · toca para definirlo</string>
+    <string name="home_trip_budget_new">Presupuesto de esta compra</string>
+    <string name="home_trip_budget_of">Esta compra: %1$s de %2$s · cambiar</string>
+    <string name="home_trip_budget_none">Esta compra: %s · ponerle presupuesto</string>
+    <string name="trip_budget_title">Presupuesto de esta compra</string>
+    <string name="trip_no_limit_hint">Sin presupuesto para esta compra · toca para ponerle uno</string>
+    <string name="trip_budget_hint">Solo para esta salida (ej. $100.000). Lo que gastes igual suma al mes. $0 = sin tope.</string>
     <string name="save">Guardar</string>
     <string name="not_now">Ahora no</string>
     <plurals name="articles">

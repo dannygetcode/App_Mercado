@@ -21,6 +21,7 @@ import co.daniel.mercado.domain.usecase.RemoveLine
 import co.daniel.mercado.domain.usecase.RenameLooseLine
 import co.daniel.mercado.domain.usecase.SetMonthlyBudget
 import co.daniel.mercado.domain.usecase.SetPaidTotal
+import co.daniel.mercado.domain.usecase.SetTripLimit
 import co.daniel.mercado.domain.usecase.StartTrip
 import co.daniel.mercado.domain.usecase.TripSession
 import co.daniel.mercado.domain.usecase.UndoLastAction
@@ -56,6 +57,7 @@ class TripFixture {
     val closeTrip = CloseTrip(trips, products, session, clock, shoppingList)
     val discardTrip = DiscardTrip(trips, session)
     val setPaidTotal = SetPaidTotal(trips)
+    val setTripLimit = SetTripLimit(trips, session)
 
     suspend fun product(
         name: String,

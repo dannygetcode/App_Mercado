@@ -23,7 +23,8 @@ class GetMonthStatus(
 ) {
     suspend operator fun invoke(month: YearMonth = Months.monthOf(clock.nowMillis())): MonthStatus {
         val own = budgets.get(month)
-        val budget = (own ?: budgets.latestBefore(month))?.amount
+        // $0 guardado = "sin presupuesto" (el usuario lo quitó): no se hereda el de antes.
+        val budget = (own ?: budgets.latestBefore(month))?.amount?.takeIf { it.isPositive }
         val spent = trips.spentBetween(Months.startMillis(month), Months.endMillisExclusive(month))
         return MonthStatus(
             yearMonth = month,
@@ -36,12 +37,16 @@ class GetMonthStatus(
     }
 }
 
+/**
+ * Presupuesto mensual (opcional). `$0` lo quita: el mes queda sin presupuesto y los meses
+ * siguientes tampoco lo heredan hasta que se defina otro.
+ */
 class SetMonthlyBudget(
     private val budgets: BudgetRepository,
     private val clock: Clock,
 ) {
     suspend operator fun invoke(amount: Pesos, month: YearMonth = Months.monthOf(clock.nowMillis())) {
-        require(amount.isPositive && amount <= Pesos.KEYPAD_MAX) { "presupuesto fuera de rango" }
+        require(amount.value >= 0 && amount <= Pesos.KEYPAD_MAX) { "presupuesto fuera de rango" }
         budgets.set(Budget(month, amount))
     }
 }

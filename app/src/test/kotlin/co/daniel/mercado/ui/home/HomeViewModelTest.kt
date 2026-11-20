@@ -118,6 +118,52 @@ class HomeViewModelTest {
     }
 
     @Test
+    fun `quitar el presupuesto del mes con 0 lo deja opcional`() {
+        runBlocking { t.graph.setMonthlyBudget(Pesos(900_000)) }
+        start()
+        await { it.month?.budget != null }
+
+        vm.onEvent(HomeEvent.EditBudget)
+        assertEquals(HomeSheet.Budget(Pesos(900_000)), await { it.sheet != null }.sheet)
+        vm.onEvent(HomeEvent.SaveBudget(Pesos.ZERO))
+
+        assertNull(await { it.month?.budget == null }.month?.budget)
+    }
+
+    @Test
+    fun `presupuesto de esta compra sin compra abierta arranca una con ese tope`() {
+        runBlocking { t.graph.setMonthlyBudget(Pesos(900_000)) }
+        start()
+
+        vm.onEvent(HomeEvent.EditTripBudget)
+        assertEquals(HomeSheet.TripBudget(null, tripOpen = false), await { it.sheet != null }.sheet)
+        vm.onEvent(HomeEvent.SaveTripBudget(Pesos(100_000)))
+
+        assertEquals(HomeEffect.OpenTrip, nextEffect())
+        assertEquals(Pesos(100_000), await { it.openTripLimit != null }.openTripLimit)
+        // El presupuesto del mes no cambia.
+        assertEquals(Pesos(900_000), vm.state.value.month?.budget)
+    }
+
+    @Test
+    fun `presupuesto de esta compra con compra abierta cambia su tope sin borrar lo sumado`() {
+        runBlocking {
+            t.graph.startTrip(TripLimit.Custom(Pesos(300_000)))
+            t.graph.addLoosePrice(Pesos(40_000))
+        }
+        start()
+        await { it.openTripLimit == Pesos(300_000) }
+
+        vm.onEvent(HomeEvent.EditTripBudget)
+        assertEquals(HomeSheet.TripBudget(Pesos(300_000), tripOpen = true), await { it.sheet != null }.sheet)
+        vm.onEvent(HomeEvent.SaveTripBudget(Pesos(100_000)))
+
+        val s = await { it.openTripLimit == Pesos(100_000) }
+        assertEquals(Pesos(40_000), s.openTripTotal)
+        assertNull(s.sheet)
+    }
+
+    @Test
     fun `cerrar una compra actualiza el gastado, la ultima compra y los productos por revisar`() {
         runBlocking { t.graph.setMonthlyBudget(Pesos(100_000)) }
         start()
