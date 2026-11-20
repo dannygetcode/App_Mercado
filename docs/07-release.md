@@ -9,7 +9,7 @@ keytool -genkeypair -v -keystore mercado-release.jks -alias mercado \
   -keyalg RSA -keysize 4096 -validity 10000
 ```
 
-- Guardar `mercado-release.jks` **fuera** del repositorio (por ejemplo `C:\Users\Usuario\keys\`).
+- Guardar `mercado-release.jks` **fuera** del repositorio (por ejemplo `C:\Users\Usuario\Desktop\main\02_Proyectos_Codigo\_keys\`).
 - Copias de respaldo en dos lugares sin conexión (USB + otro). Contraseña en un gestor de
   contraseñas. Si se pierde la llave, toca desinstalar y reinstalar la app, lo que borra los datos
   (por eso existe el respaldo cifrado).
@@ -17,7 +17,7 @@ keytool -genkeypair -v -keystore mercado-release.jks -alias mercado \
 `keystore.properties` en la raíz del repo (ignorado por git):
 
 ```properties
-storeFile=C:/Users/Usuario/keys/mercado-release.jks
+storeFile=C:/Users/Usuario/Desktop/main/02_Proyectos_Codigo/_keys/mercado-release.jks
 storePassword=...
 keyAlias=mercado
 keyPassword=...
