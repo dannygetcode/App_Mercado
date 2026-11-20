@@ -70,7 +70,7 @@
     <string name="home_start_trip">Ir a mercar</string>
     <string name="home_continue_trip">Continuar compra · %s</string>
     <string name="home_month_remaining">Quedan %s</string>
-    <string name="home_budget_edit">Toca para cambiar el presupuesto</string>
+    <string name="home_budget_edit">Toca para cambiar o quitar el presupuesto del mes</string>
     <string name="home_budget_inherited">Presupuesto del mes anterior · toca para cambiarlo</string>
     <string name="home_budget_hint_title">Define tu presupuesto del mes</string>
     <string name="home_budget_hint_text">Así cada compra arranca con lo que te queda y el semáforo te avisa.</string>
@@ -80,7 +80,9 @@
     <string name="home_needs_review_hint">Productos nuevos que esperan nombre</string>
     <string name="budget_title">Presupuesto de %s</string>
     <string name="budget_hint">Opcional. Si un mes no tiene presupuesto, usa el del mes anterior.</string>
-    <string name="budget_hint_remove">Deja $0 para quitar el presupuesto del mes.</string>
+    <string name="budget_hint_remove">Escribe el nuevo monto, o quítalo con el botón de abajo.</string>
+    <string name="budget_clear_month">Quitar presupuesto del mes</string>
+    <string name="budget_clear_trip">Quitar presupuesto de esta compra</string>
     <string name="home_budget_optional">Presupuesto del mes opcional · toca para definirlo</string>
     <string name="home_trip_budget_new">Presupuesto de esta compra</string>
     <string name="home_trip_budget_of">Esta compra: %1$s de %2$s · cambiar</string>
@@ -106,7 +108,7 @@
     <string name="receipt_continue">Seguir escaneando</string>
     <string name="receipt_qty">%1$d × %2$s</string>
     <string name="trip_no_limit_hint">Sin presupuesto para esta compra · toca para ponerle uno</string>
-    <string name="trip_budget_hint">Solo para esta salida (ej. $100.000). Lo que gastes igual suma al mes. $0 = sin tope.</string>
+    <string name="trip_budget_hint">Solo para esta salida (ej. $100.000). Lo que gastes igual suma al mes; nada se borra.</string>
     <string name="save">Guardar</string>
     <string name="not_now">Ahora no</string>
     <plurals name="articles">

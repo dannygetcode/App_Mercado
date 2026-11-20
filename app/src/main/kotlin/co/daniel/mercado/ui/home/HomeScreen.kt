@@ -135,6 +135,8 @@ fun HomeScreen(
             allowZero = sheet.current != null,
             onSubmit = { onEvent(HomeEvent.SaveBudget(it)) },
             onDismiss = { onEvent(HomeEvent.DismissSheet) },
+            clearLabel = if (sheet.current != null) stringResource(R.string.budget_clear_month) else null,
+            onClear = { onEvent(HomeEvent.SaveBudget(Pesos.ZERO)) },
         )
         is HomeSheet.TripBudget -> KeypadBottomSheet(
             title = stringResource(R.string.trip_budget_title),
@@ -144,6 +146,8 @@ fun HomeScreen(
             allowZero = true,
             onSubmit = { onEvent(HomeEvent.SaveTripBudget(it)) },
             onDismiss = { onEvent(HomeEvent.DismissSheet) },
+            clearLabel = if (sheet.tripOpen && sheet.current != null) stringResource(R.string.budget_clear_trip) else null,
+            onClear = { onEvent(HomeEvent.SaveTripBudget(Pesos.ZERO)) },
         )
         null -> Unit
     }

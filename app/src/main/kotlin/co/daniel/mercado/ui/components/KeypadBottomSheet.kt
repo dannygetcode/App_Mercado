@@ -3,7 +3,12 @@ package co.daniel.mercado.ui.components
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.ui.platform.testTag
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -22,6 +27,16 @@ import co.daniel.mercado.domain.model.Pesos
  * Hoja con el `PriceKeypad` para montos fuera de la compra: límite, presupuesto, total pagado,
  * precio de referencia. [initial] se reemplaza con la primera tecla.
  */
+/** "Quitar presupuesto": botón ancho y visible bajo el teclado, en color de error. */
+@Composable
+fun ClearAmountButton(label: String, onClick: () -> Unit) {
+    OutlinedButton(
+        onClick = onClick,
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp).heightIn(min = 48.dp).testTag("clear_amount"),
+        colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
+    ) { Text(label) }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun KeypadBottomSheet(
@@ -32,6 +47,9 @@ fun KeypadBottomSheet(
     onDismiss: () -> Unit,
     hint: String? = null,
     allowZero: Boolean = false,
+    /** Botón secundario para quitar el monto (presupuesto del mes o de la compra). */
+    clearLabel: String? = null,
+    onClear: () -> Unit = {},
 ) {
     var keypad by remember(initial) { mutableStateOf(KeypadState.prefilled(initial)) }
     ModalBottomSheet(
@@ -55,6 +73,7 @@ fun KeypadBottomSheet(
                 actionLabel = actionLabel,
                 allowZero = allowZero,
             )
+            if (clearLabel != null) ClearAmountButton(clearLabel, onClear)
         }
     }
 }

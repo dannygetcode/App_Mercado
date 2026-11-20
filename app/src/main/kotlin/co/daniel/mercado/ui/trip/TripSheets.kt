@@ -61,6 +61,8 @@ import co.daniel.mercado.domain.model.Product
 import co.daniel.mercado.domain.model.TripItem
 import co.daniel.mercado.domain.model.UnitType
 import co.daniel.mercado.domain.rules.MoneyFormat
+import co.daniel.mercado.domain.model.Pesos
+import co.daniel.mercado.ui.components.ClearAmountButton
 import co.daniel.mercado.ui.components.KeypadState
 import co.daniel.mercado.ui.components.PriceKeypad
 import co.daniel.mercado.ui.theme.MoneyTextStyle
@@ -128,6 +130,9 @@ private fun KeypadSheet(sheet: TripSheet.Keypad, viewModel: TripViewModel) {
         actionLabel = action,
         allowZero = sheet.purpose == KeypadPurpose.TripLimit,
     )
+    if (sheet.purpose == KeypadPurpose.TripLimit && sheet.initial != null) {
+        ClearAmountButton(stringResource(R.string.budget_clear_trip)) { viewModel.submitKeypad(Pesos.ZERO) }
+    }
 }
 
 // ---- T5 · Producto nuevo ----

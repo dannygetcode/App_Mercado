@@ -84,4 +84,21 @@ class HomeScreenTest {
         compose.onNodeWithText("Empezar").performClick()
         assertEquals(listOf<HomeEvent>(HomeEvent.StartTrip(Pesos(250_000))), events)
     }
+
+    @Test
+    fun `boton visible para quitar el presupuesto del mes`() {
+        val month = MonthStatus(nov, Pesos(900_000), Pesos(612_000), Pesos(288_000), TrafficLight.GREEN)
+        show(HomeUiState(loading = false, month = month, sheet = HomeSheet.Budget(Pesos(900_000))))
+
+        compose.onNodeWithText("Quitar presupuesto del mes").performClick()
+        assertEquals(listOf<HomeEvent>(HomeEvent.SaveBudget(Pesos.ZERO)), events)
+    }
+
+    @Test
+    fun `boton visible para quitar el presupuesto de la compra abierta`() {
+        show(HomeUiState(loading = false, openTripTotal = Pesos(40_000), openTripLimit = Pesos(100_000), sheet = HomeSheet.TripBudget(Pesos(100_000), tripOpen = true)))
+
+        compose.onNodeWithText("Quitar presupuesto de esta compra").performClick()
+        assertEquals(listOf<HomeEvent>(HomeEvent.SaveTripBudget(Pesos.ZERO)), events)
+    }
 }
