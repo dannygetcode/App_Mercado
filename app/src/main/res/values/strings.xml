@@ -230,6 +230,7 @@
     <string name="import_unreadable">No se pudo leer el archivo.</string>
     <string name="import_too_large">El archivo pasa de 2 MB.</string>
     <string name="import_malformed">El archivo no es un catálogo JSON válido.</string>
+    <string name="import_is_backup">Ese archivo es un respaldo de Mercado. Ábrelo desde Ajustes → Restaurar respaldo.</string>
     <string name="import_version">La versión del catálogo no es compatible.</string>
     <string name="import_too_many">El catálogo tiene más de 5.000 productos.</string>
     <string name="import_invalid_name">Producto %d: el nombre debe tener de 1 a 80 letras.</string>

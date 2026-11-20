@@ -336,6 +336,7 @@ private fun ImportResult(message: ImportMessage, onDismiss: () -> Unit) {
             when (message.error) {
                 SeedError.TOO_LARGE -> stringResource(R.string.import_too_large)
                 SeedError.MALFORMED -> stringResource(R.string.import_malformed)
+                SeedError.IS_BACKUP -> stringResource(R.string.import_is_backup)
                 SeedError.UNSUPPORTED_VERSION -> stringResource(R.string.import_version)
                 SeedError.TOO_MANY_PRODUCTS -> stringResource(R.string.import_too_many)
                 SeedError.INVALID_NAME -> stringResource(R.string.import_invalid_name, position)

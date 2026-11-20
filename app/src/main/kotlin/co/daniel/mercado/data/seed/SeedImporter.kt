@@ -21,6 +21,9 @@ import java.io.InputStream
 enum class SeedError {
     TOO_LARGE,
     MALFORMED,
+
+    /** Es un respaldo cifrado `.mercado`: se abre con Restaurar respaldo, no aquí. */
+    IS_BACKUP,
     UNSUPPORTED_VERSION,
     TOO_MANY_PRODUCTS,
     INVALID_NAME,
@@ -54,6 +57,9 @@ class SeedImporter(
             readLimited(input) ?: return SeedResult.Invalid(SeedError.TOO_LARGE)
         } catch (_: IOException) {
             return SeedResult.Invalid(SeedError.MALFORMED)
+        }
+        if (bytes.size >= BACKUP_MAGIC.size && bytes.copyOfRange(0, BACKUP_MAGIC.size).contentEquals(BACKUP_MAGIC)) {
+            return SeedResult.Invalid(SeedError.IS_BACKUP)
         }
         val file = try {
             json.decodeFromString(SeedFileDto.serializer(), bytes.toString(Charsets.UTF_8))
@@ -175,6 +181,7 @@ class SeedImporter(
     }
 
     companion object {
+        private val BACKUP_MAGIC = "MRC1".toByteArray(Charsets.US_ASCII)
         const val SUPPORTED_VERSION = 1
         const val MAX_PRODUCTS = 5_000
         const val MAX_BYTES = 2 * 1024 * 1024
